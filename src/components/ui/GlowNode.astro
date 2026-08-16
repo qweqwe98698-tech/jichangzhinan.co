@@ -1,0 +1,97 @@
+---
+interface Props {
+  color?: 'green' | 'blue' | 'purple';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+  pulsing?: boolean;
+}
+
+const {
+  color = 'green',
+  size = 'md',
+  class: className = '',
+  pulsing = true
+} = Astro.props;
+---
+
+<div class={`glow-node node-${color} node-${size} ${pulsing ? 'pulsing' : ''} ${className}`}>
+  <div class="node-core"></div>
+  <div class="node-ring"></div>
+</div>
+
+<style>
+  .glow-node {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .node-core {
+    border-radius: 50%;
+    z-index: 2;
+  }
+
+  .node-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0.4;
+    z-index: 1;
+  }
+
+  .node-green {
+    color: var(--accent);
+  }
+  .node-green .node-core {
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  .node-blue {
+    color: var(--accent-blue);
+  }
+  .node-blue .node-core {
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px rgba(114, 167, 255, 0.4);
+  }
+
+  .node-purple {
+    color: var(--accent-purple);
+  }
+  .node-purple .node-core {
+    background: var(--accent-purple);
+    box-shadow: 0 0 10px rgba(169, 140, 255, 0.4);
+  }
+
+  /* Sizes */
+  .node-sm .node-core { width: 4px; height: 4px; }
+  .node-sm .node-ring { width: 12px; height: 12px; }
+
+  .node-md .node-core { width: 6px; height: 6px; }
+  .node-md .node-ring { width: 18px; height: 18px; }
+
+  .node-lg .node-core { width: 8px; height: 8px; }
+  .node-lg .node-ring { width: 26px; height: 26px; }
+
+  .glow-node.pulsing .node-ring {
+    animation: ringPulse 3s infinite ease-out;
+  }
+
+  @keyframes ringPulse {
+    0% {
+      transform: scale(0.6);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow-node.pulsing .node-ring {
+      animation: none;
+    }
+  }
+</style>

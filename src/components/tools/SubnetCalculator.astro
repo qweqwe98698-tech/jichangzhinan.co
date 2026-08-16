@@ -1,0 +1,363 @@
+---
+// Interactive Fake-IP Range & CIDR Subnet Calculator Terminal
+---
+
+<div class="subnet-calc-box flux-card">
+  <div class="calc-header">
+    <div class="calc-title-wrap">
+      <span class="signal-dot blue"></span>
+      <h3 class="calc-title">Fake-IP & CIDR 子网掩码计算终端</h3>
+    </div>
+    <span class="calc-badge">NETWORK UTILITY</span>
+  </div>
+
+  <p class="calc-desc">
+    计算保留网段（如 <code>198.18.0.0/16</code>）的主机范围，并实时生成 Clash 与 Sing-box 的防泄漏 DNS 配置片段。
+  </p>
+
+  <div class="calc-grid">
+    <!-- Input Form -->
+    <div class="calc-input-panel">
+      <div class="form-group">
+        <label for="cidr-input" class="form-label">CIDR 地址块 (IP / Prefix):</label>
+        <div class="input-with-presets">
+          <input
+            type="text"
+            id="cidr-input"
+            class="terminal-input"
+            value="198.18.0.1/16"
+            placeholder="例如: 198.18.0.1/16 或 10.0.0.1/24"
+          />
+          <button type="button" id="calc-btn" class="flux-btn btn-primary btn-sm">计算 →</button>
+        </div>
+      </div>
+
+      <div class="presets-row">
+        <span class="presets-lbl">推荐预设:</span>
+        <button type="button" class="preset-tag" data-val="198.18.0.1/16">198.18.0.1/16 (标准 Fake-IP)</button>
+        <button type="button" class="preset-tag" data-val="172.19.0.1/16">172.19.0.1/16 (备用私网)</button>
+        <button type="button" class="preset-tag" data-val="10.0.0.1/24">10.0.0.1/24 (局域网)</button>
+      </div>
+
+      <div class="calc-results-list" id="calc-results">
+        <div class="result-row">
+          <span class="res-lbl">网络地址 (Network):</span>
+          <span class="res-val mono-num" id="res-net">198.18.0.0</span>
+        </div>
+        <div class="result-row">
+          <span class="res-lbl">广播地址 (Broadcast):</span>
+          <span class="res-val mono-num" id="res-broad">198.18.255.255</span>
+        </div>
+        <div class="result-row">
+          <span class="res-lbl">可用主机 IP 数:</span>
+          <span class="res-val mono-num" id="res-hosts">65,534</span>
+        </div>
+        <div class="result-row">
+          <span class="res-lbl">子网掩码 (Subnet Mask):</span>
+          <span class="res-val mono-num" id="res-mask">255.255.0.0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Code Preview -->
+    <div class="calc-output-panel">
+      <div class="output-tabs">
+        <button type="button" class="tab-btn is-active" data-tab="clash">Clash / Mihomo YAML</button>
+        <button type="button" class="tab-btn" data-tab="singbox">Sing-box JSON</button>
+      </div>
+
+      <div class="code-snippet-box">
+        <pre id="snippet-code"><code>dns:
+  enable: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - 'localhost.ptlogin2.qq.com'</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .subnet-calc-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin: 3rem 0;
+  }
+
+  .calc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .calc-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .calc-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .calc-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent-blue);
+    background: rgba(114, 167, 255, 0.08);
+    border: 1px solid rgba(114, 167, 255, 0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .calc-desc {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    margin-bottom: 1.75rem;
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .input-with-presets {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .terminal-input {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.85rem;
+    font-family: var(--font-mono);
+    color: #ffffff;
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  .terminal-input:focus {
+    border-color: var(--accent-blue);
+  }
+
+  .presets-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .presets-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .preset-tag {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.15rem 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .preset-tag:hover {
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+  }
+
+  .calc-results-list {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .res-lbl {
+    color: var(--muted);
+  }
+
+  .res-val {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  /* Output panel */
+  .output-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tab-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-btn.is-active {
+    background: rgba(124, 255, 178, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .code-snippet-box pre {
+    margin: 0;
+    font-size: 0.85rem;
+    min-height: 180px;
+  }
+
+  @media (max-width: 860px) {
+    .calc-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function setupSubnetCalculator() {
+    const input = document.getElementById('cidr-input') as HTMLInputElement | null;
+    const btn = document.getElementById('calc-btn');
+    const presets = document.querySelectorAll('.preset-tag');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const snippetCode = document.getElementById('snippet-code');
+    const resNet = document.getElementById('res-net');
+    const resBroad = document.getElementById('res-broad');
+    const resHosts = document.getElementById('res-hosts');
+    const resMask = document.getElementById('res-mask');
+    let currentTab = 'clash';
+
+    function calculate() {
+      if (!input) return;
+      const cidr = input.value.trim();
+      const parts = cidr.split('/');
+      const ip = parts[0] || '198.18.0.1';
+      const prefix = parseInt(parts[1] || '16', 10);
+
+      const maskNum = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
+      const maskStr = [
+        (maskNum >>> 24) & 255,
+        (maskNum >>> 16) & 255,
+        (maskNum >>> 8) & 255,
+        maskNum & 255
+      ].join('.');
+
+      const ipOctets = ip.split('.').map(Number);
+      const ipNum = ((ipOctets[0] << 24) | (ipOctets[1] << 16) | (ipOctets[2] << 8) | ipOctets[3]) >>> 0;
+      const netNum = (ipNum & maskNum) >>> 0;
+      const broadNum = (netNum | (~maskNum >>> 0)) >>> 0;
+
+      const netStr = [(netNum >>> 24) & 255, (netNum >>> 16) & 255, (netNum >>> 8) & 255, netNum & 255].join('.');
+      const broadStr = [(broadNum >>> 24) & 255, (broadNum >>> 16) & 255, (broadNum >>> 8) & 255, broadNum & 255].join('.');
+      const hostCount = prefix >= 31 ? 0 : Math.pow(2, 32 - prefix) - 2;
+
+      if (resNet) resNet.textContent = netStr;
+      if (resBroad) resBroad.textContent = broadStr;
+      if (resHosts) resHosts.textContent = hostCount.toLocaleString();
+      if (resMask) resMask.textContent = maskStr;
+
+      updateSnippet(cidr);
+    }
+
+    function updateSnippet(cidr: string) {
+      if (!snippetCode) return;
+      if (currentTab === 'clash') {
+        snippetCode.innerHTML = `<code>dns:
+  enable: true
+  enhanced-mode: fake-ip
+  fake-ip-range: ${cidr}
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - 'localhost.ptlogin2.qq.com'</code>`;
+      } else {
+        snippetCode.innerHTML = `<code>"dns": {
+  "servers": [
+    {
+      "tag": "dns_fakeip",
+      "address": "fakeip",
+      "inet4_range": "${cidr}"
+    }
+  ],
+  "fakeip": {
+    "enabled": true,
+    "inet4_range": "${cidr}"
+  }
+}</code>`;
+      }
+    }
+
+    btn?.addEventListener('click', calculate);
+    input?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') calculate();
+    });
+
+    presets.forEach(p => {
+      p.addEventListener('click', () => {
+        const val = p.getAttribute('data-val') || '';
+        if (input) {
+          input.value = val;
+          calculate();
+        }
+      });
+    });
+
+    tabBtns.forEach(t => {
+      t.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('is-active'));
+        t.classList.add('is-active');
+        currentTab = t.getAttribute('data-tab') || 'clash';
+        if (input) updateSnippet(input.value.trim());
+      });
+    });
+  }
+
+  setupSubnetCalculator();
+  document.addEventListener('astro:page-load', setupSubnetCalculator);
+</script>

@@ -1,0 +1,163 @@
+---
+interface Props {
+  enName: string;
+  name: string;
+  count: number;
+  href: string;
+  description?: string;
+  class?: string;
+}
+
+const {
+  enName,
+  name,
+  count = 0,
+  href,
+  description,
+  class: className = ''
+} = Astro.props;
+---
+
+<a href={href} class={`flux-card topic-card ${className}`}>
+  <div class="topic-header">
+    <span class="en-tag">{enName}</span>
+    <span class="badge-dot"></span>
+  </div>
+
+  <div class="topic-body">
+    <h3 class="topic-title">{name}</h3>
+    {description && <p class="topic-desc">{description}</p>}
+  </div>
+
+  <div class="topic-footer">
+    <div class="count-row">
+      <span class="count-num">{count}</span>
+      <span class="count-unit">ARTICLES</span>
+    </div>
+    <!-- Track line with moving dot on hover -->
+    <div class="orbit-track-wrap">
+      <div class="track-line"></div>
+      <div class="track-node"></div>
+    </div>
+  </div>
+</a>
+
+<style>
+  .topic-card {
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    justify-content: space-between;
+    height: 100%;
+    position: relative;
+  }
+
+  .topic-card:hover {
+    border-color: rgba(124, 255, 178, 0.35);
+    background: var(--surface-2);
+  }
+
+  .topic-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .en-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+
+  .topic-body {
+    margin: 1.25rem 0;
+  }
+
+  .topic-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+    transition: color 0.2s ease;
+  }
+
+  .topic-card:hover .topic-title {
+    color: #ffffff;
+  }
+
+  .topic-desc {
+    font-size: 0.86rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin-top: 0.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .topic-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .count-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+  }
+
+  .count-num {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .count-unit {
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .orbit-track-wrap {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    height: 8px;
+  }
+
+  .track-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .track-node {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+  }
+
+  .topic-card:hover .track-node {
+    transform: translateX(-16px);
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px rgba(114, 167, 255, 0.5);
+  }
+</style>

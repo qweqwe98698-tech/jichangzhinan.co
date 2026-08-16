@@ -1,0 +1,307 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Badge from '../../components/ui/Badge.astro';
+import { siteConfig } from '../../config/site';
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+const sortedPosts = allPosts.sort((a, b) => {
+  const dateA = new Date(a.data.pubDate).getTime();
+  const dateB = new Date(b.data.pubDate).getTime();
+  return dateB - dateA;
+});
+
+// Group posts by Year, then by Month
+interface PostByMonth {
+  monthName: string;
+  posts: typeof sortedPosts;
+}
+
+interface PostsByYear {
+  year: number;
+  months: PostByMonth[];
+}
+
+const archiveMap = new Map<number, Map<string, typeof sortedPosts>>();
+
+sortedPosts.forEach(post => {
+  const d = new Date(post.data.pubDate);
+  const year = d.getFullYear();
+  const monthName = d.toLocaleString('en-US', { month: 'long' });
+
+  if (!archiveMap.has(year)) {
+    archiveMap.set(year, new Map());
+  }
+  const yearMap = archiveMap.get(year)!;
+  if (!yearMap.has(monthName)) {
+    yearMap.set(monthName, []);
+  }
+  yearMap.get(monthName)!.push(post);
+});
+
+const archiveList: PostsByYear[] = Array.from(archiveMap.entries()).map(([year, monthsMap]) => ({
+  year,
+  months: Array.from(monthsMap.entries()).map(([monthName, posts]) => ({
+    monthName,
+    posts
+  }))
+}));
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '文章归档', item: '/archive/' }
+];
+---
+
+<BaseLayout
+  title={`时间轴文章归档 | ${siteConfig.name}`}
+  description={`按年月时间轴检索全部 ${allPosts.length} 篇网络知识库与教程文章。`}
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container archive-page">
+    <header class="archive-header" data-reveal>
+      <Badge variant="accent">
+        <span class="signal-dot"></span>
+        CHRONOLOGICAL ARCHIVE
+      </Badge>
+      <h1 class="archive-title">时间轴归档</h1>
+      <p class="archive-desc">
+        记录知识库的每一次迭代与更新。当前已收录 <strong class="highlight-count">{allPosts.length}</strong> 篇专业内容。
+      </p>
+    </header>
+
+    <div class="timeline-container" data-reveal data-reveal-delay="2">
+      {archiveList.map(yearGroup => (
+        <section class="year-block">
+          <div class="year-sticky-tag">
+            <span class="signal-dot blue"></span>
+            <span class="year-num">{yearGroup.year}</span>
+          </div>
+
+          <div class="months-stack">
+            {yearGroup.months.map(monthGroup => (
+              <div class="month-block">
+                <h3 class="month-title">{monthGroup.monthName}</h3>
+                
+                <ul class="archive-posts-list">
+                  {monthGroup.posts.map(post => {
+                    const day = new Intl.DateTimeFormat('en-US', { day: '2-digit' }).format(new Date(post.data.pubDate));
+                    return (
+                      <li class="archive-post-item">
+                        <div class="post-date-col">
+                          <span class="day-num">{day}</span>
+                        </div>
+                        <div class="post-info-col">
+                          <span class="post-cat-badge">{post.data.categoryName || post.data.category}</span>
+                          <a href={`/articles/${post.id}/`} class="post-title-link">
+                            {post.data.title}
+                          </a>
+                        </div>
+                        <div class="post-meta-col">
+                          <span class="post-read-time">{post.data.readingTime}</span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .archive-page {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+    max-width: 960px;
+  }
+
+  .archive-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .archive-title {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .archive-desc {
+    font-size: 1.1rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+  }
+
+  .highlight-count {
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+
+  /* Timeline */
+  .timeline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+    position: relative;
+  }
+
+  .timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 45px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .year-block {
+    position: relative;
+  }
+
+  .year-sticky-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.85rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .year-num {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+  }
+
+  .months-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding-left: 2rem;
+  }
+
+  .month-block {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .month-title {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-blue);
+    margin: 0;
+  }
+
+  .archive-posts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .archive-post-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.15rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    gap: 1.25rem;
+  }
+
+  .archive-post-item:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-2);
+    transform: translateX(4px);
+  }
+
+  .post-date-col {
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .post-info-col {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .post-cat-badge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .post-title-link {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .archive-post-item:hover .post-title-link {
+    color: var(--accent);
+  }
+
+  .post-meta-col {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-container::before {
+      display: none;
+    }
+    .months-stack {
+      padding-left: 0;
+    }
+    .archive-post-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .post-info-col {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .post-title-link {
+      white-space: normal;
+    }
+  }
+</style>

@@ -1,0 +1,242 @@
+---
+// Interactive Protocol & Client Support Matrix
+interface ProtocolSupport {
+  name: string;
+  type: string;
+  clashVerge: boolean;
+  singBox: boolean;
+  surge: boolean;
+  shadowrocket: boolean;
+  loon: boolean;
+  qx: boolean;
+  bestFor: string;
+}
+
+const matrixData: ProtocolSupport[] = [
+  {
+    name: 'Vless-Reality',
+    type: 'TCP (uTLS)',
+    clashVerge: true,
+    singBox: true,
+    surge: false,
+    shadowrocket: true,
+    loon: true,
+    qx: true,
+    bestFor: '高压网络审查、网站 SNI 完美伪装'
+  },
+  {
+    name: 'Hysteria 2',
+    type: 'UDP (QUIC)',
+    clashVerge: true,
+    singBox: true,
+    surge: true,
+    shadowrocket: true,
+    loon: true,
+    qx: false,
+    bestFor: '跨国高延迟弱网、高丢包宽带拉满'
+  },
+  {
+    name: 'TUIC v5',
+    type: 'UDP (QUIC)',
+    clashVerge: true,
+    singBox: true,
+    surge: true,
+    shadowrocket: true,
+    loon: true,
+    qx: false,
+    bestFor: '低延迟原生 QUIC、移动端 Wi-Fi/5G 零断联'
+  },
+  {
+    name: 'Trojan',
+    type: 'TCP (TLS 1.3)',
+    clashVerge: true,
+    singBox: true,
+    surge: true,
+    shadowrocket: true,
+    loon: true,
+    qx: true,
+    bestFor: '通用稳定出海、独立建站伪装'
+  },
+  {
+    name: 'Shadowsocks 2022',
+    type: 'TCP / UDP',
+    clashVerge: true,
+    singBox: true,
+    surge: true,
+    shadowrocket: true,
+    loon: true,
+    qx: true,
+    bestFor: 'IPLC 专线、低延迟游戏专线转发'
+  },
+  {
+    name: 'WireGuard (WARP)',
+    type: 'UDP',
+    clashVerge: true,
+    singBox: true,
+    surge: true,
+    shadowrocket: true,
+    loon: true,
+    qx: true,
+    bestFor: 'Cloudflare WARP 链式中继与出站伪装'
+  }
+];
+---
+
+<div class="protocol-matrix-box flux-card">
+  <div class="matrix-header">
+    <div class="matrix-title-wrap">
+      <span class="signal-dot breathing"></span>
+      <h3 class="matrix-title">协议与主流客户端兼容性矩阵</h3>
+    </div>
+    <span class="matrix-badge">INTERACTIVE TERMINAL</span>
+  </div>
+
+  <div class="table-scroll-wrapper">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>协议名称</th>
+          <th>传输类型</th>
+          <th>Clash Verge</th>
+          <th>Sing-box</th>
+          <th>Surge</th>
+          <th>Shadowrocket</th>
+          <th>Loon</th>
+          <th>Quantumult X</th>
+          <th>核心优势场景</th>
+        </tr>
+      </thead>
+      <tbody>
+        {matrixData.map(row => (
+          <tr>
+            <td class="proto-name-cell">
+              <span class="signal-dot"></span>
+              <strong>{row.name}</strong>
+            </td>
+            <td class="proto-type-cell">
+              <code>{row.type}</code>
+            </td>
+            <td class="status-cell">{row.clashVerge ? <span class="badge-yes">● 支持</span> : <span class="badge-no">✕ 不支持</span>}</td>
+            <td class="status-cell">{row.singBox ? <span class="badge-yes">● 支持</span> : <span class="badge-no">✕ 不支持</span>}</td>
+            <td class="status-cell">{row.surge ? <span class="badge-yes">● 支持</span> : <span class="badge-no">✕ 不支持</span>}</td>
+            <td class="status-cell">{row.shadowrocket ? <span class="badge-yes">● 支持</span> : <span class="badge-no">✕ 不支持</span>}</td>
+            <td class="status-cell">{row.loon ? <span class="badge-yes">● 支持</span> : <span class="badge-no">✕ 不支持</span>}</td>
+            <td class="status-cell">{row.qx ? <span class="badge-yes">● 支持</span> : <span class="badge-no">✕ 不支持</span>}</td>
+            <td class="scenario-cell">{row.bestFor}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .protocol-matrix-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin: 3rem 0;
+  }
+
+  .matrix-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+
+  .matrix-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .matrix-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .matrix-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.08);
+    border: 1px solid rgba(124, 255, 178, 0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .table-scroll-wrapper {
+    overflow-x: auto;
+  }
+
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 0;
+    background: transparent;
+    border: none;
+  }
+
+  .matrix-table th {
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .matrix-table td {
+    padding: 0.95rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+  }
+
+  .proto-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    color: #ffffff;
+  }
+
+  .proto-type-cell code {
+    font-size: 0.8rem;
+  }
+
+  .status-cell {
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .badge-yes {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .badge-no {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .scenario-cell {
+    color: var(--text-soft);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    min-width: 220px;
+  }
+</style>

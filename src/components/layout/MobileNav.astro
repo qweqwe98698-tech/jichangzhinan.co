@@ -1,0 +1,211 @@
+---
+import { headerNavLinks } from '../../data/navigation';
+import { siteConfig } from '../../config/site';
+
+const currentPath = Astro.url.pathname;
+---
+
+<div class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true">
+  <div class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
+  <div class="mobile-nav-content">
+    <div class="mobile-nav-header">
+      <div class="mobile-logo">
+        <span class="signal-dot"></span>
+        <span class="logo-text">{siteConfig.logo.text}</span>
+      </div>
+      <button class="mobile-close-btn" id="mobile-nav-close" aria-label="关闭导航菜单">
+        &times;
+      </button>
+    </div>
+
+    <nav class="mobile-nav-links" aria-label="移动端导航">
+      {headerNavLinks.map(link => {
+        const isActive = link.href === '/' 
+          ? currentPath === '/' 
+          : currentPath.startsWith(link.href);
+        return (
+          <a 
+            href={link.href} 
+            class={`mobile-link ${isActive ? 'is-active' : ''}`}
+            aria-current={isActive ? 'page' : undefined}
+          >
+            <span class="link-name">{link.name}</span>
+            {link.badge && <span class="link-badge">{link.badge}</span>}
+          </a>
+        );
+      })}
+    </nav>
+
+    <div class="mobile-nav-footer">
+      <div class="mobile-info">
+        <span class="mono-num">2026</span>
+        <span>{siteConfig.name} · {siteConfig.themeConcept}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .mobile-nav-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+  }
+
+  .mobile-nav-drawer.is-open {
+    display: block;
+  }
+
+  .mobile-nav-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .mobile-nav-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 82%;
+    max-width: 340px;
+    height: 100%;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+
+  .mobile-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-soft);
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.2rem;
+  }
+
+  .mobile-close-btn:hover {
+    color: #ffffff;
+  }
+
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem 0;
+    flex: 1;
+  }
+
+  .mobile-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 500;
+    background: transparent;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .mobile-link:hover,
+  .mobile-link.is-active {
+    background: var(--surface-2);
+    color: var(--accent);
+  }
+
+  .link-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    background: var(--accent);
+    color: #090b10;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .mobile-nav-footer {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .mobile-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+</style>
+
+<script>
+  function setupMobileNav() {
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const drawer = document.getElementById('mobile-nav-drawer');
+    const backdrop = document.getElementById('mobile-nav-backdrop');
+    const closeBtn = document.getElementById('mobile-nav-close');
+
+    if (!toggleBtn || !drawer) return;
+
+    function openNav() {
+      drawer?.classList.add('is-open');
+      drawer?.setAttribute('aria-hidden', 'false');
+      toggleBtn?.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeNav() {
+      drawer?.classList.remove('is-open');
+      drawer?.setAttribute('aria-hidden', 'true');
+      toggleBtn?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    toggleBtn.addEventListener('click', openNav);
+    closeBtn?.addEventListener('click', closeNav);
+    backdrop?.addEventListener('click', closeNav);
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+        closeNav();
+      }
+    });
+  }
+
+  setupMobileNav();
+  document.addEventListener('astro:page-load', setupMobileNav);
+</script>

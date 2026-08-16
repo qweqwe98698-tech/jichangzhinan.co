@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import HorizontalCard from '../cards/HorizontalCard.astro';
+
+interface Props {
+  currentSlug: string;
+  category: string;
+  relatedSlugs?: string[];
+}
+
+const { currentSlug, category, relatedSlugs = [] } = Astro.props;
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+// Match explicitly related posts first, or fall back to posts in same category
+let relatedPosts = allPosts.filter(p => p.id !== currentSlug && relatedSlugs.includes(p.id));
+
+if (relatedPosts.length < 2) {
+  const sameCategoryPosts = allPosts.filter(
+    p => p.id !== currentSlug && p.data.category === category && !relatedSlugs.includes(p.id)
+  );
+  relatedPosts = [...relatedPosts, ...sameCategoryPosts].slice(0, 3);
+}
+---
+
+{relatedPosts.length > 0 && (
+  <section class="related-posts-section" aria-labelledby="related-heading">
+    <div class="section-heading-row">
+      <div class="heading-left">
+        <span class="signal-dot"></span>
+        <h2 id="related-heading" class="section-title">RELATED KNOWLEDGE / 相关阅读</h2>
+      </div>
+      <span class="sec-cluster-tag">CLUSTER // {category.toUpperCase()}</span>
+    </div>
+
+    <div class="related-grid">
+      {relatedPosts.map(post => (
+        <HorizontalCard
+          title={post.data.title}
+          description={post.data.description}
+          href={`/articles/${post.id}/`}
+          date={post.data.pubDate}
+          category={post.data.category}
+          categoryName={post.data.categoryName}
+          readingTime={post.data.readingTime}
+          difficulty={post.data.difficulty}
+        />
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts-section {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .heading-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  .sec-cluster-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .related-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+</style>

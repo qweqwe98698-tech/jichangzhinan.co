@@ -1,0 +1,326 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ReadingProgress from '../components/article/ReadingProgress.astro';
+import ArticleHeader from '../components/article/ArticleHeader.astro';
+import ArticleTOC from '../components/article/ArticleTOC.astro';
+import ArticleMeta from '../components/article/ArticleMeta.astro';
+import RelatedPosts from '../components/article/RelatedPosts.astro';
+import ArticleNavigation from '../components/article/ArticleNavigation.astro';
+
+interface HeadingItem {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  post: {
+    id: string;
+    data: {
+      title: string;
+      description: string;
+      pubDate: Date;
+      updatedDate?: Date;
+      category: string;
+      categoryName?: string;
+      tags: string[];
+      cover?: string;
+      author: string;
+      difficulty: string;
+      readingTime: string;
+      related?: string[];
+      keyProblems?: string[];
+      faq?: { q: string; a: string }[];
+    };
+  };
+  headings: HeadingItem[];
+  prevPost?: { id: string; title: string };
+  nextPost?: { id: string; title: string };
+}
+
+const { post, headings, prevPost, nextPost } = Astro.props;
+const { title, description, pubDate, updatedDate, category, categoryName, tags, author, difficulty, readingTime, related, keyProblems, faq } = post.data;
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '专题分类', item: '/topics/' },
+  { name: categoryName || category, item: `/topics/${category}/` },
+  { name: title, item: `/articles/${post.id}/` }
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  author={author}
+  category={category}
+  breadcrumbs={breadcrumbs}
+  faqs={faq}
+  canonicalUrl={`https://jichangzhinan.co/articles/${post.id}/`}
+>
+  <!-- Reading Progress Bar -->
+  <ReadingProgress />
+
+  <article class="article-page-container container">
+    <!-- Top Article Header -->
+    <ArticleHeader
+      title={title}
+      description={description}
+      category={category}
+      categoryName={categoryName}
+      pubDate={pubDate}
+      updatedDate={updatedDate}
+      author={author}
+      difficulty={difficulty}
+      readingTime={readingTime}
+      keyProblems={keyProblems}
+    />
+
+    <!-- 3-Column Desktop Grid Layout -->
+    <div class="article-body-grid">
+      <!-- Left Column: Sticky Table of Contents -->
+      <aside class="col-toc" aria-label="目录导航">
+        <ArticleTOC headings={headings} />
+      </aside>
+
+      <!-- Center Column: Core Article Content -->
+      <div class="col-content">
+        <!-- Main Markdown Prose Container -->
+        <div class="prose-content" id="article-prose" data-pagefind-body>
+          <slot />
+        </div>
+
+        <!-- Inline FAQ Section if available -->
+        {faq && faq.length > 0 && (
+          <section class="article-faq-section" id="faq">
+            <div class="faq-sec-header">
+              <span class="signal-dot breathing"></span>
+              <h2 class="faq-sec-title">FAQ / 常见问题解答</h2>
+            </div>
+            <div class="faq-items-list">
+              {faq.map((item, idx) => (
+                <div class="faq-card">
+                  <div class="faq-q-row">
+                    <span class="faq-idx">Q{idx + 1}.</span>
+                    <h3 class="faq-question">{item.q}</h3>
+                  </div>
+                  <p class="faq-answer">{item.a}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Prev / Next Navigation -->
+        <ArticleNavigation prevPost={prevPost} nextPost={nextPost} />
+
+        <!-- Related Posts Network -->
+        <RelatedPosts
+          currentSlug={post.id}
+          category={category}
+          relatedSlugs={related}
+        />
+      </div>
+
+      <!-- Right Column: Sticky Article Meta -->
+      <aside class="col-meta" aria-label="文章信息">
+        <ArticleMeta
+          category={category}
+          categoryName={categoryName}
+          tags={tags}
+          difficulty={difficulty}
+          readingTime={readingTime}
+          slug={post.id}
+        />
+      </aside>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article-page-container {
+    padding-top: 2.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .article-body-grid {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 260px;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .col-toc {
+    width: 100%;
+  }
+
+  .col-content {
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+  }
+
+  .col-meta {
+    width: 100%;
+  }
+
+  /* Prose Content Styling */
+  .prose-content {
+    font-size: 1.06rem;
+    line-height: 1.85;
+    color: var(--text-soft);
+  }
+
+  .prose-content :global(h2) {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 3rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    letter-spacing: -0.025em;
+    scroll-margin-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  .prose-content :global(h3) {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+    letter-spacing: -0.02em;
+    scroll-margin-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  .prose-content :global(h4) {
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .prose-content :global(p) {
+    margin-bottom: 1.4rem;
+  }
+
+  .prose-content :global(ul),
+  .prose-content :global(ol) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.6rem;
+  }
+
+  .prose-content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose-content :global(strong) {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .prose-content :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose-content :global(a:hover) {
+    color: #95ffc2;
+  }
+
+  .prose-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  /* FAQ Accordion in Article */
+  .article-faq-section {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .faq-sec-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .faq-sec-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .faq-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .faq-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .faq-q-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .faq-idx {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-purple);
+  }
+
+  .faq-question {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .faq-answer {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .article-body-grid {
+      grid-template-columns: 200px minmax(0, 1fr);
+      gap: 2rem;
+    }
+    .col-meta {
+      display: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .article-body-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .col-toc {
+      display: none;
+    }
+  }
+</style>

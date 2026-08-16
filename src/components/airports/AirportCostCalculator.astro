@@ -1,0 +1,326 @@
+---
+// Interactive Airport Cost & Bandwidth Estimator
+---
+
+<div class="cost-calc-terminal flux-card">
+  <div class="calc-top-header">
+    <div class="top-title-wrap">
+      <span class="signal-dot blue"></span>
+      <h3 class="calc-main-title">流量与套餐预算智能估算器</h3>
+    </div>
+    <span class="calc-tag">COST ESTIMATOR</span>
+  </div>
+
+  <p class="calc-lead">
+    根据您的日常设备数量与真实使用场景（4K 流媒体、AI 提效、日常网页、外服游戏），智能估算每月所需流量与最佳性价比订阅模式。
+  </p>
+
+  <div class="calc-interface-grid">
+    <!-- Sliders and Inputs -->
+    <div class="calc-inputs-col">
+      <!-- Device Count Slider -->
+      <div class="slider-field">
+        <div class="slider-label-row">
+          <span>同时在线设备数:</span>
+          <span class="slider-val" id="val-devices">2 台</span>
+        </div>
+        <input type="range" id="range-devices" min="1" max="8" value="2" class="matrix-range" />
+      </div>
+
+      <!-- Video Streaming Slider -->
+      <div class="slider-field">
+        <div class="slider-label-row">
+          <span>YouTube / Netflix 4K 观看时长:</span>
+          <span class="slider-val" id="val-video">2 小时/天</span>
+        </div>
+        <input type="range" id="range-video" min="0" max="8" value="2" class="matrix-range" />
+      </div>
+
+      <!-- AI / Web Browsing Slider -->
+      <div class="slider-field">
+        <div class="slider-label-row">
+          <span>ChatGPT / Claude 交互与代码开发:</span>
+          <span class="slider-val" id="val-ai">重度使用 (50+ 对话/天)</span>
+        </div>
+        <input type="range" id="range-ai" min="1" max="3" value="2" class="matrix-range" />
+      </div>
+    </div>
+
+    <!-- Live Calculation Output -->
+    <div class="calc-result-col">
+      <div class="est-stat-box">
+        <span class="est-lbl">预估每月消耗流量:</span>
+        <div class="est-traffic-num">
+          <span id="res-traffic" class="highlight-traffic">180</span>
+          <span class="unit">GB / 月</span>
+        </div>
+      </div>
+
+      <div class="est-plan-recommendation">
+        <span class="rec-lbl">推荐订阅模式与预算:</span>
+        <div class="rec-plan-name" id="rec-plan-name">高性价比 BGP 中继 / 基础 IPLC 月付</div>
+        <div class="rec-price-est" id="rec-price">预估成本: ¥15 - ¥25 / 月</div>
+      </div>
+
+      <div class="rec-tips-box" id="rec-tips">
+        💡 建议：由于日常包含 4K 视频流媒体，推荐选择具备 150GB+ 流量的月付套餐，避免按量计费单价过高。
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cost-calc-terminal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.25rem;
+    margin: 2.5rem 0;
+  }
+
+  .calc-top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .top-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .calc-main-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .calc-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent-blue);
+    background: rgba(114, 167, 255, 0.08);
+    border: 1px solid rgba(114, 167, 255, 0.2);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+  }
+
+  .calc-lead {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .calc-interface-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2.5rem;
+  }
+
+  .calc-inputs-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .slider-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .slider-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+
+  .slider-val {
+    font-family: var(--font-mono);
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  .matrix-range {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    outline: none;
+  }
+
+  .matrix-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(114, 167, 255, 0.5);
+  }
+
+  /* Result Column */
+  .calc-result-col {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+
+  .est-stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .est-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .est-traffic-num {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .highlight-traffic {
+    font-family: var(--font-mono);
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .unit {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--accent-blue);
+    font-weight: 700;
+  }
+
+  .est-plan-recommendation {
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .rec-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .rec-plan-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+
+  .rec-price-est {
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: var(--warning);
+    font-weight: 600;
+  }
+
+  .rec-tips-box {
+    font-size: 0.84rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 2px solid var(--accent-blue);
+    padding: 0.6rem 0.85rem;
+  }
+
+  @media (max-width: 860px) {
+    .calc-interface-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function setupCostCalculator() {
+    const rangeDevices = document.getElementById('range-devices') as HTMLInputElement | null;
+    const rangeVideo = document.getElementById('range-video') as HTMLInputElement | null;
+    const rangeAi = document.getElementById('range-ai') as HTMLInputElement | null;
+
+    const valDevices = document.getElementById('val-devices');
+    const valVideo = document.getElementById('val-video');
+    const valAi = document.getElementById('val-ai');
+
+    const resTraffic = document.getElementById('res-traffic');
+    const recPlanName = document.getElementById('rec-plan-name');
+    const recPrice = document.getElementById('rec-price');
+    const recTips = document.getElementById('rec-tips');
+
+    function calculate() {
+      if (!rangeDevices || !rangeVideo || !rangeAi) return;
+
+      const devices = parseInt(rangeDevices.value, 10);
+      const videoHours = parseInt(rangeVideo.value, 10);
+      const aiLevel = parseInt(rangeAi.value, 10);
+
+      if (valDevices) valDevices.textContent = `${devices} 台设备`;
+      if (valVideo) valVideo.textContent = `${videoHours} 小时 / 天`;
+      if (valAi) {
+        valAi.textContent = aiLevel === 1 ? '轻度 (偶发使用)' : aiLevel === 2 ? '常规办公 (20+ 对话)' : '重度生产力 (50+ 频繁交互)';
+      }
+
+      // 4K video consumes ~ 3GB/hr. Normal browsing ~ 1GB/day. AI ~ 0.5GB/day.
+      const monthlyVideoGB = videoHours * 3 * 30 * (1 + (devices - 1) * 0.3);
+      const monthlyBrowsingGB = 1 * 30 * devices;
+      const monthlyAiGB = aiLevel * 10;
+
+      const totalTraffic = Math.round(monthlyVideoGB + monthlyBrowsingGB + monthlyAiGB);
+
+      if (resTraffic) resTraffic.textContent = String(totalTraffic);
+
+      if (totalTraffic < 50) {
+        if (recPlanName) recPlanName.textContent = '按量计费不限时套餐 (永久不过期)';
+        if (recPrice) recPrice.textContent = '预估成本: ¥40-50 一次性购买 (可用 1-2 年)';
+        if (recTips) recTips.textContent = '💡 建议：您的月度流量开销较低，选择按量计费套餐最划算，不限时长且无续费压力。';
+      } else if (totalTraffic <= 200) {
+        if (recPlanName) recPlanName.textContent = '高性价比 BGP 中继 / 基础 IPLC 月付';
+        if (recPrice) recPrice.textContent = '预估成本: ¥15 - ¥28 / 月';
+        if (recTips) recTips.textContent = '💡 建议：100-200GB 是主流用户的黄金区间，选择按月订阅的优质中继或入门专线套餐性价比最高。';
+      } else {
+        if (recPlanName) recPlanName.textContent = '旗舰级纯 IPLC 专线 / 大流量套餐';
+        if (recPrice) recPrice.textContent = '预估成本: ¥38 - ¥68 / 月 (300GB+)';
+        if (recTips) recTips.textContent = '💡 建议：多设备高画质流媒体与重度使用，强烈推荐顶级 IPLC 专线，保证晚高峰多人并发 0 丢包。';
+      }
+    }
+
+    rangeDevices?.addEventListener('input', calculate);
+    rangeVideo?.addEventListener('input', calculate);
+    rangeAi?.addEventListener('input', calculate);
+
+    calculate();
+  }
+
+  setupCostCalculator();
+  document.addEventListener('astro:page-load', setupCostCalculator);
+</script>

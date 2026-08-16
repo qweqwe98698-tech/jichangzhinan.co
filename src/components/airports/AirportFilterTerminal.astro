@@ -1,0 +1,523 @@
+---
+import { airportsData } from '../../data/airports';
+import Badge from '../ui/Badge.astro';
+---
+
+<div class="airport-finder-terminal flux-card">
+  <!-- Terminal Header -->
+  <div class="finder-header">
+    <div class="finder-title-wrap">
+      <span class="signal-dot breathing"></span>
+      <h3 class="finder-title">2026 优质机场多维筛选矩阵 (16 品牌实测库)</h3>
+    </div>
+    <span class="finder-status-tag">REALTIME MATRIX // 16 VERIFIED BRANDS</span>
+  </div>
+
+  <p class="finder-desc">
+    根据您的具体使用场景、网络线路偏好与预算周期，精准筛选通过编辑部稳定性压力测试的 16 家优质机场。
+  </p>
+
+  <!-- Filter Controls -->
+  <div class="finder-filters-panel">
+    <!-- Row 1: Line Type Filter -->
+    <div class="filter-group-row">
+      <span class="filter-group-lbl">线路类型:</span>
+      <div class="filter-pills-list" id="line-filters">
+        <button type="button" class="matrix-filter-pill is-active" data-filter-type="line" data-val="all">全部线路</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="line" data-val="IEPL">IEPL / IPLC 专线</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="line" data-val="企业级内网专线">企业级内网</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="line" data-val="三网优化">三网优化专线</button>
+      </div>
+    </div>
+
+    <!-- Row 2: Scenario Filter -->
+    <div class="filter-group-row">
+      <span class="filter-group-lbl">核心场景:</span>
+      <div class="filter-pills-list" id="scenario-filters">
+        <button type="button" class="matrix-filter-pill is-active" data-filter-type="scenario" data-val="all">全场景通用</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="scenario" data-val="chatgpt">ChatGPT / AI 原生</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="scenario" data-val="netflix">Netflix 4K 流媒体</button>
+      </div>
+    </div>
+
+    <!-- Row 3: Tier Filter -->
+    <div class="filter-group-row">
+      <span class="filter-group-lbl">预算档位:</span>
+      <div class="filter-pills-list" id="tier-filters">
+        <button type="button" class="matrix-filter-pill is-active" data-filter-type="tier" data-val="all">全部档位</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="tier" data-val="Flagship">旗舰主力档 (25元+)</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="tier" data-val="HighValue">高性价比主力 (18-20元)</button>
+        <button type="button" class="matrix-filter-pill" data-filter-type="tier" data-val="Budget">低价平价档 (15元内/年付)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Airport Cards Results Grid -->
+  <div class="airport-results-grid" id="airport-cards-list">
+    {airportsData.map(airport => (
+      <div
+        class="airport-matrix-card flux-card"
+        data-line={airport.lineType}
+        data-tier={airport.tier}
+        data-chatgpt={airport.aiUnlock.chatgpt ? 'true' : 'false'}
+        data-netflix={airport.streamingUnlock.netflix ? 'true' : 'false'}
+      >
+        <!-- Card Top -->
+        <div class="card-top-row">
+          <div class="top-title-group">
+            <span class="signal-dot"></span>
+            <h4 class="airport-card-name">{airport.name}</h4>
+            <span class="opened-year-tag">{airport.openedYear} 年成立</span>
+          </div>
+          <Badge variant={airport.tier === 'Flagship' ? 'accent' : airport.tier === 'Budget' ? 'purple' : 'blue'}>
+            {airport.lineType}
+          </Badge>
+        </div>
+
+        <p class="airport-tagline">{airport.tagline}</p>
+
+        <!-- Metric Ratings -->
+        <div class="metrics-bar">
+          <div class="metric-item">
+            <span class="metric-lbl">综合评分</span>
+            <span class="metric-val score">{airport.ratingScore}</span>
+          </div>
+          <div class="metric-sep"></div>
+          <div class="metric-item">
+            <span class="metric-lbl">晚高峰测速</span>
+            <span class="metric-val">{airport.speedRating}%</span>
+          </div>
+          <div class="metric-sep"></div>
+          <div class="metric-item">
+            <span class="metric-lbl">SLA 稳定性</span>
+            <span class="metric-val">{airport.stabilityRating}%</span>
+          </div>
+        </div>
+
+        <!-- Specs List -->
+        <div class="specs-box">
+          <div class="spec-row">
+            <span class="spec-lbl">入门套餐:</span>
+            <span class="spec-val price">{airport.startingPrice} / {airport.monthlyTraffic}</span>
+          </div>
+          {airport.discountCode && (
+            <div class="spec-row">
+              <span class="spec-lbl">专属优惠:</span>
+              <span class="spec-val discount">
+                {airport.discountActivity || '优惠码'}: <code>{airport.discountCode}</code>
+              </span>
+            </div>
+          )}
+          <div class="spec-row">
+            <span class="spec-lbl">协议支持:</span>
+            <span class="spec-val">{airport.protocols.join(', ')}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-lbl">适用场景:</span>
+            <span class="spec-val desc">{airport.recommendedFor}</span>
+          </div>
+        </div>
+
+        <!-- Feature Chips -->
+        <div class="features-chips-wrap">
+          {airport.features.map(f => (
+            <span class="feature-tag">{f}</span>
+          ))}
+        </div>
+
+        <!-- Action Footer -->
+        <div class="card-action-footer">
+          <a
+            href={airport.officialUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="action-btn primary"
+          >
+            直达 {airport.name} 官网 →
+          </a>
+          <a href={`/articles/2026-best-airports-ranking-guide/`} class="action-btn outline">
+            评测详情
+          </a>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .airport-finder-terminal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.25rem;
+    margin: 2.5rem 0;
+  }
+
+  .finder-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .finder-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .finder-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .finder-status-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.08);
+    border: 1px solid rgba(124, 255, 178, 0.2);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+  }
+
+  .finder-desc {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin-bottom: 1.75rem;
+  }
+
+  /* Filter Controls Panel */
+  .finder-filters-panel {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .filter-group-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-group-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    min-width: 75px;
+  }
+
+  .filter-pills-list {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .matrix-filter-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0.3rem 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .matrix-filter-pill:hover,
+  .matrix-filter-pill.is-active {
+    background: rgba(124, 255, 178, 0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Airport Cards Results */
+  .airport-results-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+
+  .airport-matrix-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+  }
+
+  .airport-matrix-card:hover {
+    border-color: rgba(124, 255, 178, 0.4);
+    background: var(--surface-hover);
+    transform: translateY(-2px);
+  }
+
+  .airport-matrix-card.is-hidden {
+    display: none;
+  }
+
+  .card-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .top-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .airport-card-name {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .opened-year-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  .airport-tagline {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .metrics-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .metric-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .metric-val {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .metric-val.score {
+    color: var(--accent);
+  }
+
+  .metric-sep {
+    width: 1px;
+    height: 22px;
+    background: var(--border);
+  }
+
+  .specs-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.84rem;
+  }
+
+  .spec-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .spec-lbl {
+    font-family: var(--font-mono);
+    color: var(--muted);
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+
+  .spec-val.price {
+    color: var(--warning);
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+
+  .spec-val.discount code {
+    color: var(--accent);
+    font-weight: 700;
+    background: rgba(124, 255, 178, 0.1);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  .spec-val.desc {
+    color: var(--text-soft);
+  }
+
+  .features-chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-tag {
+    font-size: 0.72rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    color: var(--text-soft);
+  }
+
+  .card-action-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.95rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .action-btn.primary {
+    flex: 1.4;
+    background: var(--accent);
+    color: #090b10;
+    font-weight: 700;
+  }
+
+  .action-btn.primary:hover {
+    background: #95ffc2;
+    transform: translateY(-1px);
+  }
+
+  .action-btn.outline {
+    flex: 1;
+    background: transparent;
+    color: var(--text-soft);
+    border: 1px solid var(--border);
+  }
+
+  .action-btn.outline:hover {
+    border-color: var(--text);
+    color: #ffffff;
+  }
+
+  @media (max-width: 960px) {
+    .airport-results-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function setupAirportFinder() {
+    let currentLine = 'all';
+    let currentScenario = 'all';
+    let currentTier = 'all';
+
+    const linePills = document.querySelectorAll('#line-filters .matrix-filter-pill');
+    const scenarioPills = document.querySelectorAll('#scenario-filters .matrix-filter-pill');
+    const tierPills = document.querySelectorAll('#tier-filters .matrix-filter-pill');
+    const cards = document.querySelectorAll<HTMLElement>('.airport-matrix-card');
+
+    function applyFilter() {
+      cards.forEach(card => {
+        const line = card.getAttribute('data-line') || '';
+        const tier = card.getAttribute('data-tier') || '';
+        const chatgpt = card.getAttribute('data-chatgpt') === 'true';
+        const netflix = card.getAttribute('data-netflix') === 'true';
+
+        let lineMatch = (currentLine === 'all') || line.includes(currentLine);
+        let tierMatch = (currentTier === 'all') || (tier === currentTier);
+        let scenarioMatch = true;
+
+        if (currentScenario === 'chatgpt') scenarioMatch = chatgpt;
+        else if (currentScenario === 'netflix') scenarioMatch = netflix;
+
+        if (lineMatch && tierMatch && scenarioMatch) {
+          card.classList.remove('is-hidden');
+        } else {
+          card.classList.add('is-hidden');
+        }
+      });
+    }
+
+    linePills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        linePills.forEach(p => p.classList.remove('is-active'));
+        pill.classList.add('is-active');
+        currentLine = pill.getAttribute('data-val') || 'all';
+        applyFilter();
+      });
+    });
+
+    scenarioPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        scenarioPills.forEach(p => p.classList.remove('is-active'));
+        pill.classList.add('is-active');
+        currentScenario = pill.getAttribute('data-val') || 'all';
+        applyFilter();
+      });
+    });
+
+    tierPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        tierPills.forEach(p => p.classList.remove('is-active'));
+        pill.classList.add('is-active');
+        currentTier = pill.getAttribute('data-val') || 'all';
+        applyFilter();
+      });
+    });
+  }
+
+  setupAirportFinder();
+  document.addEventListener('astro:page-load', setupAirportFinder);
+</script>

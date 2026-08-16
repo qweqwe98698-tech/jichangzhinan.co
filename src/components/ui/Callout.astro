@@ -1,0 +1,107 @@
+---
+interface Props {
+  type?: 'note' | 'tip' | 'warning' | 'important' | 'info';
+  title?: string;
+}
+
+const {
+  type = 'note',
+  title
+} = Astro.props;
+
+const titles = {
+  note: 'NOTE',
+  tip: 'TIP',
+  warning: 'WARNING',
+  important: 'IMPORTANT',
+  info: 'INFO'
+};
+
+const displayTitle = title || titles[type];
+---
+
+<div class={`flux-callout callout-${type}`}>
+  <div class="callout-header">
+    <span class={`signal-dot ${type === 'tip' ? '' : type === 'info' ? 'blue' : type === 'important' ? 'purple' : ''}`}></span>
+    <span class="callout-title">{displayTitle}</span>
+  </div>
+  <div class="callout-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .flux-callout {
+    margin: 1.75rem 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left-width: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .callout-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .callout-content {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+  }
+
+  .callout-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* Specific variants */
+  .callout-note {
+    border-left-color: var(--muted);
+  }
+  .callout-note .callout-title {
+    color: var(--text-soft);
+  }
+
+  .callout-tip {
+    border-left-color: var(--accent);
+    background: rgba(124, 255, 178, 0.03);
+  }
+  .callout-tip .callout-title {
+    color: var(--accent);
+  }
+
+  .callout-warning {
+    border-left-color: var(--warning);
+    background: rgba(243, 202, 115, 0.03);
+  }
+  .callout-warning .callout-title {
+    color: var(--warning);
+  }
+
+  .callout-important {
+    border-left-color: var(--accent-purple);
+    background: rgba(169, 140, 255, 0.03);
+  }
+  .callout-important .callout-title {
+    color: var(--accent-purple);
+  }
+
+  .callout-info {
+    border-left-color: var(--accent-blue);
+    background: rgba(114, 167, 255, 0.03);
+  }
+  .callout-info .callout-title {
+    color: var(--accent-blue);
+  }
+</style>

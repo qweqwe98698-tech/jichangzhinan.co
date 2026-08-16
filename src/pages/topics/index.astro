@@ -1,0 +1,201 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopicCard from '../../components/cards/TopicCard.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Divider from '../../components/ui/Divider.astro';
+import { topicsData } from '../../data/topics';
+import { siteConfig } from '../../config/site';
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+const topicsWithStats = topicsData.map(topic => {
+  const posts = allPosts.filter(p => p.data.category === topic.id);
+  return {
+    ...topic,
+    postsCount: posts.length
+  };
+});
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '专题分类', item: '/topics/' }
+];
+---
+
+<BaseLayout
+  title={`专题分类目录 | ${siteConfig.name}`}
+  description="按系统化知识体系浏览网络技术专题：涵盖新手入门、客户端配置、核心协议、规则分流与隐私安全。"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container topics-hub-page">
+    <!-- Top Header -->
+    <header class="hub-header" data-reveal>
+      <Badge variant="accent">
+        <span class="signal-dot"></span>
+        TAXONOMY CLUSTERS
+      </Badge>
+      <h1 class="hub-title">专题知识库</h1>
+      <p class="hub-desc">
+        将碎片化的网络配置知识沉淀为体系化的专题集群。选择适合你当前阶段的专题，沿着学习路径深入探索。
+      </p>
+    </header>
+
+    <!-- Topics Grid -->
+    <div class="topics-grid" data-reveal data-reveal-delay="2">
+      {topicsWithStats.map(topic => (
+        <div class="topic-grid-item">
+          <TopicCard
+            enName={topic.enName}
+            name={topic.name}
+            count={topic.postsCount}
+            href={`/topics/${topic.slug}/`}
+            description={topic.description}
+          />
+        </div>
+      ))}
+    </div>
+
+    <Divider label="SYSTEM ARCHITECTURE" />
+
+    <!-- Systematic Learning Methodology -->
+    <section class="methodology-section flux-card" data-reveal>
+      <div class="method-header">
+        <span class="signal-dot breathing"></span>
+        <h2 class="method-title">四阶进阶学习法则</h2>
+      </div>
+      <div class="method-steps-grid">
+        <div class="step-card">
+          <span class="step-num">01</span>
+          <h3 class="step-title">概念扫盲</h3>
+          <p class="step-desc">理解代理原理、节点订阅格式与基础网络概念，避开常见连接误区。</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">02</span>
+          <h3 class="step-title">客户端实操</h3>
+          <p class="step-desc">在你的 Windows / Mac / 手机上配置 Clash 或 Sing-box 并开启 Tun 模式。</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">03</span>
+          <h3 class="step-title">分流与防泄漏</h3>
+          <p class="step-desc">配置 Fake-IP 与 GeoSite 规则集，实现国内国外智能分流并杜绝 DNS 泄漏。</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">04</span>
+          <h3 class="step-title">自动化与进阶</h3>
+          <p class="step-desc">利用 Subconverter 与私有脚本，实现多订阅节点合并清洗与企业级分流。</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .topics-hub-page {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .hub-header {
+    margin-bottom: 3.5rem;
+    max-width: 780px;
+  }
+
+  .hub-title {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .hub-desc {
+    font-size: 1.1rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+  }
+
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+  }
+
+  .methodology-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .method-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .method-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+  }
+
+  .method-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .step-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .step-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .step-desc {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .topics-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .method-steps-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .topics-grid {
+      grid-template-columns: 1fr;
+    }
+    .method-steps-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

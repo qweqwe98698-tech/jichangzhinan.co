@@ -1,0 +1,157 @@
+---
+interface Props {
+  tag?: string;
+  statusText?: string;
+  title: string;
+  articleCount?: number;
+  href: string;
+  description?: string;
+  class?: string;
+}
+
+const {
+  tag = 'NETWORK',
+  statusText = 'ACTIVE',
+  title,
+  articleCount = 0,
+  href,
+  description,
+  class: className = ''
+} = Astro.props;
+---
+
+<a href={href} class={`flux-card signal-card ${className}`}>
+  <!-- Header Bar -->
+  <div class="signal-header">
+    <span class="signal-tag">{tag}</span>
+    <div class="status-indicator">
+      <span class="signal-dot breathing"></span>
+      <span class="status-label">{statusText}</span>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="signal-body">
+    <h3 class="signal-title">{title}</h3>
+    {description && <p class="signal-desc">{description}</p>}
+  </div>
+
+  <!-- Footer with Signal Track Line -->
+  <div class="signal-footer">
+    <span class="count-text">{articleCount} ARTICLES</span>
+    <div class="signal-line-wrapper">
+      <div class="signal-track"></div>
+      <div class="signal-terminal-node"></div>
+    </div>
+  </div>
+</a>
+
+<style>
+  .signal-card {
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    justify-content: space-between;
+    height: 100%;
+    position: relative;
+  }
+
+  .signal-card:hover {
+    border-color: rgba(114, 167, 255, 0.4);
+    background: var(--surface-2);
+  }
+
+  .signal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+  }
+
+  .signal-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .status-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  .signal-body {
+    margin: 1.5rem 0 1rem 0;
+  }
+
+  .signal-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+    transition: color 0.2s ease;
+  }
+
+  .signal-card:hover .signal-title {
+    color: #ffffff;
+  }
+
+  .signal-desc {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    margin-top: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .signal-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .count-text {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .signal-line-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 6px;
+  }
+
+  .signal-track {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .signal-terminal-node {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent-glow);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+  }
+
+  .signal-card:hover .signal-terminal-node {
+    transform: scale(1.4);
+    background: var(--accent-blue);
+  }
+</style>

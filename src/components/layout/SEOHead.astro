@@ -1,0 +1,177 @@
+---
+import { siteConfig } from '../../config/site';
+
+interface BreadcrumbItem {
+  name: string;
+  item: string;
+}
+
+interface FAQItem {
+  q: string;
+  a: string;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  pubDate?: Date;
+  updatedDate?: Date;
+  author?: string;
+  category?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  faqs?: FAQItem[];
+  canonicalUrl?: string;
+}
+
+const {
+  title,
+  description = siteConfig.description,
+  image = '/favicon.svg',
+  type = 'website',
+  pubDate,
+  updatedDate,
+  author = siteConfig.author,
+  category,
+  breadcrumbs = [],
+  faqs = [],
+  canonicalUrl: customCanonical
+} = Astro.props;
+
+// Determine clean canonical URL
+const siteUrl = siteConfig.url.replace(/\/$/, '');
+const pathname = Astro.url.pathname.replace(/\/index\.html$/, '').replace(/\/?$/, '/');
+const canonicalUrl = customCanonical || `${siteUrl}${pathname}`;
+
+// Construct Page Title
+const pageTitle = title ? (title.includes(siteConfig.name) ? title : `${title} | ${siteConfig.name}`) : `${siteConfig.name} - ${siteConfig.shortName} · 数字网络知识库`;
+const absoluteImageUrl = image.startsWith('http') ? image : `${siteUrl}${image.startsWith('/') ? '' : '/'}${image}`;
+
+// Generate JSON-LD Schemas
+const schemas: any[] = [];
+
+// Base WebSite Schema
+if (type === 'website' && pathname === '/') {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteConfig.name,
+    alternateName: siteConfig.shortName,
+    url: siteUrl,
+    description: siteConfig.description,
+    inLanguage: 'zh-CN',
+    publisher: {
+      '@type': 'Organization',
+      name: siteConfig.name,
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/favicon.svg`
+      }
+    }
+  });
+}
+
+// Article Schema
+if (type === 'article') {
+  const articleSchema: any = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalUrl
+    },
+    headline: title,
+    description: description,
+    image: absoluteImageUrl,
+    author: {
+      '@type': 'Person',
+      name: author
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: siteConfig.name,
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/favicon.svg`
+      }
+    },
+    datePublished: pubDate ? pubDate.toISOString() : undefined,
+    dateModified: (updatedDate || pubDate) ? (updatedDate || pubDate)!.toISOString() : undefined,
+    articleSection: category
+  };
+  schemas.push(articleSchema);
+}
+
+// Breadcrumb Schema
+if (breadcrumbs && breadcrumbs.length > 0) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbs.map((crumb, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: crumb.name,
+      item: crumb.item.startsWith('http') ? crumb.item : `${siteUrl}${crumb.item}`
+    }))
+  });
+}
+
+// FAQ Schema (Only when faqs exist)
+if (faqs && faqs.length > 0) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(faq => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.a
+      }
+    }))
+  });
+}
+---
+
+<!-- Global Metadata -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Primary Meta Tags -->
+<title>{pageTitle}</title>
+<meta name="title" content={pageTitle} />
+<meta name="description" content={description} />
+<meta name="author" content={author} />
+<meta name="robots" content="index, follow" />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={absoluteImageUrl} />
+<meta property="og:site_name" content={siteConfig.name} />
+<meta property="og:locale" content="zh_CN" />
+{pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+{updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+{category && <meta property="article:section" content={category} />}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalUrl} />
+<meta property="twitter:title" content={pageTitle} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={absoluteImageUrl} />
+
+<!-- Structured Data / JSON-LD -->
+{schemas.map(schema => (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}

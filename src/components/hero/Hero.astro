@@ -1,0 +1,136 @@
+---
+import SearchTrigger from '../search/SearchTrigger.astro';
+import LiveStats from './LiveStats.astro';
+import TopicTicker from './TopicTicker.astro';
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  articleCount: number;
+  topicCount: number;
+  toolsCount: number;
+}
+
+const { articleCount, topicCount, toolsCount } = Astro.props;
+---
+
+<section class="flux-hero-section" aria-label="首屏介绍">
+  <div class="container hero-container">
+    <!-- Left Hero Column -->
+    <div class="hero-content-col" data-reveal>
+      <div class="hero-pre-badge">
+        <Badge variant="accent">
+          <span class="signal-dot breathing" aria-hidden="true"></span>
+          NETWORK DISPATCH // V2.0
+        </Badge>
+      </div>
+
+      <h1 class="hero-headline">
+        EXPLORE THE NETWORK WORLD
+        <span class="headline-sub">探索网络世界。从一个问题开始。</span>
+      </h1>
+
+      <p class="hero-description">
+        专业网络协议解析、跨平台客户端实操教程、分流规则优化与深度知识库。兼顾极致性能、隐私安全与极简美学。
+      </p>
+
+      <!-- Large Hero Search Entry -->
+      <div class="hero-search-wrapper">
+        <SearchTrigger variant="hero" />
+      </div>
+
+      <!-- Hot Topic Tags -->
+      <TopicTicker />
+    </div>
+
+    <!-- Right Live Stats Card -->
+    <div class="hero-stats-col" data-reveal data-reveal-delay="2">
+      <LiveStats
+        articleCount={articleCount}
+        topicCount={topicCount}
+        toolsCount={toolsCount}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .flux-hero-section {
+    position: relative;
+    padding-top: 3.5rem;
+    padding-bottom: 4rem;
+    overflow: hidden;
+  }
+
+  .hero-container {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 3.5rem;
+    align-items: center;
+  }
+
+  .hero-content-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-pre-badge {
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-headline {
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    color: #ffffff;
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .headline-sub {
+    font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+    font-weight: 600;
+    color: var(--text-soft);
+    letter-spacing: -0.02em;
+  }
+
+  .hero-description {
+    font-size: 1.08rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+    max-width: 580px;
+  }
+
+  .hero-search-wrapper {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-stats-col {
+    width: 100%;
+    max-width: 440px;
+    justify-self: end;
+  }
+
+  @media (max-width: 1024px) {
+    .hero-container {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .hero-stats-col {
+      justify-self: start;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .flux-hero-section {
+      padding-top: 2rem;
+      padding-bottom: 2.5rem;
+    }
+  }
+</style>

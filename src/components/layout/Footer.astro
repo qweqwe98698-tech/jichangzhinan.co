@@ -1,0 +1,248 @@
+---
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../../config/site';
+import { footerSections } from '../../data/navigation';
+import { topicsData } from '../../data/topics';
+
+// Calculate dynamic stats
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+const totalArticles = allPosts.length;
+const totalTopics = topicsData.length;
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="flux-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand & Mission Column -->
+      <div class="footer-brand-col">
+        <div class="footer-logo">
+          <span class="signal-dot breathing"></span>
+          <span class="brand-title">{siteConfig.logo.text}</span>
+        </div>
+        <p class="brand-tagline">
+          {siteConfig.description}
+        </p>
+        <div class="footer-terminal-stats">
+          <div class="stat-pill">
+            <span class="stat-num">{totalArticles}+</span>
+            <span class="stat-label">ARTICLES</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-num">{totalTopics}</span>
+            <span class="stat-label">TOPICS</span>
+          </div>
+          <div class="stat-pill">
+            <span class="signal-dot"></span>
+            <span class="stat-label">ONLINE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Columns -->
+      {footerSections.map(section => (
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">{section.title}</h4>
+          <ul class="footer-nav-list">
+            {section.links.map(link => (
+              <li>
+                <a href={link.href} class="footer-link">
+                  {link.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="copyright-text">
+        <span>© {currentYear} {siteConfig.name} ({siteConfig.domain}).</span>
+        <span class="theme-tag">Theme: {siteConfig.themeName} ({siteConfig.themeConcept})</span>
+      </div>
+      <div class="footer-legal">
+        <span>SSG Static Build</span>
+        <span class="dot-separator">•</span>
+        <span>Vanilla Architecture</span>
+        <span class="dot-separator">•</span>
+        <span>No Tracker</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .flux-footer {
+    width: 100%;
+    margin-top: 5rem;
+    padding-top: 4rem;
+    padding-bottom: 2.5rem;
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border);
+    position: relative;
+    z-index: 2;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr repeat(4, 1fr);
+    gap: 3rem;
+    padding-bottom: 3.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .footer-brand-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .brand-title {
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+  }
+
+  .brand-tagline {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 320px;
+  }
+
+  .footer-terminal-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-soft);
+  }
+
+  .stat-num {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .stat-label {
+    letter-spacing: 0.05em;
+    font-size: 0.68rem;
+  }
+
+  /* Navigation Columns */
+  .footer-col-title {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    margin-bottom: 1.25rem;
+  }
+
+  .footer-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer-link {
+    font-size: 0.9rem;
+    color: var(--muted);
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+  }
+
+  .footer-link:hover {
+    color: #ffffff;
+    transform: translateX(2px);
+  }
+
+  /* Bottom Bar */
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 2rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .copyright-text {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .theme-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    background: var(--surface-2);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .footer-legal {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .dot-separator {
+    color: var(--faint);
+  }
+
+  @media (max-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.5rem;
+    }
+    .footer-brand-col {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .footer-brand-col {
+      grid-column: span 1;
+    }
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

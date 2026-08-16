@@ -1,0 +1,261 @@
+---
+// Visual Rule Converter & Config Wizard Component
+---
+
+<div class="rule-wizard-box flux-card">
+  <div class="wizard-header">
+    <div class="wizard-title-wrap">
+      <span class="signal-dot purple"></span>
+      <h3 class="wizard-title">订阅规则转换与清洗配置向导</h3>
+    </div>
+    <span class="wizard-badge">GENERATOR</span>
+  </div>
+
+  <p class="wizard-desc">
+    可视化生成 Subconverter 订阅转换链接与本地 Docker 处理指令，自定义分流规则集与节点重命名过滤器。
+  </p>
+
+  <div class="wizard-grid">
+    <!-- Controls -->
+    <div class="wizard-controls">
+      <div class="form-group">
+        <label for="sub-url-input" class="form-label">原始订阅链接 (URL):</label>
+        <input
+          type="text"
+          id="sub-url-input"
+          class="terminal-input"
+          value="https://api.example.com/sub?token=demo_token"
+          placeholder="粘贴您的机场订阅链接"
+        />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="target-format" class="form-label">目标客户端格式:</label>
+          <select id="target-format" class="terminal-select">
+            <option value="clash">Clash / Mihomo (YAML)</option>
+            <option value="singbox">Sing-box (JSON)</option>
+            <option value="surge">Surge (CONF)</option>
+            <option value="shadowrocket">Shadowrocket</option>
+            <option value="quanx">Quantumult X</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="rule-template" class="form-label">分流规则模板:</label>
+          <select id="rule-template" class="terminal-select">
+            <option value="acl4ssr_online">ACL4SSR 精简版 (推荐)</option>
+            <option value="acl4ssr_full">ACL4SSR 全分组版</option>
+            <option value="lazy_rules">Lazy-Rules 懒人规则</option>
+            <option value="custom">纯节点无外部规则</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">高级选项开关:</label>
+        <div class="switches-list">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-emoji" checked />
+            <span>自动添加国旗 Emoji</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-udp" checked />
+            <span>开启 UDP 转发支持</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-scv" checked />
+            <span>跳过证书验证 (SCV)</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="button" id="gen-sub-btn" class="flux-btn btn-primary btn-md" style="width: 100%;">
+        生成私有转换链接与指令 →
+      </button>
+    </div>
+
+    <!-- Output preview -->
+    <div class="wizard-output">
+      <span class="output-label">生成的转换链接 (Subconverter API):</span>
+      <div class="result-url-box" id="result-sub-url">
+        http://127.0.0.1:25500/sub?target=clash&url=https%3A%2F%2Fapi.example.com%2Fsub%3Ftoken%3Ddemo_token&insert=false&emoji=true&udp=true&scv=true
+      </div>
+
+      <span class="output-label" style="margin-top: 1.25rem; display: block;">本地 Docker 一键转换调用命令:</span>
+      <pre class="cmd-pre"><code id="result-docker-cmd">docker run -d --name subconverter -p 25500:25500 tindy2013/subconverter:latest</code></pre>
+    </div>
+  </div>
+</div>
+
+<style>
+  .rule-wizard-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin: 3rem 0;
+  }
+
+  .wizard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .wizard-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .wizard-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .wizard-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent-purple);
+    background: rgba(169, 140, 255, 0.08);
+    border: 1px solid rgba(169, 140, 255, 0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .wizard-desc {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    margin-bottom: 1.75rem;
+  }
+
+  .wizard-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .terminal-input,
+  .terminal-select {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.85rem;
+    font-family: var(--font-mono);
+    color: #ffffff;
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .terminal-input:focus,
+  .terminal-select:focus {
+    border-color: var(--accent-purple);
+  }
+
+  .switches-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    cursor: pointer;
+  }
+
+  .output-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .result-url-box {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+    word-break: break-all;
+    margin-top: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .cmd-pre {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 860px) {
+    .wizard-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function setupRuleWizard() {
+    const subUrlInput = document.getElementById('sub-url-input') as HTMLInputElement | null;
+    const targetFormat = document.getElementById('target-format') as HTMLSelectElement | null;
+    const ruleTemplate = document.getElementById('rule-template') as HTMLSelectElement | null;
+    const chkEmoji = document.getElementById('chk-emoji') as HTMLInputElement | null;
+    const chkUdp = document.getElementById('chk-udp') as HTMLInputElement | null;
+    const chkScv = document.getElementById('chk-scv') as HTMLInputElement | null;
+    const genBtn = document.getElementById('gen-sub-btn');
+    const resultUrl = document.getElementById('result-sub-url');
+
+    function generate() {
+      if (!subUrlInput || !targetFormat || !resultUrl) return;
+      const url = subUrlInput.value.trim();
+      const target = targetFormat.value;
+      const emoji = chkEmoji?.checked ?? true;
+      const udp = chkUdp?.checked ?? true;
+      const scv = chkScv?.checked ?? true;
+
+      const encodedUrl = encodeURIComponent(url);
+      const generated = `http://127.0.0.1:25500/sub?target=${target}&url=${encodedUrl}&insert=false&emoji=${emoji}&udp=${udp}&scv=${scv}`;
+      resultUrl.textContent = generated;
+    }
+
+    genBtn?.addEventListener('click', generate);
+    subUrlInput?.addEventListener('input', generate);
+    targetFormat?.addEventListener('change', generate);
+    ruleTemplate?.addEventListener('change', generate);
+    chkEmoji?.addEventListener('change', generate);
+    chkUdp?.addEventListener('change', generate);
+    chkScv?.addEventListener('change', generate);
+  }
+
+  setupRuleWizard();
+  document.addEventListener('astro:page-load', setupRuleWizard);
+</script>

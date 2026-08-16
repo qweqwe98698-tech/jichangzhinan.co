@@ -1,0 +1,208 @@
+---
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  date?: Date | string;
+  category: string;
+  categoryName?: string;
+  readingTime?: string;
+  difficulty?: string;
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  href,
+  date,
+  category,
+  categoryName,
+  readingTime = '8 MIN READ',
+  difficulty,
+  class: className = ''
+} = Astro.props;
+
+const safeDate = date ? new Date(date) : new Date();
+const formattedDate = !isNaN(safeDate.getTime())
+  ? new Intl.DateTimeFormat('en-US', {
+      month: '2-digit',
+      day: '2-digit'
+    }).format(safeDate)
+  : '08/16';
+
+const isoDate = !isNaN(safeDate.getTime()) ? safeDate.toISOString() : new Date().toISOString();
+---
+
+<article class={`flux-card horizontal-card ${className}`}>
+  <!-- Meta Left -->
+  <div class="card-meta-left">
+    <time class="meta-date" datetime={isoDate}>{formattedDate}</time>
+    <Badge variant={category === 'beginner' || category === 'recommendations' ? 'accent' : category === 'clients' || category === 'lines' ? 'blue' : 'purple'}>
+      {categoryName || category}
+    </Badge>
+  </div>
+
+  <!-- Content Center -->
+  <div class="card-content-center">
+    <h3 class="card-title">
+      <a href={href} class="title-link">
+        {title}
+      </a>
+    </h3>
+    <p class="card-desc">
+      {description}
+    </p>
+  </div>
+
+  <!-- Action Right -->
+  <div class="card-action-right">
+    <span class="reading-time">{readingTime}</span>
+    {difficulty && <span class="difficulty-tag">{difficulty}</span>}
+    <a href={href} class="arrow-btn" aria-label={`阅读全文：${title}`}>
+      <span>→</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .horizontal-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.75rem;
+    padding: 1.35rem 1.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .horizontal-card:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-2);
+  }
+
+  .card-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+    min-width: 140px;
+  }
+
+  .meta-date {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .card-content-center {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 0.35rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .title-link {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .horizontal-card:hover .title-link {
+    color: var(--accent);
+  }
+
+  .card-desc {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    line-height: 1.5;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-action-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .reading-time {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .difficulty-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+  }
+
+  .arrow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .horizontal-card:hover .arrow-btn {
+    background: var(--accent);
+    color: #090b10;
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 860px) {
+    .horizontal-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem;
+    }
+
+    .card-title,
+    .card-desc {
+      white-space: normal;
+    }
+
+    .card-meta-left {
+      min-width: unset;
+    }
+
+    .card-action-right {
+      width: 100%;
+      justify-content: space-between;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+  }
+</style>

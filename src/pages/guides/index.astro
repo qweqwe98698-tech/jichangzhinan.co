@@ -1,0 +1,187 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HorizontalCard from '../../components/cards/HorizontalCard.astro';
+import FeatureCard from '../../components/cards/FeatureCard.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Divider from '../../components/ui/Divider.astro';
+import { siteConfig } from '../../config/site';
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+// Filter posts that are guides
+const guidePosts = allPosts.filter(p => p.data.category === 'clients' || p.data.category === 'beginner' || p.data.category === 'routing');
+const sortedGuides = guidePosts.sort((a, b) => {
+  const dateA = new Date(a.data.updatedDate || a.data.pubDate).getTime();
+  const dateB = new Date(b.data.updatedDate || b.data.pubDate).getTime();
+  return dateB - dateA;
+});
+
+const featuredGuide = sortedGuides[0];
+const beginnerGuides = sortedGuides.filter(g => g.data.difficulty === 'Beginner');
+const intermediateGuides = sortedGuides.filter(g => g.data.difficulty === 'Intermediate');
+const advancedGuides = sortedGuides.filter(g => g.data.difficulty === 'Advanced');
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '实战教程', item: '/guides/' }
+];
+---
+
+<BaseLayout
+  title={`实战教程与配置指南 | ${siteConfig.name}`}
+  description="涵盖主流操作系统与核心代理软件的保姆级实操指南，支持按 Beginner / Intermediate / Advanced 难度筛选。"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container guides-page">
+    <header class="guides-header" data-reveal>
+      <Badge variant="accent">
+        <span class="signal-dot"></span>
+        HANDS-ON TUTORIALS
+      </Badge>
+      <h1 class="guides-title">实战配置教程</h1>
+      <p class="guides-desc">
+        拒绝空洞理论，专注可落地的实战步骤。从零搭建客户端到企业级规则分流，按难度梯次助你轻松进阶。
+      </p>
+
+      <!-- Difficulty Filter Chips (Interactive via Client-side JS) -->
+      <div class="filter-chips-bar">
+        <button class="diff-chip is-active" data-filter="all">全部教程 ({sortedGuides.length})</button>
+        <button class="diff-chip" data-filter="beginner">新手起步 ({beginnerGuides.length})</button>
+        <button class="diff-chip" data-filter="intermediate">中阶进阶 ({intermediateGuides.length})</button>
+        <button class="diff-chip" data-filter="advanced">高阶极客 ({advancedGuides.length})</button>
+      </div>
+    </header>
+
+    <!-- Top Featured Guide -->
+    {featuredGuide && (
+      <section class="featured-guide-sec" data-reveal>
+        <FeatureCard
+          title={featuredGuide.data.title}
+          description={featuredGuide.data.description}
+          href={`/articles/${featuredGuide.id}/`}
+          category={featuredGuide.data.category}
+          categoryName={featuredGuide.data.categoryName}
+          readingTime={featuredGuide.data.readingTime}
+          badgeText="EDITOR'S CHOICE"
+          indexNum="★"
+        />
+      </section>
+    )}
+
+    <Divider label="ALL GUIDES BY DIFFICULTY" />
+
+    <!-- All Guides List -->
+    <div class="guides-list-container" id="guides-list" data-reveal>
+      {sortedGuides.map(guide => (
+        <div class="guide-item-wrap" data-difficulty={guide.data.difficulty.toLowerCase()}>
+          <HorizontalCard
+            title={guide.data.title}
+            description={guide.data.description}
+            href={`/articles/${guide.id}/`}
+            date={guide.data.pubDate}
+            category={guide.data.category}
+            categoryName={guide.data.categoryName}
+            readingTime={guide.data.readingTime}
+            difficulty={guide.data.difficulty}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .guides-page {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .guides-header {
+    max-width: 820px;
+    margin-bottom: 3rem;
+  }
+
+  .guides-title {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .guides-desc {
+    font-size: 1.1rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .filter-chips-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .diff-chip {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0.35rem 0.95rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .diff-chip:hover,
+  .diff-chip.is-active {
+    background: rgba(124, 255, 178, 0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .featured-guide-sec {
+    margin-bottom: 3rem;
+  }
+
+  .guides-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .guide-item-wrap.is-hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  function setupGuideFilters() {
+    const chips = document.querySelectorAll('.diff-chip');
+    const items = document.querySelectorAll('.guide-item-wrap');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('is-active'));
+        chip.classList.add('is-active');
+
+        const filter = chip.getAttribute('data-filter');
+
+        items.forEach(item => {
+          const diff = item.getAttribute('data-difficulty');
+          if (filter === 'all' || diff === filter) {
+            item.classList.remove('is-hidden');
+          } else {
+            item.classList.add('is-hidden');
+          }
+        });
+      });
+    });
+  }
+
+  setupGuideFilters();
+  document.addEventListener('astro:page-load', setupGuideFilters);
+</script>

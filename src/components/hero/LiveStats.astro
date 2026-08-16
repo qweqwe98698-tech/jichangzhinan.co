@@ -1,0 +1,411 @@
+---
+interface Props {
+  articleCount?: number;
+  topicCount?: number;
+  toolsCount?: number;
+}
+
+const { articleCount = 39, topicCount = 6, toolsCount = 10 } = Astro.props;
+---
+
+<div class="flagship-promo-card flux-card" id="guangsu-hero-promo">
+  <!-- Card Header -->
+  <div class="promo-card-header">
+    <div class="header-signal">
+      <span class="signal-dot breathing"></span>
+      <span class="signal-text">2026 年度力荐 // TOP 1 FLAGSHIP</span>
+    </div>
+    <span class="mono-node-tag">IEPL 物理纯专线</span>
+  </div>
+
+  <!-- Brand Showcase Area -->
+  <div class="promo-brand-hero">
+    <div class="brand-title-row">
+      <div class="brand-name-wrap">
+        <span class="brand-logo-icon">⚡</span>
+        <h3 class="brand-name">光速云</h3>
+      </div>
+      <span class="discount-pill">独家 8 折特惠</span>
+    </div>
+    <p class="brand-tagline">
+      企业级内网 IEPL 专线 · 晚高峰 0.0% 丢包 · ChatGPT/Claude 原生解锁 · 4K/8K 杜比秒开
+    </p>
+  </div>
+
+  <!-- Key Specs Matrix -->
+  <div class="promo-specs-grid">
+    <div class="spec-item">
+      <span class="spec-val">¥17<small>/月</small></span>
+      <span class="spec-lbl">入门专线月付</span>
+    </div>
+    <div class="spec-divider"></div>
+    <div class="spec-item">
+      <span class="spec-val">110GB<small>+</small></span>
+      <span class="spec-lbl">月度起步高速</span>
+    </div>
+    <div class="spec-divider"></div>
+    <div class="spec-item">
+      <span class="spec-val highlight-green">&lt; 2ms</span>
+      <span class="spec-lbl">专线网络抖动</span>
+    </div>
+  </div>
+
+  <!-- Coupon Code Copy Box -->
+  <div class="promo-coupon-box" data-coupon="AMM" title="点击一键复制 8 折优惠码">
+    <div class="coupon-left">
+      <span class="coupon-tag">8折专属优惠码</span>
+      <span class="coupon-code">AMM</span>
+    </div>
+    <button type="button" class="copy-coupon-btn" aria-label="复制光速云专属优惠码">
+      <svg class="copy-icon" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+      </svg>
+      <span class="btn-copy-label">复制券码</span>
+    </button>
+  </div>
+
+  <!-- High-Converting CTA Button -->
+  <a
+    href="https://sahude.gsyvipaff.com/#/?code=keqgvT5Y"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="promo-cta-btn"
+  >
+    <span class="cta-glow"></span>
+    <span class="cta-text">直达光速云官网选购专线</span>
+    <span class="cta-arrow">→</span>
+  </a>
+
+  <!-- Secondary Meta Link -->
+  <div class="promo-footer-row">
+    <a href="/airports/" class="footer-matrix-link">
+      <span>已收录 16 家实测天梯榜 ({articleCount}+ 篇技术指南)</span>
+      <span class="arrow-sym">→</span>
+    </a>
+  </div>
+</div>
+
+<style>
+  .flagship-promo-card {
+    background: linear-gradient(135deg, rgba(22, 27, 34, 0.95) 0%, rgba(13, 17, 23, 0.98) 100%);
+    border: 1px solid rgba(124, 255, 178, 0.35);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(124, 255, 178, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flagship-promo-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #7CFFB2 0%, #72A7FF 50%, #A98CFF 100%);
+  }
+
+  .flagship-promo-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(124, 255, 178, 0.15);
+  }
+
+  .promo-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-signal {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .signal-text {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+  }
+
+  .mono-node-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--accent-purple);
+    background: rgba(169, 140, 255, 0.1);
+    border: 1px solid rgba(169, 140, 255, 0.25);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+  }
+
+  /* Brand Showcase */
+  .promo-brand-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .brand-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .brand-logo-icon {
+    font-size: 1.4rem;
+    color: var(--accent);
+  }
+
+  .brand-name {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+
+  .discount-pill {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #0d1117;
+    background: #7CFFB2;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 12px rgba(124, 255, 178, 0.4);
+  }
+
+  .brand-tagline {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* Specs Grid */
+  .promo-specs-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+  }
+
+  .spec-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+
+  .spec-val {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+  }
+
+  .spec-val small {
+    font-size: 0.72rem;
+    font-weight: normal;
+    color: var(--muted);
+  }
+
+  .spec-val.highlight-green {
+    color: var(--accent);
+  }
+
+  .spec-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-top: 0.25rem;
+  }
+
+  .spec-divider {
+    width: 1px;
+    height: 26px;
+    background: var(--border);
+  }
+
+  /* Coupon Box */
+  .promo-coupon-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(124, 255, 178, 0.05);
+    border: 1px dashed rgba(124, 255, 178, 0.35);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .promo-coupon-box:hover {
+    background: rgba(124, 255, 178, 0.1);
+    border-color: var(--accent);
+  }
+
+  .coupon-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .coupon-tag {
+    font-size: 0.75rem;
+    color: var(--text-soft);
+  }
+
+  .coupon-code {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    border: 1px solid rgba(124, 255, 178, 0.2);
+  }
+
+  .copy-coupon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .promo-coupon-box:hover .copy-coupon-btn {
+    background: var(--accent);
+    color: #0d1117;
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .copy-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* High Converting CTA */
+  .promo-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(124, 255, 178, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .promo-cta-btn:hover {
+    background: #95ffc2;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(124, 255, 178, 0.45);
+    color: #000000;
+  }
+
+  .cta-arrow {
+    transition: transform 0.2s ease;
+    font-weight: 800;
+  }
+
+  .promo-cta-btn:hover .cta-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Footer Link */
+  .promo-footer-row {
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-matrix-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-matrix-link:hover {
+    color: var(--accent);
+  }
+
+  .footer-matrix-link:hover .arrow-sym {
+    transform: translateX(3px);
+  }
+
+  .arrow-sym {
+    transition: transform 0.2s ease;
+  }
+</style>
+
+<script>
+  function setupHeroCouponCopy() {
+    const box = document.getElementById('guangsu-hero-promo');
+    if (!box) return;
+
+    const couponBox = box.querySelector('.promo-coupon-box');
+    if (couponBox) {
+      couponBox.addEventListener('click', async () => {
+        const coupon = couponBox.getAttribute('data-coupon') || 'AMM';
+        const label = couponBox.querySelector('.btn-copy-label');
+        try {
+          await navigator.clipboard.writeText(coupon);
+          if (label) {
+            label.textContent = '已复制 AMM!';
+            setTimeout(() => {
+              label.textContent = '复制券码';
+            }, 2000);
+          }
+        } catch (err) {
+          console.error('Copy coupon failed:', err);
+        }
+      });
+    }
+  }
+
+  setupHeroCouponCopy();
+  document.addEventListener('astro:page-load', setupHeroCouponCopy);
+</script>

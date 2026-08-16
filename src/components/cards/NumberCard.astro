@@ -1,0 +1,114 @@
+---
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  num: string;
+  title: string;
+  category?: string;
+  href: string;
+  description?: string;
+  class?: string;
+}
+
+const {
+  num,
+  title,
+  category = 'FAQ',
+  href,
+  description,
+  class: className = ''
+} = Astro.props;
+---
+
+<a href={href} class={`flux-card number-card ${className}`}>
+  <div class="card-header">
+    <span class="giant-num">{num}</span>
+    <Badge variant="purple">{category}</Badge>
+  </div>
+
+  <div class="card-body">
+    <h3 class="card-title">{title}</h3>
+    {description && <p class="card-desc">{description}</p>}
+  </div>
+
+  <div class="card-footer">
+    <span class="action-hint">Explore</span>
+    <span class="arrow-icon">↗</span>
+  </div>
+</a>
+
+<style>
+  .number-card {
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.75rem;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .number-card:hover {
+    border-color: rgba(169, 140, 255, 0.4);
+    background: var(--surface-2);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .giant-num {
+    font-family: var(--font-mono);
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent-purple);
+    letter-spacing: -0.05em;
+  }
+
+  .card-body {
+    margin: 1.5rem 0;
+  }
+
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    transition: color 0.2s ease;
+  }
+
+  .number-card:hover .card-title {
+    color: #ffffff;
+  }
+
+  .card-desc {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin-top: 0.5rem;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .arrow-icon {
+    font-size: 1rem;
+    color: var(--text-soft);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+  }
+
+  .number-card:hover .arrow-icon {
+    transform: translate(2px, -2px);
+    color: var(--accent-purple);
+  }
+</style>

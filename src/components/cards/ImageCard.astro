@@ -1,0 +1,169 @@
+---
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  category: string;
+  categoryName?: string;
+  readingTime?: string;
+  coverImage?: string;
+  coverAlt?: string;
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  href,
+  category,
+  categoryName,
+  readingTime = '8 MIN READ',
+  coverImage,
+  coverAlt = '文章配图',
+  class: className = ''
+} = Astro.props;
+---
+
+<article class={`flux-card image-card ${className}`}>
+  <!-- Visual Header / Cover Illustration -->
+  <div class="card-visual-header">
+    {coverImage ? (
+      <img src={coverImage} alt={coverAlt} class="card-image" loading="lazy" />
+    ) : (
+      <div class="card-abstract-graphic">
+        <svg viewBox="0 0 320 180" fill="none" class="graphic-svg">
+          <rect width="320" height="180" fill="#131720"/>
+          <circle cx="160" cy="90" r="60" stroke="rgba(124, 255, 178, 0.15)" stroke-width="1.5" stroke-dasharray="6 6"/>
+          <circle cx="160" cy="90" r="35" stroke="rgba(114, 167, 255, 0.2)" stroke-width="1"/>
+          <path d="M60 140 L160 50 L260 140" stroke="rgba(169, 140, 255, 0.25)" stroke-width="1.5" fill="none"/>
+          <circle cx="160" cy="50" r="5" fill="#7CFFB2"/>
+        </svg>
+      </div>
+    )}
+    <div class="category-tag-wrapper">
+      <Badge variant="blue">{categoryName || category}</Badge>
+    </div>
+  </div>
+
+  <!-- Content Body -->
+  <div class="card-content">
+    <h3 class="card-title">
+      <a href={href} class="title-link">
+        {title}
+      </a>
+    </h3>
+    <p class="card-desc">
+      {description}
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <div class="card-footer">
+    <span class="read-meta">{readingTime}</span>
+    <a href={href} class="read-arrow" aria-label={`查看详情：${title}`}>
+      <span>→</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .image-card {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .card-visual-header {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background: var(--surface-2);
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-image,
+  .graphic-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .image-card:hover .card-image,
+  .image-card:hover .graphic-svg {
+    transform: scale(1.03);
+  }
+
+  .category-tag-wrapper {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 2;
+  }
+
+  .card-content {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    flex: 1;
+  }
+
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 0.65rem;
+  }
+
+  .title-link {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .image-card:hover .title-link {
+    color: var(--accent);
+  }
+
+  .card-desc {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem 1.25rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .read-meta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .read-arrow {
+    font-family: var(--font-mono);
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .image-card:hover .read-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+</style>

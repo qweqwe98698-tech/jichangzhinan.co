@@ -1,0 +1,58 @@
+:root {
+  /* Color System */
+  --bg: #090b10;
+  --bg-soft: #0d1016;
+  --bg-translucent: rgba(9, 11, 16, 0.82);
+
+  --surface: #11141b;
+  --surface-2: #161a23;
+  --surface-3: #1d222e;
+  --surface-hover: #1a1f29;
+
+  --text: #f4f6fa;
+  --text-soft: #b2b8c5;
+  --muted: #7f8796;
+  --faint: #434a58;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(124, 255, 178, 0.3);
+
+  /* Proportions: Black/Grey 80%, Green 8%, Blue 7%, Purple 5% */
+  --accent: #7cffb2;
+  --accent-soft: rgba(124, 255, 178, 0.12);
+  --accent-glow: rgba(124, 255, 178, 0.25);
+
+  --accent-blue: #72a7ff;
+  --accent-blue-soft: rgba(114, 167, 255, 0.12);
+
+  --accent-purple: #a98cff;
+  --accent-purple-soft: rgba(169, 140, 255, 0.12);
+
+  --success: #62e7a3;
+  --warning: #f3ca73;
+  --danger: #ff7f91;
+
+  /* Dimensions & Spacing */
+  --max-width: 1380px;
+  --content-max-width: 800px;
+  --header-height: 72px;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+
+  /* Shadows */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 30px rgba(124, 255, 178, 0.08);
+
+  /* Mouse Glow Variables (Dynamically updated via JS) */
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}

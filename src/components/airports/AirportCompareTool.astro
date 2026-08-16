@@ -1,0 +1,380 @@
+---
+import { airportsData } from '../../data/airports';
+---
+
+<div class="airport-compare-box flux-card">
+  <div class="compare-header">
+    <div class="compare-title-wrap">
+      <span class="signal-dot breathing"></span>
+      <h3 class="compare-title">16 家机场品牌横向对决 PK 终端</h3>
+    </div>
+    <span class="compare-badge">SIDE-BY-SIDE MATRIX</span>
+  </div>
+
+  <p class="compare-desc">
+    选择任意两家或三家机场服务商，实时比对入门价格、包含流量、专线类型、折扣优惠码与应用场景支持度。
+  </p>
+
+  <!-- Selectors Row -->
+  <div class="compare-selectors-bar">
+    <div class="selector-col">
+      <label for="select-brand-1" class="selector-lbl">对比品牌 A:</label>
+      <select id="select-brand-1" class="matrix-select">
+        {airportsData.map((item, idx) => (
+          <option value={item.id} selected={idx === 0}>{item.name} ({item.startingPrice})</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="selector-col">
+      <label for="select-brand-2" class="selector-lbl">对比品牌 B:</label>
+      <select id="select-brand-2" class="matrix-select">
+        {airportsData.map((item, idx) => (
+          <option value={item.id} selected={idx === 2}>{item.name} ({item.startingPrice})</option>
+        ))}
+      </select>
+    </div>
+
+    <div class="selector-col">
+      <label for="select-brand-3" class="selector-lbl">对比品牌 C (可选):</label>
+      <select id="select-brand-3" class="matrix-select">
+        <option value="none">-- 不选择第三家 --</option>
+        {airportsData.map((item, idx) => (
+          <option value={item.id} selected={idx === 1}>{item.name} ({item.startingPrice})</option>
+        ))}
+      </select>
+    </div>
+  </div>
+
+  <!-- Comparison Results Table -->
+  <div class="table-scroll-wrap">
+    <table class="compare-table" id="compare-result-table">
+      <thead>
+        <tr id="compare-th-row">
+          <th class="feature-col-th">对比指标</th>
+          <th class="brand-col-th" id="th-brand-1">品牌 A</th>
+          <th class="brand-col-th" id="th-brand-2">品牌 B</th>
+          <th class="brand-col-th" id="th-brand-3">品牌 C</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-name-td">推荐定位</td>
+          <td id="td-rec-1" class="brand-val-td"></td>
+          <td id="td-rec-2" class="brand-val-td"></td>
+          <td id="td-rec-3" class="brand-val-td"></td>
+        </tr>
+        <tr>
+          <td class="feature-name-td">入门价格 / 流量</td>
+          <td id="td-price-1" class="brand-val-td highlight-price"></td>
+          <td id="td-price-2" class="brand-val-td highlight-price"></td>
+          <td id="td-price-3" class="brand-val-td highlight-price"></td>
+        </tr>
+        <tr>
+          <td class="feature-name-td">优惠活动与折扣码</td>
+          <td id="td-code-1" class="brand-val-td code-td"></td>
+          <td id="td-code-2" class="brand-val-td code-td"></td>
+          <td id="td-code-3" class="brand-val-td code-td"></td>
+        </tr>
+        <tr>
+          <td class="feature-name-td">线路类型与协议</td>
+          <td id="td-line-1" class="brand-val-td"></td>
+          <td id="td-line-2" class="brand-val-td"></td>
+          <td id="td-line-3" class="brand-val-td"></td>
+        </tr>
+        <tr>
+          <td class="feature-name-td">开业年份 (运营资历)</td>
+          <td id="td-year-1" class="brand-val-td mono-num"></td>
+          <td id="td-year-2" class="brand-val-td mono-num"></td>
+          <td id="td-year-3" class="brand-val-td mono-num"></td>
+        </tr>
+        <tr>
+          <td class="feature-name-td">支付方式</td>
+          <td id="td-pay-1" class="brand-val-td"></td>
+          <td id="td-pay-2" class="brand-val-td"></td>
+          <td id="td-pay-3" class="brand-val-td"></td>
+        </tr>
+        <tr>
+          <td class="feature-name-td">ChatGPT / AI 解锁</td>
+          <td id="td-ai-1" class="brand-val-td"></td>
+          <td id="td-ai-2" class="brand-val-td"></td>
+          <td id="td-ai-3" class="brand-val-td"></td>
+        </tr>
+        <tr>
+          <td class="feature-name-td">官网注册直达</td>
+          <td id="td-btn-1" class="brand-val-td btn-td"></td>
+          <td id="td-btn-2" class="brand-val-td btn-td"></td>
+          <td id="td-btn-3" class="brand-val-td btn-td"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .airport-compare-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.25rem;
+    margin: 2.5rem 0;
+  }
+
+  .compare-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .compare-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .compare-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .compare-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.08);
+    border: 1px solid rgba(124, 255, 178, 0.2);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+  }
+
+  .compare-desc {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .compare-selectors-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .selector-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .selector-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .matrix-select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.75rem;
+    font-family: var(--font-sans);
+    color: #ffffff;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .matrix-select:focus {
+    border-color: var(--accent);
+  }
+
+  .table-scroll-wrap {
+    overflow-x: auto;
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 0;
+    background: transparent;
+    border: none;
+  }
+
+  .compare-table th {
+    background: var(--surface-2);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .compare-table th.feature-col-th {
+    width: 22%;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+  }
+
+  .compare-table td {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+  }
+
+  .feature-name-td {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .brand-val-td {
+    color: var(--text);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .highlight-price {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--warning);
+    font-size: 0.95rem;
+  }
+
+  .compare-coupon-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(124, 255, 178, 0.1);
+    border: 1px dashed var(--accent);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .direct-register-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    background: var(--accent);
+    color: #090b10;
+    font-weight: 700;
+    font-size: 0.82rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .direct-register-btn:hover {
+    background: #95ffc2;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 860px) {
+    .compare-selectors-bar {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script define:vars={{ airportsData }}>
+  function setupAirportCompare() {
+    const sel1 = document.getElementById('select-brand-1');
+    const sel2 = document.getElementById('select-brand-2');
+    const sel3 = document.getElementById('select-brand-3');
+
+    const brandMap = {};
+    airportsData.forEach(b => {
+      brandMap[b.id] = b;
+    });
+
+    function updateComparison() {
+      const b1 = brandMap[sel1?.value] || airportsData[0];
+      const b2 = brandMap[sel2?.value] || airportsData[2];
+      const b3 = sel3?.value !== 'none' ? brandMap[sel3?.value] : null;
+
+      const th1 = document.getElementById('th-brand-1');
+      const th2 = document.getElementById('th-brand-2');
+      const th3 = document.getElementById('th-brand-3');
+
+      if (th1) th1.textContent = b1.name;
+      if (th2) th2.textContent = b2.name;
+      if (th3) {
+        th3.textContent = b3 ? b3.name : '未选择';
+        th3.style.opacity = b3 ? '1' : '0.4';
+      }
+
+      function populateBrand(idx, brand) {
+        const tdRec = document.getElementById(`td-rec-${idx}`);
+        const tdPrice = document.getElementById(`td-price-${idx}`);
+        const tdCode = document.getElementById(`td-code-${idx}`);
+        const tdLine = document.getElementById(`td-line-${idx}`);
+        const tdYear = document.getElementById(`td-year-${idx}`);
+        const tdPay = document.getElementById(`td-pay-${idx}`);
+        const tdAi = document.getElementById(`td-ai-${idx}`);
+        const tdBtn = document.getElementById(`td-btn-${idx}`);
+
+        if (!brand) {
+          if (tdRec) tdRec.textContent = '-';
+          if (tdPrice) tdPrice.textContent = '-';
+          if (tdCode) tdCode.textContent = '-';
+          if (tdLine) tdLine.textContent = '-';
+          if (tdYear) tdYear.textContent = '-';
+          if (tdPay) tdPay.textContent = '-';
+          if (tdAi) tdAi.textContent = '-';
+          if (tdBtn) tdBtn.innerHTML = '-';
+          return;
+        }
+
+        if (tdRec) tdRec.textContent = brand.recommendedFor;
+        if (tdPrice) tdPrice.textContent = `${brand.startingPrice} (${brand.monthlyTraffic})`;
+        if (tdCode) {
+          tdCode.innerHTML = brand.discountCode
+            ? `<span class="compare-coupon-badge">${brand.discountActivity || '优惠码'}: ${brand.discountCode}</span>`
+            : '<span style="color:var(--muted)">常规无门槛价格</span>';
+        }
+        if (tdLine) tdLine.textContent = `${brand.lineType} (${brand.protocols.join(', ')})`;
+        if (tdYear) tdYear.textContent = `${brand.openedYear} 年成立运营`;
+        if (tdPay) tdPay.textContent = brand.paymentMethods.join(' / ');
+        if (tdAi) tdAi.textContent = brand.aiUnlock.chatgpt ? '● 原生解锁 ChatGPT/Claude' : '○ 基础支持';
+        if (tdBtn) {
+          tdBtn.innerHTML = `<a href="${brand.officialUrl}" target="_blank" rel="noopener noreferrer" class="direct-register-btn">直达 ${brand.name} 官网 →</a>`;
+        }
+      }
+
+      populateBrand(1, b1);
+      populateBrand(2, b2);
+      populateBrand(3, b3);
+    }
+
+    sel1?.addEventListener('change', updateComparison);
+    sel2?.addEventListener('change', updateComparison);
+    sel3?.addEventListener('change', updateComparison);
+
+    updateComparison();
+  }
+
+  setupAirportCompare();
+  document.addEventListener('astro:page-load', setupAirportCompare);
+</script>

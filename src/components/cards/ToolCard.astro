@@ -1,0 +1,201 @@
+---
+import type { ToolItem } from '../../data/tools';
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  tool: ToolItem;
+  class?: string;
+}
+
+const { tool, class: className = '' } = Astro.props;
+---
+
+<div class={`flux-card tool-card ${className}`}>
+  <!-- Top Bar -->
+  <div class="tool-top">
+    <div class="tool-brand">
+      <span class="signal-dot"></span>
+      <span class="tool-category">{tool.category.toUpperCase()}</span>
+    </div>
+    <div class="tool-status">
+      <Badge variant={tool.status === 'Active' ? 'accent' : 'blue'}>{tool.status}</Badge>
+      <span class="tool-version">{tool.version}</span>
+    </div>
+  </div>
+
+  <!-- Main Info -->
+  <div class="tool-main">
+    <h3 class="tool-name">{tool.name}</h3>
+    <p class="tool-desc">{tool.description}</p>
+    
+    <!-- Feature tags -->
+    <div class="tool-features">
+      {tool.features.map(f => (
+        <span class="feature-chip">{f}</span>
+      ))}
+    </div>
+  </div>
+
+  <!-- Bottom Details & Platform Support -->
+  <div class="tool-bottom">
+    <div class="platform-chips">
+      {tool.platforms.map(p => (
+        <span class="platform-badge">{p}</span>
+      ))}
+    </div>
+    <div class="tool-actions">
+      {tool.githubUrl && (
+        <a href={tool.githubUrl} target="_blank" rel="noopener noreferrer" class="tool-link-btn outline" aria-label={`${tool.name} GitHub Repository`}>
+          GitHub
+        </a>
+      )}
+      <a href={tool.officialUrl} target="_blank" rel="noopener noreferrer" class="tool-link-btn primary" aria-label={`访问 ${tool.name} 官网`}>
+        官网 →
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.75rem;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 280px;
+  }
+
+  .tool-card:hover {
+    border-color: rgba(124, 255, 178, 0.35);
+    background: var(--surface-2);
+  }
+
+  .tool-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tool-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tool-category {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .tool-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tool-version {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .tool-main {
+    margin: 1.5rem 0;
+  }
+
+  .tool-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .tool-desc {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .tool-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .feature-chip {
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+  }
+
+  .tool-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .platform-chips {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .platform-badge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .tool-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .tool-link-btn {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.82rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .tool-link-btn.primary {
+    background: var(--accent);
+    color: #090b10;
+  }
+
+  .tool-link-btn.primary:hover {
+    background: #95ffc2;
+    transform: translateY(-1px);
+  }
+
+  .tool-link-btn.outline {
+    background: transparent;
+    color: var(--text-soft);
+    border: 1px solid var(--border);
+  }
+
+  .tool-link-btn.outline:hover {
+    border-color: var(--text);
+    color: #ffffff;
+  }
+</style>

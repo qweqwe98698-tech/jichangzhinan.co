@@ -1,0 +1,112 @@
+---
+interface PostLink {
+  id: string;
+  title: string;
+}
+
+interface Props {
+  prevPost?: PostLink;
+  nextPost?: PostLink;
+}
+
+const { prevPost, nextPost } = Astro.props;
+---
+
+{(prevPost || nextPost) && (
+  <nav class="article-nav-container" aria-label="相邻文章导航">
+    {prevPost ? (
+      <a href={`/articles/${prevPost.id}/`} class="nav-direction-box prev">
+        <div class="dir-meta">
+          <span class="arrow">←</span>
+          <span class="dir-label">PREVIOUS</span>
+        </div>
+        <span class="dir-title">{prevPost.title}</span>
+      </a>
+    ) : (
+      <div class="nav-direction-placeholder"></div>
+    )}
+
+    {nextPost ? (
+      <a href={`/articles/${nextPost.id}/`} class="nav-direction-box next">
+        <div class="dir-meta">
+          <span class="dir-label">NEXT</span>
+          <span class="arrow">→</span>
+        </div>
+        <span class="dir-title">{nextPost.title}</span>
+      </a>
+    ) : (
+      <div class="nav-direction-placeholder"></div>
+    )}
+  </nav>
+)}
+
+<style>
+  .article-nav-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-direction-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .nav-direction-box:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-2);
+    transform: translateY(-2px);
+  }
+
+  .nav-direction-box.next {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .dir-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .dir-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .nav-direction-box:hover .dir-title {
+    color: #ffffff;
+  }
+
+  @media (max-width: 640px) {
+    .article-nav-container {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .nav-direction-box.next {
+      text-align: left;
+      align-items: flex-start;
+    }
+  }
+</style>

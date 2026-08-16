@@ -1,0 +1,355 @@
+---
+// Real IPLC vs Fake Transit Verifier & Topology Diagnostic Component
+---
+
+<div class="iplc-verifier-box flux-card" id="iplc-verifier-root">
+  <div class="verifier-header">
+    <div class="verifier-title-wrap">
+      <span class="signal-dot purple"></span>
+      <h3 class="verifier-title">真假 IPLC 专线与网络拓扑自检工具</h3>
+    </div>
+    <span class="verifier-tag">DIAGNOSTIC WORKFLOW</span>
+  </div>
+
+  <p class="verifier-desc">
+    市面上大量低价“假专线”实际是用公网隧道或廉价中继冒充 IPLC。本工具提供标准的排查检测链路，点击卡片或复制指令即可快速辨别真伪。
+  </p>
+
+  <div class="verifier-steps-grid">
+    <!-- Step 1 -->
+    <div class="vstep-card">
+      <div class="vstep-head">
+        <span class="vstep-num">STEP 01</span>
+        <h4>路由跳数 (Hops) 深度检测</h4>
+      </div>
+      <p class="vstep-text">
+        使用 <code>NextTrace</code> 或 <code>BestTrace</code> 跟踪节点入口与落地机房 IP：
+      </p>
+      <div class="vstep-code-preview" data-copy="nexttrace 节点入口IP" title="点击一键复制命令">
+        <code>nexttrace 节点入口IP</code>
+        <button type="button" class="copy-cmd-btn" aria-label="复制命令">
+          <svg class="copy-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path></svg>
+          <span class="btn-text">复制</span>
+        </button>
+      </div>
+      <ul class="vstep-checklist">
+        <li><strong>真专线</strong>：境内入口接入后，第 2-3 跳直接到达香港/日本机房内网，中间无公网骨干网路由（如 202.97 / 59.43 等公网 AS）。</li>
+        <li><strong>假专线</strong>：中间出现大量公网骨干路由跳数，甚至途经多个省份公网跳转。</li>
+      </ul>
+      <a href="/articles/iplc-iepl-dedicated-line-airports/" class="vstep-link">
+        <span>查看真假专线深度图文解析</span>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="vstep-card">
+      <div class="vstep-head">
+        <span class="vstep-num">STEP 02</span>
+        <h4>晚高峰丢包率压力测试 (MTR)</h4>
+      </div>
+      <p class="vstep-text">
+        在晚间 20:30 - 23:00（网络拥堵最高峰），对节点发起 500 次并发 ICMP/TCP Ping：
+      </p>
+      <div class="vstep-code-preview" data-copy="mtr -c 500 --report 节点入口IP" title="点击一键复制命令">
+        <code>mtr -c 500 --report 节点入口IP</code>
+        <button type="button" class="copy-cmd-btn" aria-label="复制命令">
+          <svg class="copy-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path></svg>
+          <span class="btn-text">复制</span>
+        </button>
+      </div>
+      <ul class="vstep-checklist">
+        <li><strong>真 IPLC</strong>：全程丢包率严格保持在 <strong>0.0%</strong>，抖动波动 &lt; 2ms。</li>
+        <li><strong>普通中继/公网</strong>：晚高峰丢包率飙升至 5% - 25%，延迟剧烈波动。</li>
+      </ul>
+      <a href="/articles/beginner-network-troubleshooting/" class="vstep-link">
+        <span>查看 MTR 压测与排错实操</span>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="vstep-card">
+      <div class="vstep-head">
+        <span class="vstep-num">STEP 03</span>
+        <h4>倍率与真实可用带宽审计</h4>
+      </div>
+      <p class="vstep-text">
+        检查机场订阅中是否存在隐蔽的“倍率刺客”与限速套路：
+      </p>
+      <div class="vstep-code-preview" data-copy="1.0x 标准倍率" title="点击一键复制">
+        <code>主干节点要求: 1.0x 真实倍率</code>
+        <button type="button" class="copy-cmd-btn" aria-label="复制">
+          <svg class="copy-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path></svg>
+          <span class="btn-text">复制</span>
+        </button>
+      </div>
+      <ul class="vstep-checklist">
+        <li><strong>良心服务商</strong>：主干节点均标明 1.0x 倍率，大流量下载消耗实际流量。</li>
+        <li><strong>套路机场</strong>：宣传 1000GB 流量，但所有节点标为 3.0x - 8.0x 倍率，实际可用仅 100GB。</li>
+      </ul>
+      <a href="/articles/airport-scam-avoidance-and-fake-iplc/" class="vstep-link">
+        <span>查看倍率套路与避坑指南</span>
+        <span class="link-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .iplc-verifier-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.25rem;
+    margin: 2.5rem 0;
+  }
+
+  .verifier-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .verifier-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .verifier-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .verifier-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-purple);
+    background: rgba(169, 140, 255, 0.1);
+    border: 1px solid rgba(169, 140, 255, 0.25);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-full);
+  }
+
+  .verifier-desc {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .verifier-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .vstep-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: all 0.2s ease;
+  }
+
+  .vstep-card:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .vstep-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .vstep-num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent-purple);
+  }
+
+  .vstep-head h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .vstep-text {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .vstep-text code {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.08);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+
+  .vstep-code-preview {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 0.5rem;
+  }
+
+  .vstep-code-preview:hover {
+    border-color: var(--accent);
+    background: #131a24;
+  }
+
+  .vstep-code-preview code {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .copy-cmd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .vstep-code-preview:hover .copy-cmd-btn {
+    background: var(--accent);
+    color: #0d1117;
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .copy-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .vstep-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    line-height: 1.55;
+    flex: 1;
+  }
+
+  .vstep-checklist li {
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  .vstep-checklist li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+  }
+
+  .vstep-checklist li strong {
+    color: #ffffff;
+  }
+
+  .vstep-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .vstep-link:hover {
+    color: #ffffff;
+  }
+
+  .link-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .vstep-link:hover .link-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 900px) {
+    .verifier-steps-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function setupCopyButtons() {
+    const codeBoxes = document.querySelectorAll('.vstep-code-preview');
+    codeBoxes.forEach(box => {
+      box.addEventListener('click', async () => {
+        const textToCopy = box.getAttribute('data-copy') || '';
+        const btnText = box.querySelector('.btn-text');
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          if (btnText) {
+            btnText.textContent = '已复制!';
+            box.style.borderColor = '#7CFFB2';
+            setTimeout(() => {
+              btnText.textContent = '复制';
+              box.style.borderColor = '';
+            }, 2000);
+          }
+        } catch (err) {
+          console.error('Copy failed:', err);
+        }
+      });
+    });
+  }
+
+  setupCopyButtons();
+  document.addEventListener('astro:page-load', setupCopyButtons);
+</script>

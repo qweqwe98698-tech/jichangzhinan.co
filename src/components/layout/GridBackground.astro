@@ -1,0 +1,62 @@
+---
+import OrbitLines from '../ui/OrbitLines.astro';
+---
+
+<div class="grid-background" aria-hidden="true">
+  <div class="grid-overlay"></div>
+  <div class="glow-radial-top"></div>
+  <div class="glow-radial-bottom"></div>
+  <OrbitLines />
+</div>
+
+<style>
+  .grid-background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: var(--bg);
+  }
+
+  .grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-size: 48px 48px;
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+  }
+
+  .glow-radial-top {
+    position: absolute;
+    top: -15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 500px;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(124, 255, 178, 0.04) 0%,
+      rgba(114, 167, 255, 0.025) 45%,
+      transparent 70%
+    );
+    filter: blur(60px);
+  }
+
+  .glow-radial-bottom {
+    position: absolute;
+    bottom: 0;
+    right: 5%;
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(
+      circle at center,
+      rgba(169, 140, 255, 0.02) 0%,
+      transparent 65%
+    );
+    filter: blur(80px);
+  }
+</style>

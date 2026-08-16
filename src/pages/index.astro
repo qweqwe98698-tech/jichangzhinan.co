@@ -1,0 +1,597 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/hero/Hero.astro';
+import FeatureCard from '../components/cards/FeatureCard.astro';
+import ImageCard from '../components/cards/ImageCard.astro';
+import SignalCard from '../components/cards/SignalCard.astro';
+import NumberCard from '../components/cards/NumberCard.astro';
+import TopicCard from '../components/cards/TopicCard.astro';
+import HorizontalCard from '../components/cards/HorizontalCard.astro';
+import AirportFilterTerminal from '../components/airports/AirportFilterTerminal.astro';
+import Badge from '../components/ui/Badge.astro';
+import Divider from '../components/ui/Divider.astro';
+import { topicsData } from '../data/topics';
+import { toolsData } from '../data/tools';
+import { trendingPicks } from '../data/navigation';
+import { siteConfig } from '../config/site';
+
+// Fetch all live posts
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+// Sort by updatedDate or pubDate descending
+const sortedPosts = allPosts.sort((a, b) => {
+  const dateA = new Date(a.data.updatedDate || a.data.pubDate).getTime();
+  const dateB = new Date(b.data.updatedDate || b.data.pubDate).getTime();
+  return dateB - dateA;
+});
+
+const featuredPosts = sortedPosts.filter(p => p.data.featured);
+const mainFeaturePost = featuredPosts.find(p => p.id === '2026-best-airports-ranking-guide') || featuredPosts[0] || sortedPosts[0];
+const secondaryPost1 = featuredPosts.find(p => p.id === 'iplc-iepl-dedicated-line-airports') || featuredPosts[1] || sortedPosts[1];
+const secondaryPost2 = sortedPosts.find(p => p.id === 'best-airports-for-chatgpt-claude') || sortedPosts[2];
+
+// Compute dynamic count per topic
+const topicCounts = topicsData.map(topic => {
+  const count = allPosts.filter(p => p.data.category === topic.id).length;
+  return {
+    ...topic,
+    count
+  };
+});
+
+// Latest articles
+const latestPosts = sortedPosts.slice(0, 6);
+---
+
+<BaseLayout
+  title={`${siteConfig.name} - 2026最新优质机场推荐与代理导航 · 数字知识库`}
+  description={siteConfig.description}
+>
+  <!-- Hero Section -->
+  <Hero
+    articleCount={allPosts.length}
+    topicCount={topicsData.length}
+    toolsCount={toolsData.length}
+  />
+
+  <div class="container main-sections-wrap">
+    <!-- SECTION: TODAY / 编辑精选与实时热度 -->
+    <section class="home-section today-section" aria-labelledby="today-title" data-reveal>
+      <div class="section-header-bar">
+        <div class="sec-left">
+          <span class="signal-dot breathing"></span>
+          <h2 id="today-title" class="sec-main-title">TODAY'S SELECTION // 编辑精选与榜单</h2>
+        </div>
+        <span class="sec-right-tag">2026 权威天梯榜</span>
+      </div>
+
+      <div class="today-grid">
+        <!-- Col 1: Large Primary Feature Card -->
+        <div class="today-col-primary">
+          <FeatureCard
+            title={mainFeaturePost.data.title}
+            description={mainFeaturePost.data.description}
+            href={`/articles/${mainFeaturePost.id}/`}
+            category={mainFeaturePost.data.category}
+            categoryName={mainFeaturePost.data.categoryName}
+            readingTime={mainFeaturePost.data.readingTime}
+            badgeText={mainFeaturePost.data.badge || 'FEATURED PILLAR'}
+            indexNum="01"
+          />
+        </div>
+
+        <!-- Col 2: Secondary Double Cards -->
+        <div class="today-col-secondary">
+          {secondaryPost1 && (
+            <ImageCard
+              title={secondaryPost1.data.title}
+              description={secondaryPost1.data.description}
+              href={`/articles/${secondaryPost1.id}/`}
+              category={secondaryPost1.data.category}
+              categoryName={secondaryPost1.data.categoryName}
+              readingTime={secondaryPost1.data.readingTime}
+              coverImage={secondaryPost1.data.cover}
+              coverAlt={secondaryPost1.data.coverAlt}
+            />
+          )}
+          {secondaryPost2 && (
+            <SignalCard
+              tag="AI UNLOCK"
+              title={secondaryPost2.data.title}
+              description={secondaryPost2.data.description}
+              href={`/articles/${secondaryPost2.id}/`}
+              articleCount={allPosts.filter(p => p.data.category === secondaryPost2.data.category).length}
+            />
+          )}
+        </div>
+
+        <!-- Col 3: Trending List -->
+        <div class="today-col-trending">
+          <div class="trending-card flux-card">
+            <div class="trending-header">
+              <div class="trending-title-wrap">
+                <span class="signal-dot blue"></span>
+                <h3 class="trending-title">HOT RANKING</h3>
+              </div>
+              <span class="trending-badge">2026 PICKS</span>
+            </div>
+
+            <ol class="trending-list">
+              {trendingPicks.map(pick => (
+                <li class="trending-item">
+                  <span class="rank-num">{pick.rank}</span>
+                  <div class="trending-content">
+                    <a href={`/articles/${pick.slug}/`} class="trending-link">
+                      {pick.title}
+                    </a>
+                    <div class="trending-meta">
+                      <span class="trending-tag">{pick.tag}</span>
+                      <span class="trending-time">{pick.readTime}</span>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div class="trending-card-footer">
+              <a href="/airports/" class="trending-more-link">
+                <span>查看 16 品牌完整横评天梯</span>
+                <span class="trend-arrow">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Divider label="2026 AIRPORT SELECTION MATRIX" />
+
+    <!-- SECTION: AIRPORT FINDER TERMINAL (Direct interactive embedding) -->
+    <section class="home-section airport-matrix-section" data-reveal>
+      <div class="section-header-bar">
+        <div class="sec-left">
+          <span class="signal-dot"></span>
+          <h2 class="sec-main-title">AIRPORT FINDER // 2026 优质机场筛选终端</h2>
+        </div>
+        <a href="/airports/" class="sec-more-link">进入完整机场导航中心 →</a>
+      </div>
+
+      <AirportFilterTerminal />
+    </section>
+
+    <Divider label="EXPLORE BENTO GRID" />
+
+    <!-- SECTION: EXPLORE GRID (Irregular Bento Grid) -->
+    <section class="home-section explore-bento-section" aria-labelledby="bento-title" data-reveal>
+      <div class="section-header-bar">
+        <div class="sec-left">
+          <span class="signal-dot purple"></span>
+          <h2 id="bento-title" class="sec-main-title">EXPLORE GRID // 探索矩阵</h2>
+        </div>
+        <span class="sec-right-tag">IRREGULAR BENTO</span>
+      </div>
+
+      <div class="bento-grid-irregular">
+        <!-- Bento Item 1: Client Signal Terminal -->
+        <div class="bento-box bento-span-1">
+          <SignalCard
+            tag="CLIENT OS"
+            statusText="ACTIVE"
+            title="跨平台客户端矩阵"
+            description="覆盖 Windows、macOS、iOS 与 Android 各端主流网络调试工具。"
+            href="/topics/clients/"
+            articleCount={topicCounts.find(t => t.id === 'clients')?.count || 6}
+          />
+        </div>
+
+        <!-- Bento Item 2: Central Pillar Highlight -->
+        <div class="bento-box bento-span-2">
+          <FeatureCard
+            title="IPLC / IEPL 纯专线机场全景深度解析：为什么专线晚高峰永不卡顿？"
+            description="深度拆解跨国内网点对点物理专线技术：不过 GFW 审查机制、晚高峰 0 丢包特性与真专线选型指南。"
+            href="/articles/iplc-iepl-dedicated-line-airports/"
+            category="lines"
+            categoryName="专线与网络线路"
+            readingTime="15 MIN READ"
+            badgeText="IPLC PILLAR"
+            indexNum="02"
+          />
+        </div>
+
+        <!-- Bento Item 3: Number Highlight Card -->
+        <div class="bento-box bento-span-1">
+          <NumberCard
+            num="05"
+            title="机场避坑指南 2026：跑路特征识别与倍率套路揭秘"
+            description="系统化识别不良服务商跑路信号与拆穿假 IPLC 专线谎言。"
+            href="/articles/airport-scam-avoidance-and-fake-iplc/"
+            category="SECURITY"
+          />
+        </div>
+
+        <!-- Bento Item 4: Tools Ecosystem Highlight -->
+        <div class="bento-box bento-span-1">
+          <TopicCard
+            enName="TOOLBOX"
+            name="工具生态与数据终端"
+            description="协议兼容性矩阵、Fake-IP 计算器与订阅清洗向导。"
+            href="/tools/"
+            count={toolsData.length}
+          />
+        </div>
+
+        <!-- Bento Item 5: AI & Scenario Card -->
+        <div class="bento-box bento-span-2">
+          <ImageCard
+            title="ChatGPT & Claude 专属机场推荐：原生解锁不封号的高纯净 IP 节点指南"
+            description="彻底解决 OpenAI / Anthropic 封号、Access Denied 报错与 Cloudflare 无限验证码的高纯净度机场选型实测。"
+            href="/articles/best-airports-for-chatgpt-claude/"
+            category="scenarios"
+            categoryName="场景专用方案"
+            readingTime="14 MIN READ"
+          />
+        </div>
+      </div>
+    </section>
+
+    <Divider label="TAXONOMY TERMINAL" />
+
+    <!-- SECTION: TOPICS TERMINAL -->
+    <section class="home-section topics-section" aria-labelledby="topics-title" data-reveal>
+      <div class="section-header-bar">
+        <div class="sec-left">
+          <span class="signal-dot blue"></span>
+          <h2 id="topics-title" class="sec-main-title">TOPICS // 专题分类索引</h2>
+        </div>
+        <a href="/topics/" class="sec-more-link">浏览全部专题体系 →</a>
+      </div>
+
+      <div class="topics-cards-grid">
+        {topicCounts.map(topic => (
+          <TopicCard
+            name={topic.name}
+            enName={topic.enName}
+            description={topic.description}
+            href={`/topics/${topic.slug}/`}
+            count={topic.count}
+          />
+        ))}
+      </div>
+    </section>
+
+    <Divider label="LATEST STREAM" />
+
+    <!-- SECTION: LATEST ARTICLES STREAM -->
+    <section class="home-section latest-stream-section" aria-labelledby="stream-title" data-reveal>
+      <div class="section-header-bar">
+        <div class="sec-left">
+          <span class="signal-dot breathing"></span>
+          <h2 id="stream-title" class="sec-main-title">LATEST ARTICLES // 最新文章矩阵</h2>
+        </div>
+        <a href="/archive/" class="sec-more-link">查看完整归档时间轴 ({allPosts.length} 篇) →</a>
+      </div>
+
+      <div class="latest-stream-list">
+        {latestPosts.map(post => (
+          <HorizontalCard
+            title={post.data.title}
+            description={post.data.description}
+            href={`/articles/${post.id}/`}
+            category={post.data.category}
+            categoryName={post.data.categoryName}
+            date={post.data.pubDate}
+            readingTime={post.data.readingTime}
+            difficulty={post.data.difficulty}
+          />
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .main-sections-wrap {
+    padding-top: 1.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .home-section {
+    margin-bottom: 4rem;
+  }
+
+  .section-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .sec-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .sec-main-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .sec-right-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .sec-more-link {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .sec-more-link:hover {
+    color: #95ffc2;
+    transform: translateX(4px);
+  }
+
+  /* TODAY GRID: 3 columns */
+  .today-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr 0.9fr;
+    gap: 1.75rem;
+  }
+
+  .today-col-primary {
+    display: flex;
+  }
+
+  .today-col-secondary {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .today-col-trending {
+    display: flex;
+  }
+
+  /* Trending Card */
+  .trending-card {
+    background: linear-gradient(145deg, var(--surface) 0%, rgba(22, 26, 35, 0.95) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    transition: all 0.25s ease;
+  }
+
+  .trending-card:hover {
+    border-color: rgba(114, 167, 255, 0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(114, 167, 255, 0.06);
+  }
+
+  .trending-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 0.85rem;
+  }
+
+  .trending-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .trending-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .trending-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--accent-blue);
+    background: rgba(114, 167, 255, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(114, 167, 255, 0.2);
+  }
+
+  .trending-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+    justify-content: space-around;
+  }
+
+  .trending-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+  }
+
+  .trending-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateX(3px);
+  }
+
+  .rank-num {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.2;
+    min-width: 24px;
+  }
+
+  .trending-item:nth-child(1) .rank-num {
+    color: #FF7C7C;
+  }
+  .trending-item:nth-child(2) .rank-num {
+    color: #FFAE7C;
+  }
+  .trending-item:nth-child(3) .rank-num {
+    color: #F3CA73;
+  }
+
+  .trending-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+  }
+
+  .trending-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.45;
+    transition: color 0.2s ease;
+  }
+
+  .trending-link:hover {
+    color: var(--accent);
+  }
+
+  .trending-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+
+  .trending-tag {
+    color: var(--accent-blue);
+    background: rgba(114, 167, 255, 0.08);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  .trending-time {
+    color: var(--muted);
+  }
+
+  .trending-card-footer {
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .trending-more-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .trending-more-link:hover {
+    color: #ffffff;
+  }
+
+  .trend-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .trending-more-link:hover .trend-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Bento Grid Irregular */
+  .bento-grid-irregular {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+  }
+
+  .bento-box {
+    display: flex;
+  }
+
+  .bento-span-1 {
+    grid-column: span 1;
+  }
+
+  .bento-span-2 {
+    grid-column: span 2;
+  }
+
+  /* Topics Grid */
+  .topics-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+  }
+
+  /* Latest Stream List */
+  .latest-stream-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Responsive Breakpoints */
+  @media (max-width: 1200px) {
+    .today-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .today-col-trending {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .today-grid {
+      grid-template-columns: 1fr;
+    }
+    .today-col-trending {
+      grid-column: span 1;
+    }
+    .bento-grid-irregular {
+      grid-template-columns: 1fr;
+    }
+    .bento-span-2 {
+      grid-column: span 1;
+    }
+    .topics-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .topics-cards-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

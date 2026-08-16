@@ -1,0 +1,518 @@
+---
+// Pagefind search modal
+---
+
+<div class="search-modal-container" id="search-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="search-modal-title">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+
+  <div class="modal-window">
+    <!-- Modal Header with Search Input -->
+    <div class="modal-search-box">
+      <svg class="search-box-icon" viewBox="0 0 20 20" fill="none">
+        <path d="M9 15A6 6 0 1 0 9 3a6 6 0 0 0 0 12zM17 17l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <input
+        type="search"
+        id="search-input"
+        class="search-text-input"
+        placeholder="搜索文章、客户端教程、分流规则与工具..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="modal-close-btn" id="modal-close-btn" aria-label="关闭搜索">
+        <kbd>ESC</kbd>
+      </button>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="search-filter-bar">
+      <button class="filter-pill is-active" data-filter="all">全部</button>
+      <button class="filter-pill" data-filter="clients">客户端</button>
+      <button class="filter-pill" data-filter="protocols">协议</button>
+      <button class="filter-pill" data-filter="beginner">新手</button>
+      <button class="filter-pill" data-filter="tools">工具</button>
+    </div>
+
+    <!-- Search Results Container -->
+    <div class="modal-results-area" id="search-results-area">
+      <div class="search-initial-state" id="search-initial-state">
+        <div class="hint-row">
+          <span class="hint-key">↑ ↓</span>
+          <span class="hint-text">切换选项</span>
+          <span class="hint-key">Enter</span>
+          <span class="hint-text">打开页面</span>
+          <span class="hint-key">Esc</span>
+          <span class="hint-text">关闭</span>
+        </div>
+        <div class="popular-searches">
+          <span class="popular-title">热门搜索：</span>
+          <button class="quick-tag" data-query="Clash">Clash Verge</button>
+          <button class="quick-tag" data-query="Sing-box">Sing-box</button>
+          <button class="quick-tag" data-query="Hysteria">Hysteria 2</button>
+          <button class="quick-tag" data-query="DNS">DNS 泄漏</button>
+        </div>
+      </div>
+
+      <div class="search-loading" id="search-loading" style="display: none;">
+        <span class="signal-dot breathing"></span>
+        <span>正在检索知识库...</span>
+      </div>
+
+      <ul class="results-list" id="results-list" role="listbox"></ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .search-modal-container {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10vh;
+  }
+
+  .search-modal-container.is-open {
+    display: flex;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 7, 10, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .modal-window {
+    position: relative;
+    width: 92%;
+    max-width: 680px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(124, 255, 178, 0.05);
+    overflow: hidden;
+    z-index: 10;
+    animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes modalPop {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .modal-search-box {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    gap: 1rem;
+  }
+
+  .search-box-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .search-text-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1.15rem;
+    color: #ffffff;
+    font-family: var(--font-sans);
+  }
+
+  .search-text-input::placeholder {
+    color: var(--muted);
+  }
+
+  .modal-close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem;
+  }
+
+  .modal-close-btn kbd {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .search-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .filter-pill {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filter-pill:hover,
+  .filter-pill.is-active {
+    background: rgba(124, 255, 178, 0.12);
+    border-color: rgba(124, 255, 178, 0.4);
+    color: var(--accent);
+  }
+
+  .modal-results-area {
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+  }
+
+  .search-initial-state {
+    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .hint-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .hint-key {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    color: var(--text-soft);
+  }
+
+  .popular-searches {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .popular-title {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .quick-tag {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .quick-tag:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2.5rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  :global(.search-result-item) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.15rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.18s ease;
+    cursor: pointer;
+  }
+
+  :global(.search-result-item:hover),
+  :global(.search-result-item.is-selected) {
+    background: var(--surface-hover);
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  :global(.result-content) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  :global(.result-title) {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.result-snippet) {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  :global(.result-snippet mark) {
+    background: rgba(124, 255, 178, 0.25);
+    color: #ffffff;
+    padding: 0 0.2em;
+    border-radius: 2px;
+  }
+
+  :global(.result-meta) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  function setupSearchModal() {
+    const modal = document.getElementById('search-modal');
+    const backdrop = document.getElementById('modal-backdrop');
+    const closeBtn = document.getElementById('modal-close-btn');
+    const input = document.getElementById('search-input') as HTMLInputElement | null;
+    const resultsList = document.getElementById('results-list');
+    const initialState = document.getElementById('search-initial-state');
+    const loadingState = document.getElementById('search-loading');
+    const triggers = document.querySelectorAll('#search-trigger, .search-trigger-btn');
+    const quickTags = document.querySelectorAll('.quick-tag');
+    let pagefind: any = null;
+    let selectedIndex = -1;
+
+    function openModal() {
+      if (!modal) return;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => input?.focus(), 50);
+      loadPagefind();
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (input) input.value = '';
+      if (resultsList) resultsList.innerHTML = '';
+      if (initialState) initialState.style.display = 'flex';
+      if (loadingState) loadingState.style.display = 'none';
+      selectedIndex = -1;
+    }
+
+    async function loadPagefind() {
+      if (pagefind) return;
+      try {
+        const pagefindUrl = '/pagefind/pagefind.js';
+        // @ts-ignore
+        pagefind = await import(/* @vite-ignore */ pagefindUrl);
+        await pagefind.init();
+      } catch (e) {
+        console.log('Pagefind index initializing...');
+      }
+    }
+
+    async function performSearch(query: string) {
+      if (!query.trim()) {
+        if (resultsList) resultsList.innerHTML = '';
+        if (initialState) initialState.style.display = 'flex';
+        if (loadingState) loadingState.style.display = 'none';
+        return;
+      }
+
+      if (initialState) initialState.style.display = 'none';
+      if (loadingState) loadingState.style.display = 'flex';
+
+      try {
+        if (pagefind) {
+          const search = await pagefind.search(query);
+          const results = await Promise.all(search.results.slice(0, 8).map((r: any) => r.data()));
+          renderResults(results);
+        } else {
+          // Fallback static search simulation for dev mode
+          setTimeout(() => {
+            renderDevFallback(query);
+          }, 150);
+        }
+      } catch (err) {
+        console.error('Search error:', err);
+      } finally {
+        if (loadingState) loadingState.style.display = 'none';
+      }
+    }
+
+    function renderResults(results: any[]) {
+      if (!resultsList) return;
+      resultsList.innerHTML = '';
+
+      if (results.length === 0) {
+        resultsList.innerHTML = '<li class="no-results" style="padding: 2rem; text-align: center; color: var(--muted); font-size: 0.95rem;">未找到相关知识与文章，请尝试其他关键词。</li>';
+        return;
+      }
+
+      results.forEach((item, index) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.className = 'search-result-item';
+        a.href = item.url;
+        a.setAttribute('role', 'option');
+        a.setAttribute('data-index', String(index));
+
+        a.innerHTML = `
+          <div class="result-content">
+            <span class="result-title">${item.meta?.title || '未命名文章'}</span>
+            <span class="result-snippet">${item.excerpt || ''}</span>
+          </div>
+          <div class="result-meta">
+            <span>GO →</span>
+          </div>
+        `;
+        li.appendChild(a);
+        resultsList.appendChild(li);
+      });
+      selectedIndex = -1;
+    }
+
+    function renderDevFallback(query: string) {
+      // In dev mode when pagefind isn't built yet
+      const sampleArticles = [
+        { title: 'Clash Verge Rev 从入门到精通完整实战指南', url: '/articles/clash-verge-rev-guide/', excerpt: '掌握 Clash Verge Rev 客户端订阅导入、Tun 模式与规则分流' },
+        { title: 'Sing-box 核心原理与通用配置全景解析', url: '/articles/sing-box-universal-config/', excerpt: '深入理解 Sing-box 核心架构、Hysteria2 / TUIC 协议与 Rule-Set' },
+        { title: '主流代理协议全维度对比：Shadowsocks / Vmess / Vless / Trojan / Hysteria2', url: '/articles/network-protocols-comparison/', excerpt: '全方位对比主流网络协议性能、加密机制与抗丢包测试' },
+        { title: '彻底杜绝 DNS 泄漏：DoH / DoT 与分流解析深度防范指南', url: '/articles/anti-dns-leak-guide/', excerpt: '保护 DNS 真实解析行为，防止运营商劫持与 DNS 泄漏' }
+      ];
+
+      const matched = sampleArticles.filter(a => a.title.toLowerCase().includes(query.toLowerCase()) || a.excerpt.toLowerCase().includes(query.toLowerCase()));
+      renderResults(matched.map(m => ({ url: m.url, meta: { title: m.title }, excerpt: m.excerpt })));
+    }
+
+    triggers.forEach(t => t.addEventListener('click', openModal));
+    closeBtn?.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', closeModal);
+
+    quickTags.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const q = btn.getAttribute('data-query') || '';
+        if (input) {
+          input.value = q;
+          performSearch(q);
+        }
+      });
+    });
+
+    let debounceTimer: any = null;
+    input?.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        performSearch((e.target as HTMLInputElement).value);
+      }, 200);
+    });
+
+    // Keyboard navigation: Ctrl+K / '/' to open, Arrow keys, Enter, Esc
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        if (modal?.classList.contains('is-open')) closeModal();
+        else openModal();
+      } else if (e.key === '/' && !modal?.classList.contains('is-open') && (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA')) {
+        e.preventDefault();
+        openModal();
+      } else if (e.key === 'Escape' && modal?.classList.contains('is-open')) {
+        closeModal();
+      } else if (modal?.classList.contains('is-open')) {
+        const items = resultsList?.querySelectorAll<HTMLElement>('.search-result-item');
+        if (!items || items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          selectedIndex = (selectedIndex + 1) % items.length;
+          updateSelected(items);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+          updateSelected(items);
+        } else if (e.key === 'Enter' && selectedIndex >= 0 && items[selectedIndex]) {
+          e.preventDefault();
+          items[selectedIndex].click();
+        }
+      }
+    });
+
+    function updateSelected(items: NodeListOf<HTMLElement>) {
+      items.forEach((it, idx) => {
+        if (idx === selectedIndex) {
+          it.classList.add('is-selected');
+          it.scrollIntoView({ block: 'nearest' });
+        } else {
+          it.classList.remove('is-selected');
+        }
+      });
+    }
+  }
+
+  setupSearchModal();
+  document.addEventListener('astro:page-load', setupSearchModal);
+</script>

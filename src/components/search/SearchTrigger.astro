@@ -1,0 +1,119 @@
+---
+interface Props {
+  variant?: 'compact' | 'hero';
+  class?: string;
+}
+
+const { variant = 'compact', class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  class={`search-trigger-btn trigger-${variant} ${className}`}
+  id="search-trigger"
+  aria-label="打开搜索 (Ctrl + K)"
+>
+  <div class="trigger-left">
+    <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 15A6 6 0 1 0 9 3a6 6 0 0 0 0 12zM17 17l-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="trigger-text">
+      {variant === 'hero' ? '搜索文章、教程、协议与工具...' : 'Search...'}
+    </span>
+  </div>
+  <div class="trigger-hotkey">
+    <kbd class="hotkey-badge">Ctrl K</kbd>
+  </div>
+</button>
+
+<style>
+  .search-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--font-sans);
+    text-align: left;
+  }
+
+  .search-trigger-btn:hover {
+    border-color: var(--border-hover);
+    color: var(--text-soft);
+    background: var(--surface-hover);
+  }
+
+  .trigger-compact {
+    height: 38px;
+    padding: 0 0.85rem;
+    gap: 1rem;
+    min-width: 170px;
+  }
+
+  .trigger-hero {
+    height: 52px;
+    padding: 0 1.25rem;
+    width: 100%;
+    max-width: 580px;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  .trigger-hero:hover {
+    border-color: rgba(124, 255, 178, 0.4);
+    box-shadow: 0 0 20px rgba(124, 255, 178, 0.05);
+  }
+
+  .trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .search-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .trigger-hero .search-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--accent);
+  }
+
+  .trigger-text {
+    font-size: 0.88rem;
+  }
+
+  .trigger-hero .trigger-text {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+  }
+
+  .hotkey-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  @media (max-width: 640px) {
+    .trigger-compact {
+      min-width: unset;
+      padding: 0 0.6rem;
+    }
+    .trigger-compact .trigger-text,
+    .trigger-compact .trigger-hotkey {
+      display: none;
+    }
+  }
+</style>

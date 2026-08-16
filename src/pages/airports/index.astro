@@ -1,0 +1,374 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AirportFilterTerminal from '../../components/airports/AirportFilterTerminal.astro';
+import AirportCompareTool from '../../components/airports/AirportCompareTool.astro';
+import AirportEvidenceGallery from '../../components/airports/AirportEvidenceGallery.astro';
+import AirportCostCalculator from '../../components/airports/AirportCostCalculator.astro';
+import RealIPLCVerifier from '../../components/airports/RealIPLCVerifier.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Divider from '../../components/ui/Divider.astro';
+import { siteConfig } from '../../config/site';
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '机场推荐与导航', item: '/airports/' }
+];
+---
+
+<BaseLayout
+  title={`2026 最新优质机场推荐与代理导航 | ${siteConfig.name}`}
+  description="2026 稳定好用机场梯子全维度横评推荐：涵盖光速云、灵猫网络、星岛梦等 16 家主流机场实测资料、IEPL 专线、16 张原始测速图证据、优惠折扣码与 ChatGPT / Netflix 4K 解锁能力评测。"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container airports-hub-page">
+    <!-- Top Hero Banner -->
+    <header class="airports-hero-header" data-reveal>
+      <div class="hero-pre-badge">
+        <Badge variant="accent">
+          <span class="signal-dot breathing"></span>
+          2026 AIRPORT SELECTION MATRIX // 16 品牌实测证据库
+        </Badge>
+        <span class="hero-update-tag">最后更新: 2026-08</span>
+      </div>
+
+      <h1 class="airports-main-title">2026 优质机场推荐与网络代理导航</h1>
+      <p class="airports-lead-desc">
+        汇集 16 家经过严格实测的优质机场服务商。公开 16 张节点测速原始截图证据，提供专属优惠码、真实入门套餐规格、专线类型甄别与多品牌横向 PK 对比。
+      </p>
+
+      <!-- Quick Anchor Navigation -->
+      <div class="airports-quick-nav">
+        <a href="#airport-filter" class="quick-nav-pill">● 16 品牌筛选矩阵</a>
+        <a href="#evidence-gallery" class="quick-nav-pill">● 16 品牌实测证据库</a>
+        <a href="#airport-compare" class="quick-nav-pill">● 品牌横向 PK 对决</a>
+        <a href="#cost-calculator" class="quick-nav-pill">● 流量预算计算器</a>
+        <a href="#iplc-verifier" class="quick-nav-pill">● 真假专线自检</a>
+        <a href="#methodology" class="quick-nav-pill">● 评测准则</a>
+      </div>
+    </header>
+
+    <!-- SECTION 1: Airport Filter Terminal (16 Brands) -->
+    <section id="airport-filter" data-reveal>
+      <AirportFilterTerminal />
+    </section>
+
+    <!-- SECTION 2: 16 Brands Untouched Measured Evidence Gallery -->
+    <section id="evidence-gallery" data-reveal>
+      <Divider label="16 BRANDS UNTOUCHED SPEEDTEST EVIDENCE" />
+      <AirportEvidenceGallery />
+    </section>
+
+    <!-- SECTION 3: Side-by-Side Brand Comparison -->
+    <section id="airport-compare" data-reveal>
+      <Divider label="SIDE-BY-SIDE BRAND COMPARISON" />
+      <AirportCompareTool />
+    </section>
+
+    <!-- SECTION 4: Cost & Bandwidth Calculator -->
+    <section id="cost-calculator" data-reveal>
+      <Divider label="TRAFFIC & BUDGET ESTIMATION" />
+      <AirportCostCalculator />
+    </section>
+
+    <!-- SECTION 5: Real IPLC Verifier -->
+    <section id="iplc-verifier" data-reveal>
+      <Divider label="IPLC TOPOLOGY DIAGNOSTIC" />
+      <RealIPLCVerifier />
+    </section>
+
+    <!-- SECTION 6: Editorial Standards & Selection Methodology -->
+    <section id="methodology" class="methodology-card flux-card" data-reveal>
+      <div class="method-header">
+        <span class="signal-dot"></span>
+        <h2 class="method-title">机场指南编辑部 · 评测与选型六大准则</h2>
+      </div>
+
+      <div class="method-points-grid">
+        <a href="#evidence-gallery" class="mpoint-item">
+          <div class="mpoint-top">
+            <span class="mpoint-idx">01</span>
+            <span class="mpoint-badge">实测图库</span>
+          </div>
+          <h3>真实晚高峰压测与测速截图公开</h3>
+          <p>所有 16 家推荐节点均提供 2026-08-11 批次原始多并发测速截图证据，绝无 PS 或隐瞒异常高延迟节点。</p>
+          <div class="mpoint-action">
+            <span>查看 16 品牌测速证据画廊</span>
+            <span class="action-arrow">↓</span>
+          </div>
+        </a>
+
+        <a href="/articles/iplc-iepl-dedicated-line-airports/" class="mpoint-item">
+          <div class="mpoint-top">
+            <span class="mpoint-idx">02</span>
+            <span class="mpoint-badge">专线深度</span>
+          </div>
+          <h3>拒绝假专线中继</h3>
+          <p>严格审查服务商上游物理链路，排查是否使用廉价公网隧道冒充高成本的物理 IPLC/IEPL 内网专线。</p>
+          <div class="mpoint-action">
+            <span>阅读真假专线深度辨析</span>
+            <span class="action-arrow">→</span>
+          </div>
+        </a>
+
+        <a href="/articles/airport-scam-avoidance-and-fake-iplc/" class="mpoint-item">
+          <div class="mpoint-top">
+            <span class="mpoint-idx">03</span>
+            <span class="mpoint-badge">避坑指南</span>
+          </div>
+          <h3>倍率透明无套路</h3>
+          <p>严厉曝光标榜超大流量但节点倍率高达 5x-10x 的“倍率刺客”，优先收录 1.0x 真实倍率的良心服务商。</p>
+          <div class="mpoint-action">
+            <span>阅读倍率防坑与套路揭秘</span>
+            <span class="action-arrow">→</span>
+          </div>
+        </a>
+
+        <a href="/articles/best-airports-for-chatgpt-claude/" class="mpoint-item">
+          <div class="mpoint-top">
+            <span class="mpoint-idx">04</span>
+            <span class="mpoint-badge">AI 解锁</span>
+          </div>
+          <h3>AI 与流媒体原生解锁</h3>
+          <p>全节点深度测试 OpenAI (ChatGPT)、Claude 3.5、Midjourney 及 Netflix 4K、Disney+ 跨区原生解锁能力。</p>
+          <div class="mpoint-action">
+            <span>查看 ChatGPT/Claude 纯净专线</span>
+            <span class="action-arrow">→</span>
+          </div>
+        </a>
+
+        <a href="/guides/" class="mpoint-item">
+          <div class="mpoint-top">
+            <span class="mpoint-idx">05</span>
+            <span class="mpoint-badge">客户端</span>
+          </div>
+          <h3>全协议与客户端生态</h3>
+          <p>支持 Shadowsocks 2022、Vless-Reality、Hysteria 2、Trojan 等现代协议，并完美适配 Clash、Sing-box、Loon、Surge。</p>
+          <div class="mpoint-action">
+            <span>浏览客户端配置教程中心</span>
+            <span class="action-arrow">→</span>
+          </div>
+        </a>
+
+        <a href="/articles/cheap-budget-airports-recommendation/" class="mpoint-item">
+          <div class="mpoint-top">
+            <span class="mpoint-idx">06</span>
+            <span class="mpoint-badge">平价精选</span>
+          </div>
+          <h3>多梯队灵活订阅</h3>
+          <p>涵盖学生党平价月付、轻度用户按量不限时、极客高速 Hysteria2 及企业级独享住宅 IP 专线全矩阵。</p>
+          <div class="mpoint-action">
+            <span>查看平价与按量不限时推荐</span>
+            <span class="action-arrow">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .airports-hub-page {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .airports-hero-header {
+    max-width: 920px;
+    margin-bottom: 3.5rem;
+  }
+
+  .hero-pre-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-update-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .airports-main-title {
+    font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    color: #ffffff;
+    margin-bottom: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .airports-lead-desc {
+    font-size: 1.15rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .airports-quick-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .quick-nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .quick-nav-pill:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(124, 255, 178, 0.06);
+    transform: translateY(-1px);
+  }
+
+  /* Methodology Card */
+  .methodology-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    margin-top: 3.5rem;
+  }
+
+  .method-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .method-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .method-points-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+  }
+
+  .mpoint-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+
+  .mpoint-item:hover {
+    border-color: var(--accent);
+    background: var(--surface-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .mpoint-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mpoint-idx {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .mpoint-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    transition: all 0.2s ease;
+  }
+
+  .mpoint-item:hover .mpoint-badge {
+    color: var(--accent);
+    border-color: rgba(124, 255, 178, 0.3);
+    background: rgba(124, 255, 178, 0.08);
+  }
+
+  .mpoint-item h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    transition: color 0.2s ease;
+  }
+
+  .mpoint-item:hover h3 {
+    color: var(--accent);
+  }
+
+  .mpoint-item p {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+    margin: 0;
+    flex: 1;
+  }
+
+  .mpoint-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.2s ease;
+  }
+
+  .action-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .mpoint-item:hover .action-arrow {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 1024px) {
+    .method-points-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .method-points-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

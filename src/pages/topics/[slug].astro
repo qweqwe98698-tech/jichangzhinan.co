@@ -1,0 +1,324 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HorizontalCard from '../../components/cards/HorizontalCard.astro';
+import FeatureCard from '../../components/cards/FeatureCard.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Divider from '../../components/ui/Divider.astro';
+import { topicsData, type TopicMeta } from '../../data/topics';
+import { siteConfig } from '../../config/site';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+  return topicsData.map(topic => {
+    const posts = allPosts.filter(p => p.data.category === topic.id);
+    const sortedPosts = posts.sort((a, b) => {
+      const dateA = new Date(a.data.updatedDate || a.data.pubDate).getTime();
+      const dateB = new Date(b.data.updatedDate || b.data.pubDate).getTime();
+      return dateB - dateA;
+    });
+
+    return {
+      params: { slug: topic.slug },
+      props: { topic, posts: sortedPosts }
+    };
+  });
+}
+
+interface Props {
+  topic: TopicMeta;
+  posts: any[];
+}
+
+const { topic, posts } = Astro.props;
+const featuredPost = posts.find(p => p.data.featured) || posts[0];
+const remainingPosts = posts.filter(p => p.id !== featuredPost?.id);
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '专题分类', item: '/topics/' },
+  { name: topic.name, item: `/topics/${topic.slug}/` }
+];
+---
+
+<BaseLayout
+  title={`${topic.name} (${topic.enName}) 知识专题 | ${siteConfig.name}`}
+  description={topic.description}
+  breadcrumbs={breadcrumbs}
+  faqs={topic.faqs}
+>
+  <div class="container topic-detail-page">
+    <!-- Top Hero Banner for Topic -->
+    <header class="topic-hero-header" data-reveal>
+      <div class="header-pre-badge">
+        <Badge variant="accent">
+          <span class="signal-dot"></span>
+          CLUSTER // {topic.enName}
+        </Badge>
+        <span class="header-count">{posts.length} 篇收录文章</span>
+      </div>
+
+      <h1 class="topic-main-title">{topic.name}</h1>
+      <p class="topic-lead-desc">{topic.description}</p>
+    </header>
+
+    <!-- Learning Path / 学习路径 -->
+    {topic.learningPath && topic.learningPath.length > 0 && (
+      <section class="learning-path-section flux-card" data-reveal>
+        <div class="sec-title-row">
+          <span class="signal-dot breathing"></span>
+          <h2 class="sec-heading">RECOMMENDED LEARNING PATH // 学习路径</h2>
+        </div>
+        <ol class="path-steps-list">
+          {topic.learningPath.map((step, idx) => (
+            <li class="path-step-item">
+              <span class="path-step-idx">{String(idx + 1).padStart(2, '0')}</span>
+              <span class="path-step-text">{step}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    <!-- Featured Pillar Guide in this Topic -->
+    {featuredPost && (
+      <section class="topic-featured-section" data-reveal>
+        <div class="sec-title-row">
+          <span class="signal-dot blue"></span>
+          <h2 class="sec-heading">PILLAR GUIDE // 核心指南</h2>
+        </div>
+        <FeatureCard
+          title={featuredPost.data.title}
+          description={featuredPost.data.description}
+          href={`/articles/${featuredPost.id}/`}
+          category={featuredPost.data.category}
+          categoryName={featuredPost.data.categoryName}
+          readingTime={featuredPost.data.readingTime}
+          badgeText="RECOMMENDED"
+          indexNum="★"
+        />
+      </section>
+    )}
+
+    <Divider label="ALL TOPIC ARTICLES" />
+
+    <!-- All Articles List -->
+    <section class="topic-articles-section" data-reveal>
+      <div class="sec-title-row">
+        <span class="signal-dot purple"></span>
+        <h2 class="sec-heading">ALL ARTICLES // 本专题全部文章</h2>
+      </div>
+
+      {posts.length > 0 ? (
+        <div class="articles-stack">
+          {posts.map(post => (
+            <HorizontalCard
+              title={post.data.title}
+              description={post.data.description}
+              href={`/articles/${post.id}/`}
+              date={post.data.pubDate}
+              category={post.data.category}
+              categoryName={post.data.categoryName}
+              readingTime={post.data.readingTime}
+              difficulty={post.data.difficulty}
+            />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state-card flux-card">
+          <p>暂无相关内容，编辑部正在积极编撰中。</p>
+        </div>
+      )}
+    </section>
+
+    <!-- Topic FAQ Section if available -->
+    {topic.faqs && topic.faqs.length > 0 && (
+      <section class="topic-faq-section flux-card" id="faq" data-reveal>
+        <div class="sec-title-row">
+          <span class="signal-dot"></span>
+          <h2 class="sec-heading">TOPIC FAQ // 常见问题</h2>
+        </div>
+        <div class="faq-list">
+          {topic.faqs.map((faq, idx) => (
+            <div class="faq-row">
+              <div class="faq-q">
+                <span class="faq-num">Q{idx + 1}.</span>
+                <h3>{faq.q}</h3>
+              </div>
+              <p class="faq-a">{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .topic-detail-page {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .topic-hero-header {
+    max-width: 840px;
+  }
+
+  .header-pre-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .header-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .topic-main-title {
+    font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    color: #ffffff;
+    margin-bottom: 1rem;
+  }
+
+  .topic-lead-desc {
+    font-size: 1.15rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+  }
+
+  .sec-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sec-heading {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+  }
+
+  /* Learning Path */
+  .learning-path-section {
+    padding: 2rem 2.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .path-steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .path-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .path-step-idx {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+
+  .path-step-text {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Articles stack */
+  .articles-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* FAQ */
+  .topic-faq-section {
+    padding: 2.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .faq-row {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .faq-q {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .faq-num {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-purple);
+  }
+
+  .faq-q h3 {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .faq-a {
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .empty-state-card {
+    padding: 3rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  @media (max-width: 768px) {
+    .path-steps-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

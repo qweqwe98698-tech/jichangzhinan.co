@@ -1,0 +1,151 @@
+---
+import SEOHead from '../components/layout/SEOHead.astro';
+import GridBackground from '../components/layout/GridBackground.astro';
+import Header from '../components/layout/Header.astro';
+import MobileNav from '../components/layout/MobileNav.astro';
+import Footer from '../components/layout/Footer.astro';
+import SearchModal from '../components/search/SearchModal.astro';
+import '../styles/global.css';
+
+interface BreadcrumbItem {
+  name: string;
+  item: string;
+}
+
+interface FAQItem {
+  q: string;
+  a: string;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  pubDate?: Date;
+  updatedDate?: Date;
+  author?: string;
+  category?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  faqs?: FAQItem[];
+  canonicalUrl?: string;
+  hideFooter?: boolean;
+}
+
+const {
+  title,
+  description,
+  image,
+  type = 'website',
+  pubDate,
+  updatedDate,
+  author,
+  category,
+  breadcrumbs,
+  faqs,
+  canonicalUrl,
+  hideFooter = false
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <SEOHead
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      pubDate={pubDate}
+      updatedDate={updatedDate}
+      author={author}
+      category={category}
+      breadcrumbs={breadcrumbs}
+      faqs={faqs}
+      canonicalUrl={canonicalUrl}
+    />
+  </head>
+  <body>
+    <!-- Ambient Tech Grid & Orbit Lines -->
+    <GridBackground />
+
+    <!-- Top Header Navigation -->
+    <Header />
+
+    <!-- Mobile Drawer -->
+    <MobileNav />
+
+    <!-- Main Content Slot -->
+    <main class="main-content" id="main-content">
+      <slot />
+    </main>
+
+    <!-- Global Footer -->
+    {!hideFooter && <Footer />}
+
+    <!-- Global Command Palette Search Modal -->
+    <SearchModal />
+
+    <!-- Global Micro-interactions & Mouse Glow Scripts -->
+    <script>
+      function initInteractiveMotion() {
+        // 1. Mouse Glow Effect on Flux Cards
+        const cards = document.querySelectorAll('.flux-card');
+        const handleMouseMove = (e: MouseEvent) => {
+          const card = (e.currentTarget as HTMLElement);
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        };
+
+        cards.forEach(card => {
+          card.addEventListener('mousemove', handleMouseMove as EventListener, { passive: true });
+        });
+
+        // 2. Scroll Reveal with IntersectionObserver
+        const revealElements = document.querySelectorAll('[data-reveal]');
+        if (revealElements.length > 0 && 'IntersectionObserver' in window) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-revealed');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -40px 0px'
+          });
+
+          revealElements.forEach(el => observer.observe(el));
+        } else {
+          // Fallback if no IntersectionObserver or already revealed
+          revealElements.forEach(el => el.classList.add('is-revealed'));
+        }
+
+        // 3. Magnetic Button Micro-interaction for primary/large buttons (Desktop only)
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          const magneticBtns = document.querySelectorAll<HTMLElement>('.magnetic-btn');
+          magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e: MouseEvent) => {
+              const rect = btn.getBoundingClientRect();
+              const x = (e.clientX - rect.left - rect.width / 2) * 0.12;
+              const y = (e.clientY - rect.top - rect.height / 2) * 0.12;
+              btn.style.transform = `translate(${x}px, ${y}px)`;
+            });
+
+            btn.addEventListener('mouseleave', () => {
+              btn.style.transform = '';
+            });
+          });
+        }
+      }
+
+      // Initialize on load and on Astro page transitions
+      initInteractiveMotion();
+      document.addEventListener('astro:page-load', initInteractiveMotion);
+    </script>
+  </body>
+</html>

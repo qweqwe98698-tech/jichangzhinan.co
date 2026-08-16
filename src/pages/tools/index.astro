@@ -1,0 +1,304 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolCard from '../../components/cards/ToolCard.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Divider from '../../components/ui/Divider.astro';
+import ProtocolMatrix from '../../components/tools/ProtocolMatrix.astro';
+import SubnetCalculator from '../../components/tools/SubnetCalculator.astro';
+import RuleConverterWizard from '../../components/tools/RuleConverterWizard.astro';
+import { toolsData } from '../../data/tools';
+import { siteConfig } from '../../config/site';
+
+const platforms = ['All', 'Windows', 'macOS', 'iOS', 'Android', 'Linux'];
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '网络工具箱', item: '/tools/' }
+];
+---
+
+<BaseLayout
+  title={`网络工具箱与客户端生态 | ${siteConfig.name}`}
+  description="精选经过严格安全审查的主流开源代理客户端、订阅转换后端与网络诊断分析工具。"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container tools-page">
+    <!-- Header -->
+    <header class="tools-header" data-reveal>
+      <Badge variant="accent">
+        <span class="signal-dot"></span>
+        SOFTWARE ECOSYSTEM & DATA TERMINALS
+      </Badge>
+      <h1 class="tools-title">网络工具箱与客户端生态</h1>
+      <p class="tools-desc">
+        汇集经过社区广泛检验的现代化客户端、高性能代理内核与订阅转换利器。内置协议兼容性矩阵与 Fake-IP 计算终端。
+      </p>
+
+      <!-- Quick Jump Anchors -->
+      <div class="tool-quick-anchors">
+        <a href="#clients-list" class="quick-anchor-btn">● 客户端矩阵</a>
+        <a href="#protocol-matrix" class="quick-anchor-btn">● 协议兼容性</a>
+        <a href="#subnet-calculator" class="quick-anchor-btn">● Fake-IP 计算器</a>
+        <a href="#rule-converter" class="quick-anchor-btn">● 规则转换向导</a>
+      </div>
+
+      <!-- Platform Filter Chips -->
+      <div class="platform-filter-bar" id="clients-list">
+        <span class="filter-lbl">平台筛选:</span>
+        {platforms.map((p, idx) => (
+          <button
+            class={`platform-chip ${idx === 0 ? 'is-active' : ''}`}
+            data-platform={p.toLowerCase()}
+          >
+            {p === 'All' ? '全部平台' : p}
+          </button>
+        ))}
+      </div>
+    </header>
+
+    <!-- Tools Grid -->
+    <div class="tools-grid" id="tools-grid" data-reveal data-reveal-delay="2">
+      {toolsData.map(tool => (
+        <div
+          class="tool-card-item"
+          data-platforms={tool.platforms.map(p => p.toLowerCase()).join(',')}
+        >
+          <ToolCard tool={tool} />
+        </div>
+      ))}
+    </div>
+
+    <!-- TERMINAL TOOL 1: Protocol Matrix -->
+    <div id="protocol-matrix" data-reveal>
+      <Divider label="PROTOCOL & CLIENT MATRIX" />
+      <ProtocolMatrix />
+    </div>
+
+    <!-- TERMINAL TOOL 2: Subnet Calculator -->
+    <div id="subnet-calculator" data-reveal>
+      <Divider label="FAKE-IP & SUBNET TERMINAL" />
+      <SubnetCalculator />
+    </div>
+
+    <!-- TERMINAL TOOL 3: Rule Converter Wizard -->
+    <div id="rule-converter" data-reveal>
+      <Divider label="RULE CONVERSION WIZARD" />
+      <RuleConverterWizard />
+    </div>
+
+    <Divider label="ECOSYSTEM SELECTION ADVICE" />
+
+    <!-- Selection Advice Box -->
+    <section class="advice-card flux-card" data-reveal>
+      <div class="advice-header">
+        <span class="signal-dot breathing"></span>
+        <h2 class="advice-title">客户端选型避坑指北</h2>
+      </div>
+      <div class="advice-grid">
+        <div class="advice-item">
+          <h3>Windows 用户首选</h3>
+          <p>推荐 <strong>Clash Verge Rev</strong> 或 <strong>Mihomo Party</strong>。支持 Tun 虚拟网卡，内存开销低，易于导入各种机场订阅。</p>
+        </div>
+        <div class="advice-item">
+          <h3>macOS 用户首选</h3>
+          <p>追求极致功能选 <strong>Surge</strong>（支持增强模式与 Ponte）；追求高性价比开源选 <strong>Clash Verge Rev (M1/M2/M3)</strong>。</p>
+        </div>
+        <div class="advice-item">
+          <h3>iOS 用户首选</h3>
+          <p>入门推荐 <strong>Shadowrocket (小火箭)</strong>，操作简便生态丰富；进阶用户推荐 <strong>Loon</strong> 或 <strong>Surge iOS</strong>。</p>
+        </div>
+        <div class="advice-item">
+          <h3>Android 用户首选</h3>
+          <p>推荐 <strong>Clash Verge Android</strong> 或 <strong>Sing-box 官方版</strong>，支持 Material You 原生主题与前沿协议。</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .tools-page {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .tools-header {
+    max-width: 880px;
+    margin-bottom: 3rem;
+  }
+
+  .tools-title {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .tools-desc {
+    font-size: 1.1rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+  }
+
+  .tool-quick-anchors {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .quick-anchor-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .quick-anchor-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(124, 255, 178, 0.05);
+  }
+
+  .platform-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    padding-top: 0.5rem;
+  }
+
+  .filter-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .platform-chip {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0.35rem 0.95rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .platform-chip:hover,
+  .platform-chip.is-active {
+    background: rgba(124, 255, 178, 0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+  }
+
+  .tool-card-item.is-hidden {
+    display: none;
+  }
+
+  /* Advice Card */
+  .advice-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+  }
+
+  .advice-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.75rem;
+  }
+
+  .advice-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .advice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .advice-item h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .advice-item p {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .tools-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
+    .advice-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function setupToolPlatformFilter() {
+    const chips = document.querySelectorAll('.platform-chip');
+    const cards = document.querySelectorAll('.tool-card-item');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('is-active'));
+        chip.classList.add('is-active');
+
+        const selectedPlatform = chip.getAttribute('data-platform');
+
+        cards.forEach(card => {
+          const cardPlatforms = card.getAttribute('data-platforms') || '';
+          if (selectedPlatform === 'all' || cardPlatforms.includes(selectedPlatform!)) {
+            card.classList.remove('is-hidden');
+          } else {
+            card.classList.add('is-hidden');
+          }
+        });
+      });
+    });
+  }
+
+  setupToolPlatformFilter();
+  document.addEventListener('astro:page-load', setupToolPlatformFilter);
+</script>

@@ -1,0 +1,68 @@
+---
+import { topicsData } from '../../data/topics';
+---
+
+<div class="topic-ticker-container">
+  <span class="ticker-label">HOT TOPICS:</span>
+  <div class="ticker-tags">
+    {topicsData.slice(0, 4).map(topic => (
+      <a href={`/topics/${topic.slug}/`} class="ticker-pill">
+        <span class="pill-dot"></span>
+        <span class="pill-name">{topic.name}</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .topic-ticker-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .ticker-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .ticker-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .ticker-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .ticker-pill:hover {
+    border-color: var(--accent);
+    color: #ffffff;
+    background: rgba(124, 255, 178, 0.06);
+    transform: translateY(-1px);
+  }
+
+  .pill-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+</style>
