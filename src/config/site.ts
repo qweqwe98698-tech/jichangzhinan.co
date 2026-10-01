@@ -55,7 +55,7 @@ export const siteConfig: SiteConfig = {
     { name: 'GitHub', href: 'https://github.com', icon: 'github' }
   ],
   stats: {
-    articlesCountText: '39+',
+    articlesCountText: '40+',
     topicsCountText: '7+'
   }
 };

@@ -9,6 +9,7 @@
     "pagefind": "pagefind --site dist",
     "build": "astro build && pagefind --site dist",
     "indexnow": "node scripts/indexnow.js",
+    "matrix:publish": "node scripts/auto-publish-matrix.js",
     "preview": "astro preview"
   },
   "dependencies": {

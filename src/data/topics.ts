@@ -181,5 +181,28 @@ export const topicsData: TopicMeta[] = [
         a: '首先检查客户端是否正常获取了节点延迟并开启系统代理或 TUN 模式；其次检查系统时间是否精准同步（时间误差超过 90 秒会导致 TLS 握手失败）；最后排查第三方杀毒软件是否拦截了核心驱动。'
       }
     ]
+  },
+  {
+    id: 'protocols',
+    name: '底层协议与技术原理',
+    slug: 'protocols',
+    enName: 'PROTOCOLS',
+    badge: 'PROTOCOL MATRIX',
+    description: '深度解构 Shadowsocks、VLESS-Reality、Hysteria 2、TUIC 与 WireGuard 等现代代理协议传输层原理与伪装特性。',
+    icon: 'cpu',
+    featured: true,
+    order: 8,
+    learningPath: [
+      '现代代理协议演进路线：从明文混淆到主动嗅探免疫',
+      'VLESS-Reality 握手机制与 SNI 借用防封锁实测',
+      'Hysteria 2 基于 QUIC/UDP 的单边拥塞控制与抗限速',
+      'uTLS 客户端指纹伪装与反主动探测硬化'
+    ],
+    faqs: [
+      {
+        q: '为什么现代协议越来越倾向于使用 Reality 和 Hysteria 2？',
+        a: 'Reality 彻底消除了服务端 TLS 证书特征并借用大厂真实合法证书，防御 GFW 的主动探测；Hysteria 2 基于 UDP/QUIC 架构，能在高丢包恶劣链路下跑满带宽，是晚高峰抗 QoS 限速的核心武器。'
+      }
+    ]
   }
 ];
