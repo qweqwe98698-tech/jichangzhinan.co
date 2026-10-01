@@ -45,11 +45,11 @@ const { tool, class: className = '' } = Astro.props;
     </div>
     <div class="tool-actions">
       {tool.githubUrl && (
-        <a href={tool.githubUrl} target="_blank" rel="noopener noreferrer" class="tool-link-btn outline" aria-label={`${tool.name} GitHub Repository`}>
+        <a href={tool.githubUrl} target="_blank" rel="nofollow noopener noreferrer" class="tool-link-btn outline" aria-label={`${tool.name} GitHub Repository`}>
           GitHub
         </a>
       )}
-      <a href={tool.officialUrl} target="_blank" rel="noopener noreferrer" class="tool-link-btn primary" aria-label={`访问 ${tool.name} 官网`}>
+      <a href={tool.officialUrl} target="_blank" rel="nofollow noopener noreferrer" class="tool-link-btn primary" aria-label={`访问 ${tool.name} 官网`}>
         官网 →
       </a>
     </div>

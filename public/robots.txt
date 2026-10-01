@@ -1,4 +1,13 @@
+User-agent: bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Googlebot
+Allow: /
+
 User-agent: *
 Allow: /
+Disallow: /404.html
+Disallow: /404/
 
 Sitemap: https://jichangzhinan.co/sitemap-index.xml

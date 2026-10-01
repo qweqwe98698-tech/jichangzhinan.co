@@ -36,7 +36,7 @@ import { airportsData } from '../../data/airports';
         </div>
         <div class="thumb-foot">
           <span class="test-date-lbl">实测: {airport.speedtestDate}</span>
-          <a href={airport.officialUrl} target="_blank" rel="noopener noreferrer" class="link-aff">官网 →</a>
+          <a href={airport.officialUrl} target="_blank" rel="nofollow sponsored noopener noreferrer" class="link-aff">官网 →</a>
         </div>
       </div>
     ))}
@@ -60,7 +60,7 @@ import { airportsData } from '../../data/airports';
           <button type="button" class="tool-btn" id="btn-zoom-out" title="缩小 (按键 -)">－ 缩小</button>
           <button type="button" class="tool-btn" id="btn-zoom-reset" title="还原 100%">↺ 还原</button>
           <button type="button" class="tool-btn" id="btn-fit-width" title="适应宽度">⛶ 适宽</button>
-          <a id="modal-aff-link" href="#" target="_blank" rel="noopener noreferrer" class="tool-btn aff-btn">前往官网 →</a>
+          <a id="modal-aff-link" href="javascript:void(0)" target="_blank" rel="nofollow sponsored noopener noreferrer" class="tool-btn aff-btn">前往官网 →</a>
           <button type="button" class="modal-close-btn" id="modal-close" aria-label="关闭">&times;</button>
         </div>
       </div>

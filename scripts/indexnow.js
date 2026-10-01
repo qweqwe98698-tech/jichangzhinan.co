@@ -32,7 +32,8 @@ const urlList = [
   `https://${HOST}/topics/scenarios/`,
   `https://${HOST}/topics/clients/`,
   `https://${HOST}/topics/routing/`,
-  `https://${HOST}/topics/security/`
+  `https://${HOST}/topics/security/`,
+  `https://${HOST}/topics/beginner/`
 ];
 
 postFiles.forEach(file => {

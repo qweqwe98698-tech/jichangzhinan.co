@@ -23,6 +23,7 @@ interface Props {
   breadcrumbs?: BreadcrumbItem[];
   faqs?: FAQItem[];
   canonicalUrl?: string;
+  noindex?: boolean;
 }
 
 const {
@@ -36,7 +37,8 @@ const {
   category,
   breadcrumbs = [],
   faqs = [],
-  canonicalUrl: customCanonical
+  canonicalUrl: customCanonical,
+  noindex = false
 } = Astro.props;
 
 // Determine clean canonical URL
@@ -143,18 +145,18 @@ if (faqs && faqs.length > 0) {
 <meta name="generator" content={Astro.generator} />
 
 <!-- Canonical URL -->
-<link rel="canonical" href={canonicalUrl} />
+{!noindex && <link rel="canonical" href={canonicalUrl} />}
 
 <!-- Primary Meta Tags -->
 <title>{pageTitle}</title>
 <meta name="title" content={pageTitle} />
 <meta name="description" content={description} />
 <meta name="author" content={author} />
-<meta name="robots" content="index, follow" />
+<meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={type} />
-<meta property="og:url" content={canonicalUrl} />
+{!noindex && <meta property="og:url" content={canonicalUrl} />}
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={absoluteImageUrl} />

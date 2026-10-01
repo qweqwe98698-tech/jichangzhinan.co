@@ -359,7 +359,7 @@ import { airportsData } from '../../data/airports';
         if (tdPay) tdPay.textContent = brand.paymentMethods.join(' / ');
         if (tdAi) tdAi.textContent = brand.aiUnlock.chatgpt ? '● 原生解锁 ChatGPT/Claude' : '○ 基础支持';
         if (tdBtn) {
-          tdBtn.innerHTML = `<a href="${brand.officialUrl}" target="_blank" rel="noopener noreferrer" class="direct-register-btn">直达 ${brand.name} 官网 →</a>`;
+          tdBtn.innerHTML = `<a href="${brand.officialUrl}" target="_blank" rel="nofollow sponsored noopener noreferrer" class="direct-register-btn">直达 ${brand.name} 官网 →</a>`;
         }
       }
 
