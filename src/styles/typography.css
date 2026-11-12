@@ -154,3 +154,33 @@ hr {
   background: var(--border);
   margin: 2.5rem 0;
 }
+
+.main-content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  th, td {
+    padding: 0.7rem 0.85rem;
+    font-size: 0.88rem;
+  }
+}

@@ -3,8 +3,8 @@ title: "节点连接失败排错全流程：TLS 握手与系统防火墙排查"
 description: "网络工程师视角节点排错指南：ICMP Ping 测试、TCP 三次握手诊断、OpenSSL 模拟 TLS 证书协商、Windows Defender 拦截排查全景实战。"
 pubDate: 2026-08-05
 updatedDate: 2026-08-16
-category: "security"
-categoryName: "安全与避坑"
+category: "beginner"
+categoryName: "新手入门与排错"
 tags: ["排错教程", "TLS握手", "TCP连接", "Windows防火墙", "OpenSSL", "排障全流程", "安全防御"]
 author: "机场指南编辑部"
 featured: false

@@ -130,4 +130,4 @@ dns:
 | **关掉软件后电脑彻底断网** | Windows 注册表残留系统代理未还原 | 打开 Windows 设置 -> 网络和 Internet -> 代理 -> 关闭代理开关 |
 | **TUN 模式开启后无网络** | 虚拟网卡驱动冲突或防火墙拦截 | 进入设置重装服务模式，并在防火墙中允许 Mihomo 内核通信 |
 
-更多系统级故障排查，请参阅 [代理排错全百科 (20大高频解答)](/articles/proxy-troubleshooting-geo-faq/) 及 [彻底杜绝 DNS 泄漏指南](/articles/anti-dns-leak-guide/)。
+更多系统级故障排查与 Mihomo 进阶脚本覆写，请参阅 [Clash Verge Rev Script 脚本覆写与私有订阅链实战](/articles/clash-verge-rev-advanced-scripts-mihomo-meta-overrides/)、[代理排错全百科 (20大高频解答)](/articles/proxy-troubleshooting-geo-faq/) 及 [彻底杜绝 DNS 泄漏指南](/articles/anti-dns-leak-guide/)。

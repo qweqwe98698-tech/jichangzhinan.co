@@ -6,6 +6,7 @@ import Divider from '../../components/ui/Divider.astro';
 import ProtocolMatrix from '../../components/tools/ProtocolMatrix.astro';
 import SubnetCalculator from '../../components/tools/SubnetCalculator.astro';
 import RuleConverterWizard from '../../components/tools/RuleConverterWizard.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import { toolsData } from '../../data/tools';
 import { siteConfig } from '../../config/site';
 
@@ -13,33 +14,55 @@ const platforms = ['All', 'Windows', 'macOS', 'iOS', 'Android', 'Linux'];
 
 const breadcrumbs = [
   { name: '首页', item: '/' },
-  { name: '网络工具箱', item: '/tools/' }
+  { name: '工具箱与客户端', item: '/tools/' }
+];
+
+const toolsSchemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: '网络工具箱、客户端下载生态与在线配置终端',
+    description: '汇集 Clash Verge Rev、Mihomo Party、Shadowrocket、Sing-box 等开源代理客户端与协议矩阵、Fake-IP 子网计算器、订阅转换向导。',
+    url: `${siteConfig.url}/tools/`,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: toolsData.map((tool, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: tool.name,
+        description: tool.description
+      }))
+    }
+  }
 ];
 ---
 
 <BaseLayout
-  title={`网络工具箱与客户端生态 | ${siteConfig.name}`}
-  description="精选经过严格安全审查的主流开源代理客户端、订阅转换后端与网络诊断分析工具。"
+  title={`网络工具箱与开源客户端下载导航（Clash/Shadowrocket/Sing-box） | ${siteConfig.name}`}
+  description="2026 主流开源代理客户端与实用在线终端汇总：提供协议兼容性对比矩阵、Fake-IP 子网掩码计算器、Subconverter 规则转换配置向导及各平台安装包安全推荐。"
   breadcrumbs={breadcrumbs}
+  extraSchemas={toolsSchemas}
 >
   <div class="container tools-page">
+    <Breadcrumb items={breadcrumbs} />
+
     <!-- Header -->
     <header class="tools-header" data-reveal>
       <Badge variant="accent">
         <span class="signal-dot"></span>
-        SOFTWARE ECOSYSTEM & DATA TERMINALS
+        实用工具终端 · SOFTWARE ECOSYSTEM
       </Badge>
-      <h1 class="tools-title">网络工具箱与客户端生态</h1>
+      <h1 class="tools-title">网络工具箱与开源客户端生态</h1>
       <p class="tools-desc">
-        汇集经过社区广泛检验的现代化客户端、高性能代理内核与订阅转换利器。内置协议兼容性矩阵与 Fake-IP 计算终端。
+        汇集经过社区长期检验的现代化代理客户端、高性能内核与订阅转换工具，内置交互式协议兼容性矩阵、Fake-IP 子网计算器与规则向导。买好套餐不知道配哪款软件？可先读 <a href="/articles/airport-ladder-beginner-selection-guide/" style="color:var(--accent);">新手买机场梯子全流程攻略</a>。
       </p>
 
       <!-- Quick Jump Anchors -->
       <div class="tool-quick-anchors">
-        <a href="#clients-list" class="quick-anchor-btn">● 客户端矩阵</a>
-        <a href="#protocol-matrix" class="quick-anchor-btn">● 协议兼容性</a>
-        <a href="#subnet-calculator" class="quick-anchor-btn">● Fake-IP 计算器</a>
-        <a href="#rule-converter" class="quick-anchor-btn">● 规则转换向导</a>
+        <a href="#clients-list" class="quick-anchor-btn">● 开源客户端推荐</a>
+        <a href="#protocol-matrix" class="quick-anchor-btn">● 协议兼容性矩阵</a>
+        <a href="#subnet-calculator" class="quick-anchor-btn">● Fake-IP 子网计算器</a>
+        <a href="#rule-converter" class="quick-anchor-btn">● 订阅规则转换向导</a>
       </div>
 
       <!-- Platform Filter Chips -->
@@ -56,6 +79,8 @@ const breadcrumbs = [
       </div>
     </header>
 
+    <h2 style="font-size:1.35rem;font-weight:700;margin:0 0 1.25rem;color:var(--text);">全平台开源代理客户端与生态工具</h2>
+
     <!-- Tools Grid -->
     <div class="tools-grid" id="tools-grid" data-reveal data-reveal-delay="2">
       {toolsData.map(tool => (
@@ -70,19 +95,22 @@ const breadcrumbs = [
 
     <!-- TERMINAL TOOL 1: Protocol Matrix -->
     <div id="protocol-matrix" data-reveal>
-      <Divider label="PROTOCOL & CLIENT MATRIX" />
+      <Divider label="协议技术对比 · PROTOCOL MATRIX" />
+      <h2 style="font-size:1.35rem;font-weight:700;margin:0 0 1rem;color:var(--text);">代理加密协议与多端兼容性对比矩阵</h2>
       <ProtocolMatrix />
     </div>
 
     <!-- TERMINAL TOOL 2: Subnet Calculator -->
     <div id="subnet-calculator" data-reveal>
-      <Divider label="FAKE-IP & SUBNET TERMINAL" />
+      <Divider label="CIDR 计算器 · FAKE-IP TERMINAL" />
+      <h2 style="font-size:1.35rem;font-weight:700;margin:0 0 1rem;color:var(--text);">Fake-IP 与 CIDR 保留网段在线计算器</h2>
       <SubnetCalculator />
     </div>
 
     <!-- TERMINAL TOOL 3: Rule Converter Wizard -->
     <div id="rule-converter" data-reveal>
-      <Divider label="RULE CONVERSION WIZARD" />
+      <Divider label="订阅清洗向导 · RULE CONVERTER" />
+      <h2 style="font-size:1.35rem;font-weight:700;margin:0 0 1rem;color:var(--text);">Subconverter 订阅转换与节点清洗配置生成器</h2>
       <RuleConverterWizard />
     </div>
 

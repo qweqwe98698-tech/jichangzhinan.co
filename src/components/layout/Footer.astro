@@ -42,7 +42,7 @@ const currentYear = new Date().getFullYear();
       <!-- Navigation Columns -->
       {footerSections.map(section => (
         <div class="footer-nav-col">
-          <h4 class="footer-col-title">{section.title}</h4>
+          <div class="footer-col-title">{section.title}</div>
           <ul class="footer-nav-list">
             {section.links.map(link => (
               <li>

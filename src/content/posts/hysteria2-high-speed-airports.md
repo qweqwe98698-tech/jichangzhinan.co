@@ -55,9 +55,10 @@ faq: [
 
 | 品牌名称 | 协议支持生态 | 线路架构 | 专属优惠码 / 活动 | 最低起步价 | 综合评分 | 官网直达 |
 | :--- | :--- | :--- | :--- | :--- | :---: | :---: |
-| **[光速云](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y)** | **VLESS / Shadowsocks 2022** | **IEPL 企业内网专线** | 优惠码 `AMM` (新人 8 折) | **¥17 / 月** | **9.8** | [直达官网](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y) |
-| **[唯兔云](https://guangs.v2yunvipaff.com/#/?code=xIutqOBA)** | **VLESS 现代协议** | **60+ 节点三网优化** | 优惠码 `rabbit` (新人 9 折) | **¥14.9 / 月** | **9.5** | [直达官网](https://guangs.v2yunvipaff.com/#/?code=xIutqOBA) |
-| **[灵猫网络](https://vip01.civetnet.com/#/?code=8MIAyxak)** | **VLESS / Trojan / SS** | **150GB 专线大流量** | 优惠码 `lmao888` (新人 9 折) | **¥19 / 月** | **9.6** | [直达官网](https://vip01.civetnet.com/#/?code=8MIAyxak) |
+| **[光速云](/airports/guangsu-cloud/)** | **VLESS / SS / AnyTLS / Trojan** | **IEPL 企业内网专线** | 码 `AMM` (极速版及以上) | **年付 ¥99 (月¥25)** | **9.8** | [直达官网](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y) |
+| **[微风网络](/airports/weifeng/)** | **VLESS 纯现代协议** | **不限设备 288GB 大流量** | 季9 / 半8 / 年7折 | **¥29.9 / 月** | **9.6** | [直达官网](https://breezenet.breezenetaff.com/#/register?code=w90lR5i4) |
+| **[唯兔云](/airports/v2yun/)** | **VLESS 现代协议** | **60+ 节点三网优化** | 优惠码 `rabbit` (新人 9 折) | **¥14.9 / 月** | **9.5** | [直达官网](https://guangs.v2yunvipaff.com/#/?code=xIutqOBA) |
+| **[灵猫网络](/airports/civetnet/)** | **VLESS / Trojan / SS** | **150GB 专线大流量** | 优惠码 `lmao888` (新人 9 折) | **¥19 / 月** | **9.6** | [直达官网](https://vip01.civetnet.com/#/?code=8MIAyxak) |
 
 ---
 

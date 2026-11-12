@@ -203,4 +203,4 @@ sing-box run -c config.json
 sing-box format -c config.json -w
 ```
 
-更多旁路由部署实操，请继续阅读 [Docker 部署 Sing-box 旁路由核心](/articles/docker-sing-box-router/) 与 [彻底杜绝 DNS 泄漏深度指南](/articles/anti-dns-leak-guide/)。
+更多旁路由部署与 Linux 高性能调优实操，请继续阅读 [Sing-box 内核 eBPF / cgroup 透明代理 10Gbps 调优实战](/articles/sing-box-ebpf-cgroup-transparent-proxy-optimization/)、[Docker 部署 Sing-box 旁路由核心](/articles/docker-sing-box-router/) 与 [彻底杜绝 DNS 泄漏深度指南](/articles/anti-dns-leak-guide/)。

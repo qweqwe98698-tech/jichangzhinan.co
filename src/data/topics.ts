@@ -138,7 +138,7 @@ export const topicsData: TopicMeta[] = [
     slug: 'security',
     enName: 'SECURITY',
     badge: 'HARDENING',
-    description: '机场跑路预警机制、真假专线防骗揭秘、TLS 指纹伪装与数字隐私安全加固。',
+    description: '机场跑路预警机制、真假专线防骗取证、免费节点安全风险防范、TLS 指纹伪装与数字隐私安全加固指南。',
     icon: 'shield',
     featured: false,
     order: 6,

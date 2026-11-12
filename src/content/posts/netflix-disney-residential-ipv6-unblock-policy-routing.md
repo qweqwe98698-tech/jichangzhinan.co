@@ -2,7 +2,7 @@
 title: "Netflix 4K HDR 与 Disney+ 跨区解锁实战：住宅 IPv6 原生广播 + 策略路由链深度拆解"
 description: "从 TCP/TLS 握手指纹、IP 风控评分到 IPv6 原生广播与策略路由链，系统拆解 Netflix 4K HDR、Disney+、YouTube Premium 跨区解锁的底层机理。含 Mihomo/Sing-box 生产级配置、住宅 IP 落地拓扑、DNS 泄漏审计与吞吐压测数据。"
 pubDate: 2026-10-09
-updatedDate: 2026-10-09
+updatedDate: 2026-11-12
 category: "scenarios"
 categoryName: "场景方案"
 tags: ["Netflix 4K解锁","家庭住宅IP","IPv6原生广播","分流策略组","流媒体跨区"]
@@ -146,7 +146,7 @@ IPv6 的情况完全不同。全球 IPv6 部署率在 2026 年已经超过 45%�
 应用层: Safari 发起 https://www.netflix.com/browse
    │
    ▼
-DNS ��: Mihomo fake-ip 拦截 DNS 查询
+DNS 侧: Mihomo fake-ip 拦截 DNS 查询
    │  netflix.com → 198.18.0.23 (fake-ip)
    │  真实解析交给落地节点侧的 DNS
    │
@@ -403,7 +403,7 @@ rules:
 
 **`dns.nameserver-policy`**：这是整套配置的核心。`geosite:netflix` 的 DNS 查询被强制走 `US-Residential-IPv6` 节点解析。这意味着 Netflix 拿到的 CDN 边缘节点 IP 是基于美区住宅 IP 的视角返回的。如果不做这个配置，DNS 走本地解析，拿到的可能是香港或新加坡的 CDN 节点，即使出口 IP 在美区，播放请求也会被重定向。
 
-**`fake-ip-filter`**���这些域名不走 fake-ip，直接返回真实 IP。STUN、NTP、Windows 网络检测这类服务需要真实 IP 才能工作，走 fake-ip 会导致连接失败。
+**`fake-ip-filter`**：这些域名不走 fake-ip，直接返回真实 IP。STUN、NTP、Windows 网络检测这类服务需要真实 IP 才能工作，走 fake-ip 会导致连接失败。
 
 **`rules` 的顺序**：Mihomo 的规则是自上而下匹配，第一条命中即停止。所以流媒体规则必须放在国内直连规则之前。如果把 `GEOSITE,cn,DIRECT` 放在前面，某些 Netflix 的中文域名可能被误判为国内流量直连出去。
 
@@ -662,4 +662,11 @@ Netflix 4K HDR 的码率范围：
 | 4K SDR | 15 Mbps | 25 Mbps | 30 Mbps |
 | 4K HDR10 | 20 Mbps | 35 Mbps | 45 Mbps |
 | 4K Dolby Vision | 25 Mbps | 45 Mbps | 55 Mbps |
-| 1080p HDR | 8 Mbps |
+| 1080p HDR | 8 Mbps | 15 Mbps | 20 Mbps |
+
+---
+
+### 流媒体专线与防泄漏延伸指南
+
+- **实测解锁 4K 机场总览**：直接对比已通过奈飞非自制剧与 Disney+ 4K 验证的套餐，请参阅 [2026 Netflix / Disney+ 流媒体解锁机场推荐](/articles/netflix-disney-streaming-airports/) 与 [流媒体分流策略组专题指南](/articles/streaming-unlock-policy/)，也可进入 [2026 优质机场总榜](/airports/) 一键过滤流媒体解锁机场。
+- **防泄漏排查与专题导航**：观看 4K 出现“代理检测”时，请同步检查 [代理防 DNS 泄漏检查清单](/articles/anti-dns-leak-guide/) 与 [场景化选型方案专题](/topics/scenarios/)。

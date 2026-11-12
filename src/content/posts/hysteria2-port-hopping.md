@@ -3,8 +3,8 @@ title: "Hysteria 2 端口跳跃实战：突破晚高峰运营商 UDP 限速"
 description: "破解运营商单端口限速终极利器：Hysteria 2 动态端口跳跃 (Port Hopping) 原理、iptables 多端口重定向与抗 QoS 满速实战指南。"
 pubDate: 2026-08-04
 updatedDate: 2026-08-16
-category: "security"
-categoryName: "安全与避坑"
+category: "protocols"
+categoryName: "底层协议与原理"
 tags: ["Hysteria2", "端口跳跃", "PortHopping", "UDP加速", "抗QoS", "iptables", "安全防御"]
 author: "机场指南编辑部"
 featured: false

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Badge from '../../components/ui/Badge.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import { siteConfig } from '../../config/site';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
@@ -28,7 +29,7 @@ const archiveMap = new Map<number, Map<string, typeof sortedPosts>>();
 sortedPosts.forEach(post => {
   const d = new Date(post.data.pubDate);
   const year = d.getFullYear();
-  const monthName = d.toLocaleString('en-US', { month: 'long' });
+  const monthName = `${d.getMonth() + 1} 月`;
 
   if (!archiveMap.has(year)) {
     archiveMap.set(year, new Map());
@@ -55,19 +56,21 @@ const breadcrumbs = [
 ---
 
 <BaseLayout
-  title={`时间轴文章归档 | ${siteConfig.name}`}
-  description={`按年月时间轴检索全部 ${allPosts.length} 篇网络知识库与教程文章。`}
+  title={`全站文章时间轴归档（共 ${allPosts.length} 篇） | ${siteConfig.name}`}
+  description={`按年月时间轴完整检索全部 ${allPosts.length} 篇机场评测、IPLC 专线分析、纯净 IP 方案与代理客户端配置教程。`}
   breadcrumbs={breadcrumbs}
 >
   <div class="container archive-page">
+    <Breadcrumb items={breadcrumbs} />
+
     <header class="archive-header" data-reveal>
       <Badge variant="accent">
         <span class="signal-dot"></span>
-        CHRONOLOGICAL ARCHIVE
+        全站文章时间轴 · ARCHIVE
       </Badge>
       <h1 class="archive-title">时间轴归档</h1>
       <p class="archive-desc">
-        记录知识库的每一次迭代与更新。当前已收录 <strong class="highlight-count">{allPosts.length}</strong> 篇专业内容。
+        记录知识库的每一次迭代与更新。当前已收录 <strong class="highlight-count">{allPosts.length}</strong> 篇实测与教程内容，也可前往 <a href="/airports/" style="color:var(--accent);">机场推荐总榜</a> 或 <a href="/topics/" style="color:var(--accent);">八大知识专题</a> 浏览。
       </p>
     </header>
 
@@ -82,7 +85,7 @@ const breadcrumbs = [
           <div class="months-stack">
             {yearGroup.months.map(monthGroup => (
               <div class="month-block">
-                <h3 class="month-title">{monthGroup.monthName}</h3>
+                <h2 class="month-title">{monthGroup.monthName}</h2>
                 
                 <ul class="archive-posts-list">
                   {monthGroup.posts.map(post => {

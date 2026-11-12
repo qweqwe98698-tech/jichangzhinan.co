@@ -85,4 +85,4 @@ iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-m
 - **按需接入模式**：在电脑、Apple TV 或手机的 Wi-Fi 设置中，将 IP 获取方式改为「静态」，IP 设为 `192.168.1.50`，**路由器/网关填 `192.168.1.2`，DNS 填 `192.168.1.2`**。此时该设备即可享受全屋 4K 秒开加速。
 - **全屋无感模式**：在主路由后台将 DHCP 默认下发的网关与 DNS 全局修改为 `192.168.1.2`。
 
-更多主旁路由防环路与网关广播调优，请参阅 [主路由与旁路由 DHCP 网关指定实操](/articles/home-network-dhcp-traffic/) 与 [Docker 部署 Sing-box 旁路由](/articles/docker-sing-box-router/)。
+更多主旁路由防环路与网关广播调优，请参阅 [主路由与旁路由 DHCP 网关指定实操](/articles/home-network-dhcp-traffic/)、[OpenWrt / iStoreOS 旁路由 MosDNS 与 Fake-IP 避坑指南](/articles/openwrt-istoreos-bypass-gateway-mosdns-fakeip-mastery/) 与 [Docker 部署 Sing-box 旁路由](/articles/docker-sing-box-router/)。

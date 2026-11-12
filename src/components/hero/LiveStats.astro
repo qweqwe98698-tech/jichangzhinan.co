@@ -5,7 +5,7 @@ interface Props {
   toolsCount?: number;
 }
 
-const { articleCount = 39, topicCount = 6, toolsCount = 10 } = Astro.props;
+const { articleCount = 53, topicCount = 8, toolsCount = 10 } = Astro.props;
 ---
 
 <div class="flagship-promo-card flux-card" id="guangsu-hero-promo">
@@ -23,7 +23,7 @@ const { articleCount = 39, topicCount = 6, toolsCount = 10 } = Astro.props;
     <div class="brand-title-row">
       <div class="brand-name-wrap">
         <span class="brand-logo-icon">⚡</span>
-        <h3 class="brand-name">光速云</h3>
+        <div class="brand-name">光速云</div>
       </div>
       <span class="discount-pill">独家 8 折特惠</span>
     </div>
@@ -35,12 +35,12 @@ const { articleCount = 39, topicCount = 6, toolsCount = 10 } = Astro.props;
   <!-- Key Specs Matrix -->
   <div class="promo-specs-grid">
     <div class="spec-item">
-      <span class="spec-val">¥17<small>/月</small></span>
+      <span class="spec-val">¥25<small>/月(年¥99)</small></span>
       <span class="spec-lbl">入门专线月付</span>
     </div>
     <div class="spec-divider"></div>
     <div class="spec-item">
-      <span class="spec-val">110GB<small>+</small></span>
+      <span class="spec-val">168GB<small>+</small></span>
       <span class="spec-lbl">月度起步高速</span>
     </div>
     <div class="spec-divider"></div>
@@ -80,7 +80,7 @@ const { articleCount = 39, topicCount = 6, toolsCount = 10 } = Astro.props;
   <!-- Secondary Meta Link -->
   <div class="promo-footer-row">
     <a href="/airports/" class="footer-matrix-link">
-      <span>已收录 16 家实测天梯榜 ({articleCount}+ 篇技术指南)</span>
+      <span>已收录 42 品牌全库 · 18 家实测 ({articleCount}+ 篇技术指南)</span>
       <span class="arrow-sym">→</span>
     </a>
   </div>

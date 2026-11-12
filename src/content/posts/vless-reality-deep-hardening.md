@@ -3,8 +3,8 @@ title: "VLESS-Reality 安全加固：SNI 伪装与抗深度探测实战"
 description: "现代代理防封锁技术巅峰 VLESS-Reality 深度指南：X25519 密钥交换、SNI 目标域名精选、SpiderX 爬虫防御与生产级加固配置实战。"
 pubDate: 2026-08-02
 updatedDate: 2026-08-16
-category: "security"
-categoryName: "安全与避坑"
+category: "protocols"
+categoryName: "底层协议与原理"
 tags: ["VLESS", "Reality", "Xray", "Sing-box", "SNI伪装", "防封锁", "安全加固"]
 author: "机场指南编辑部"
 featured: false
@@ -98,4 +98,4 @@ faq: [
 
 配合 `xtls-rprx-vision` 流控模式，数据包在通过 TLS 加密后直接由内核在二层网络中进行零拷贝转发，不仅 CPU 占用极低，而且彻底消除了 TLS in TLS 的二次加密特征。
 
-更多指纹模拟与密码套件加固，请继续阅读 [uTLS 客户端指纹模拟深度加固](/articles/utls-fingerprint-simulation/) 与 [2026 代理协议全景横评](/articles/network-protocols-comparison/)。
+更多 SNI 借用原理、TLS 1.3 主动探测对抗与指纹模拟细节，请继续阅读 [VLESS-Reality 密钥套件与 SNI 伪装机制深度破译](/articles/vless-reality-sni-camouflage-active-probing-hardening/)、[uTLS 客户端指纹模拟深度加固](/articles/utls-fingerprint-simulation/) 与 [2026 代理协议全景横评](/articles/network-protocols-comparison/)。

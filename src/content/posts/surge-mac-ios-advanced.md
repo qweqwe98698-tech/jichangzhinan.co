@@ -104,4 +104,4 @@ Surge 的 **模块（Module）** 功能允许用户在不修改主配置的前�
 
 通过开启 **Surge Ponte** 功能，你出差在外的 iPhone 可以直接通过 P2P 隧道穿透回办公室或家里的 Mac，获得与身在家中完全一致的内网访问权限与 IP 地址，无需在家里配置昂贵的公网 IP 或复杂的端口映射。
 
-更多规则集与分流优化，请进一步阅读 [GeoIP 与 GeoSite 规则集优化](/articles/rule-sets-optimization/) 及 [Loon iOS 完整工作流指南](/articles/loon-ios-complete-workflow/)。
+更多规则集与分流优化，请进一步阅读 [Surge 5 与 Loon iOS MitM 脚本插件编写实战](/articles/surge-loon-ios-mitm-scripts-plugin-workflow/)、[GeoIP 与 GeoSite 规则集优化](/articles/rule-sets-optimization/) 及 [Loon iOS 完整工作流指南](/articles/loon-ios-complete-workflow/)。

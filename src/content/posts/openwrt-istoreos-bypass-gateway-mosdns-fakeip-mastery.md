@@ -1,8 +1,8 @@
 ---
-title: "OpenWrt 与 iStoreOS 旁路由全景避坑：Fake-IP 内存劫持、DHCP 网关死锁与 MosDNS 双栈分流终极拓扑"
+title: "OpenWrt 与 iStoreOS 旁路由避坑指南：Fake-IP 内存防劫持、网关死锁排查与 MosDNS 双栈拓扑"
 description: "从内核 netfilter 钩子到 MosDNS 双栈分流，拆解 OpenWrt/iStoreOS 旁路由最致命的五类故障：Fake-IP 内存池耗尽、DHCP 网关死锁与环路、DNS 泄漏、MTU 黑洞与 UDP 分片。给出可直接落地的 nftables、MosDNS、Sing-box、Mihomo 生产配置与抓包审计方法。"
 pubDate: 2026-11-09
-updatedDate: 2026-11-09
+updatedDate: 2026-11-12
 category: "routing"
 categoryName: "规则与路由"
 tags: ["OpenWrt旁路由","iStoreOS配置","MosDNS分流","Fake-IP防泄漏","DHCP网关环路"]
@@ -471,4 +471,11 @@ nft add rule inet fw4 dstnat tcp dport 53 redirect to :53
 
 2. **IPv6 DNS 泄漏**：主路由通过 RA 下发了 IPv6 DNS（比如运营商的 `240e::1`），客户端优先用 IPv6 DNS 解析，完全绕过 MosDNS。解决办法是在主路由上关闭 RA 的 DNS 下发，或者把 RA 的 DNS 指向旁路由的 IPv6 链路本地地址（`fe80::2`）。
 
-3. **DoH / DoT 绕过**：浏览器（Chrome、Firefox）
+3. **DoH / DoT 绕过**：浏览器（Chrome、Firefox）默认开启安全 DNS 后会直接向外部 DoH 服务器发起 HTTPS 443 请求，旁路网关难以用常规 UDP 53 规则拦截。生产环境应在终端关闭浏览器自带 DoH，或直接在旁路防火墙层对已知 DoH 服务器 IP 列表实施分流/丢弃，确保所有域名解析由 MosDNS 统一掌管。
+
+---
+
+### 旁路由与 DNS 深度阅读
+
+- **配套基础架构**：深入调整本地分流与网段掩码可参阅 [OpenWrt 透明网关架构总览](/articles/openwrt-transparent-gateway-master/)、[MosDNS 智能分流与防污染实践](/articles/mosdns-smart-resolver/) 以及 [在线 Fake-IP / CIDR 子网计算工具](/tools/)。
+- **网关节点选型与专题**：家庭长期在线路由建议搭配低丢包稳定的 [IPLC/IEPL 纯专线或高性价比主力机场](/articles/high-value-cost-effective-airports/)，更多路由教程见 [智能分流与 DNS 专题集群](/topics/routing/)。

@@ -1,173 +1,484 @@
 ---
-import { airportsData } from '../../data/airports';
-import Badge from '../ui/Badge.astro';
+import { airportsData, deepReviewAirports, totalAirportsCount, type AirportItem } from '../../data/airports';
+
+const lineTypes = ['全部', 'IEPL 专线', 'IPLC 纯专线', '企业级内网专线', '三网优化专线', 'BGP 优质中继'];
+const tiers: { label: string; value: string }[] = [
+  { label: '全部档位', value: 'all' },
+  { label: '旗舰专线 (Flagship)', value: 'Flagship' },
+  { label: '高性价比 (HighValue)', value: 'HighValue' },
+  { label: '按量不限时 (OnDemand)', value: 'OnDemand' },
+  { label: '便宜入门 (Budget)', value: 'Budget' },
+  { label: '企业独享 (Enterprise)', value: 'Enterprise' }
+];
+
+const measuredCount = deepReviewAirports.length;
+const vendorCount = airportsData.filter((a) => a.dataStatus === 'vendor').length;
+const historicCount = airportsData.filter((a) => a.dataStatus === 'historic').length;
+
+const dataStatusLabel: Record<AirportItem['dataStatus'], string> = {
+  measured: '实测证据',
+  vendor: '厂商口径',
+  historic: '历史档案'
+};
+
+const tierNameMap: Record<AirportItem['tier'], string> = {
+  Flagship: '旗舰专线',
+  HighValue: '高性价比',
+  OnDemand: '按量不限时',
+  Budget: '便宜入门',
+  Enterprise: '企业极速'
+};
 ---
 
-<div class="airport-finder-terminal flux-card">
-  <!-- Terminal Header -->
+<div class="finder-box flux-card" id="airport-finder-root">
   <div class="finder-header">
     <div class="finder-title-wrap">
       <span class="signal-dot breathing"></span>
-      <h3 class="finder-title">2026 优质机场多维筛选矩阵 (16 品牌实测库)</h3>
+      <h2 class="finder-title">2026 优质机场多维筛选矩阵 ({totalAirportsCount} 品牌库 · {measuredCount} 家实测)</h2>
     </div>
-    <span class="finder-status-tag">REALTIME MATRIX // 16 VERIFIED BRANDS</span>
+    <span class="finder-status-tag">
+      {measuredCount} MEASURED // {vendorCount} VENDOR // {historicCount} HISTORIC
+    </span>
   </div>
 
   <p class="finder-desc">
-    根据您的具体使用场景、网络线路偏好与预算周期，精准筛选通过编辑部稳定性压力测试的 16 家优质机场。
+    全站完整收录 <strong>{totalAirportsCount} 家机场品牌</strong>，严格区分口径：前 10 位按编辑部主推序列置顶；其中 <strong>{measuredCount} 家配有真实测速图/解锁图（可点进独立深度评测页）</strong>，其余 {vendorCount} 家标注官方口径、{historicCount} 家保留历史档案以防混淆。
   </p>
 
-  <!-- Filter Controls -->
-  <div class="finder-filters-panel">
-    <!-- Row 1: Line Type Filter -->
-    <div class="filter-group-row">
-      <span class="filter-group-lbl">线路类型:</span>
-      <div class="filter-pills-list" id="line-filters">
-        <button type="button" class="matrix-filter-pill is-active" data-filter-type="line" data-val="all">全部线路</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="line" data-val="IEPL">IEPL / IPLC 专线</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="line" data-val="企业级内网专线">企业级内网</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="line" data-val="三网优化">三网优化专线</button>
+  <!-- Search + Multi-Facet Controls -->
+  <div class="finder-controls">
+    <div class="search-row">
+      <label for="airport-keyword-search" class="sr-only">按品牌名、协议、节点地区或特性搜索机场</label>
+      <div class="search-input-wrap">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          id="airport-keyword-search"
+          class="keyword-input"
+          placeholder="搜索品牌名、协议（VLESS / Hysteria2 / SS）、地区、优惠码或特性..."
+          autocomplete="off"
+        />
+      </div>
+      <div class="match-counter">
+        当前匹配 <strong id="finder-match-count">{totalAirportsCount}</strong> / {totalAirportsCount} 家
+      </div>
+      <button type="button" id="finder-reset-btn" class="reset-btn">重置筛选</button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">数据口径与特性:</span>
+      <div class="filter-pills" data-filter-group="scope">
+        <button type="button" class="fpill is-active" data-val="all">全部 {totalAirportsCount} 家</button>
+        <button type="button" class="fpill" data-val="measured">有测速/解锁实测 ({measuredCount})</button>
+        <button type="button" class="fpill" data-val="topten">Top 10 主推</button>
+        <button type="button" class="fpill" data-val="unlimited">含永久/不限时包</button>
+        <button type="button" class="fpill" data-val="thirdparty">支持 Clash 第三方订阅</button>
+        <button type="button" class="fpill" data-val="historic">历史档案库 ({historicCount})</button>
       </div>
     </div>
 
-    <!-- Row 2: Scenario Filter -->
-    <div class="filter-group-row">
-      <span class="filter-group-lbl">核心场景:</span>
-      <div class="filter-pills-list" id="scenario-filters">
-        <button type="button" class="matrix-filter-pill is-active" data-filter-type="scenario" data-val="all">全场景通用</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="scenario" data-val="chatgpt">ChatGPT / AI 原生</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="scenario" data-val="netflix">Netflix 4K 流媒体</button>
+    <div class="filter-group">
+      <span class="filter-label">线路架构:</span>
+      <div class="filter-pills" data-filter-group="line">
+        {lineTypes.map((lt, idx) => (
+          <button
+            type="button"
+            class={`fpill ${idx === 0 ? 'is-active' : ''}`}
+            data-val={lt === '全部' ? 'all' : lt}
+          >
+            {lt}
+          </button>
+        ))}
       </div>
     </div>
 
-    <!-- Row 3: Tier Filter -->
-    <div class="filter-group-row">
-      <span class="filter-group-lbl">预算档位:</span>
-      <div class="filter-pills-list" id="tier-filters">
-        <button type="button" class="matrix-filter-pill is-active" data-filter-type="tier" data-val="all">全部档位</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="tier" data-val="Flagship">旗舰主力档 (25元+)</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="tier" data-val="HighValue">高性价比主力 (18-20元)</button>
-        <button type="button" class="matrix-filter-pill" data-filter-type="tier" data-val="Budget">低价平价档 (15元内/年付)</button>
+    <div class="filter-row-split">
+      <div class="filter-group">
+        <span class="filter-label">核心场景:</span>
+        <div class="filter-pills" data-filter-group="scenario">
+          <button type="button" class="fpill is-active" data-val="all">全部场景</button>
+          <button type="button" class="fpill" data-val="chatgpt">ChatGPT / Claude AI</button>
+          <button type="button" class="fpill" data-val="netflix">Netflix / 4K 流媒体</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">预算档位:</span>
+        <div class="filter-pills" data-filter-group="tier">
+          {tiers.map((t, idx) => (
+            <button
+              type="button"
+              class={`fpill ${idx === 0 ? 'is-active' : ''}`}
+              data-val={t.value}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Airport Cards Results Grid -->
-  <div class="airport-results-grid" id="airport-cards-list">
-    {airportsData.map(airport => (
-      <div
-        class="airport-matrix-card flux-card"
-        data-line={airport.lineType}
-        data-tier={airport.tier}
-        data-chatgpt={airport.aiUnlock.chatgpt ? 'true' : 'false'}
-        data-netflix={airport.streamingUnlock.netflix ? 'true' : 'false'}
-      >
-        <!-- Card Top -->
-        <div class="card-top-row">
-          <div class="top-title-group">
-            <span class="signal-dot"></span>
-            <h4 class="airport-card-name">{airport.name}</h4>
-            <span class="opened-year-tag">{airport.openedYear} 年成立</span>
-          </div>
-          <Badge variant={airport.tier === 'Flagship' ? 'accent' : airport.tier === 'Budget' ? 'purple' : 'blue'}>
-            {airport.lineType}
-          </Badge>
-        </div>
+  <!-- 42-Brand Card Matrix -->
+  <div class="airport-cards-grid" id="airport-matrix-grid">
+    {airportsData.map((airport) => {
+      const hasExternalUrl = /^https?:\/\//i.test(airport.officialUrl);
+      const supportsThirdParty = airport.supportsThirdPartySub !== false;
+      const evCount = airport.evidenceImages?.length || (airport.speedtestImage ? 1 : 0);
+      const searchBlob = [
+        airport.name,
+        airport.tagline,
+        airport.lineType,
+        airport.protocols.join(' '),
+        airport.features.join(' '),
+        airport.nodeCoverage || '',
+        airport.recommendedFor,
+        airport.discountCode || ''
+      ]
+        .join(' ')
+        .toLowerCase();
 
-        <p class="airport-tagline">{airport.tagline}</p>
+      return (
+        <article
+          id={`airport-${airport.id}`}
+          class={`airport-matrix-card flux-card status-${airport.dataStatus}`}
+          data-line={airport.lineType}
+          data-tier={airport.tier}
+          data-status={airport.dataStatus}
+          data-topten={airport.isTopTen ? 'true' : 'false'}
+          data-unlimited={airport.hasUnlimitedPlan ? 'true' : 'false'}
+          data-thirdparty={supportsThirdParty ? 'true' : 'false'}
+          data-chatgpt={airport.aiUnlock.chatgpt ? 'true' : 'false'}
+          data-netflix={airport.streamingUnlock.netflix ? 'true' : 'false'}
+          data-search={searchBlob}
+        >
+          <!-- Card Top Header -->
+          <div class="card-top-row">
+            <div class="rank-name-wrap">
+              <span class={`rank-num ${airport.isTopTen ? 'top10' : ''}`}>
+                #{String(airport.rankOrder).padStart(2, '0')}
+              </span>
+              <h3 class="airport-card-name">
+                {airport.hasDeepReview ? (
+                  <a href={`/airports/${airport.slug}/`} class="name-link">
+                    {airport.name}
+                  </a>
+                ) : (
+                  <span>{airport.name}</span>
+                )}
+              </h3>
+            </div>
 
-        <!-- Metric Ratings -->
-        <div class="metrics-bar">
-          <div class="metric-item">
-            <span class="metric-lbl">综合评分</span>
-            <span class="metric-val score">{airport.ratingScore}</span>
-          </div>
-          <div class="metric-sep"></div>
-          <div class="metric-item">
-            <span class="metric-lbl">晚高峰测速</span>
-            <span class="metric-val">{airport.speedRating}%</span>
-          </div>
-          <div class="metric-sep"></div>
-          <div class="metric-item">
-            <span class="metric-lbl">SLA 稳定性</span>
-            <span class="metric-val">{airport.stabilityRating}%</span>
-          </div>
-        </div>
-
-        <!-- Specs List -->
-        <div class="specs-box">
-          <div class="spec-row">
-            <span class="spec-lbl">入门套餐:</span>
-            <span class="spec-val price">{airport.startingPrice} / {airport.monthlyTraffic}</span>
-          </div>
-          {airport.discountCode && (
-            <div class="spec-row">
-              <span class="spec-lbl">专属优惠:</span>
-              <span class="spec-val discount">
-                {airport.discountActivity || '优惠码'}: <code>{airport.discountCode}</code>
+            <div class="card-badges">
+              {airport.isTopTen && <span class="mini-badge top">TOP 10</span>}
+              <span class={`mini-badge status-${airport.dataStatus}`}>
+                {dataStatusLabel[airport.dataStatus]}
+                {evCount > 0 ? ` (${evCount}图)` : ''}
               </span>
             </div>
-          )}
-          <div class="spec-row">
-            <span class="spec-lbl">协议支持:</span>
-            <span class="spec-val">{airport.protocols.join(', ')}</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-lbl">适用场景:</span>
-            <span class="spec-val desc">{airport.recommendedFor}</span>
+
+          <p class="airport-tagline">{airport.tagline}</p>
+
+          <!-- Key Metrics Strip -->
+          <div class="card-metrics-strip">
+            <div class="cm-cell">
+              <span class="cm-lbl">起步价</span>
+              <strong class="cm-val price">{airport.startingPrice}</strong>
+            </div>
+            <div class="cm-cell">
+              <span class="cm-lbl">月流量</span>
+              <strong class="cm-val">{airport.monthlyTraffic}</strong>
+            </div>
+            <div class="cm-cell">
+              <span class="cm-lbl">线路/档位</span>
+              <strong class="cm-val">{tierNameMap[airport.tier]}</strong>
+            </div>
+            <div class="cm-cell">
+              <span class="cm-lbl">创立/评分</span>
+              <strong class="cm-val">{airport.openedYear} · {airport.ratingScore.toFixed(1)}</strong>
+            </div>
           </div>
-        </div>
 
-        <!-- Feature Chips -->
-        <div class="features-chips-wrap">
-          {airport.features.map(f => (
-            <span class="feature-tag">{f}</span>
-          ))}
-        </div>
+          <!-- Protocols & Unlocks -->
+          <div class="card-tags-row">
+            <span class="line-tag">{airport.lineType}</span>
+            {airport.protocols.slice(0, 3).map((proto) => (
+              <span class="feature-tag">{proto}</span>
+            ))}
+            {airport.hasUnlimitedPlan && <span class="feature-tag accent-soft">含永久不限时</span>}
+            {!supportsThirdParty && <span class="feature-tag warn-soft">无第三方订阅</span>}
+          </div>
 
-        <!-- Action Footer -->
-        <div class="card-action-footer">
-          <a
-            href={airport.officialUrl}
-            target="_blank"
-            rel="nofollow sponsored noopener noreferrer"
-            class="action-btn primary"
-          >
-            直达 {airport.name} 官网 →
-          </a>
-          <a href={`/articles/2026-best-airports-ranking-guide/`} class="action-btn outline">
-            评测详情
-          </a>
-        </div>
-      </div>
-    ))}
+          <div class="unlock-mini-bar">
+            <span class={airport.aiUnlock.chatgpt ? 'um ok' : 'um muted'}>
+              ChatGPT {airport.aiUnlock.chatgpt ? '✓' : '△'}
+            </span>
+            <span class={airport.aiUnlock.claude ? 'um ok' : 'um muted'}>
+              Claude {airport.aiUnlock.claude ? '✓' : '△'}
+            </span>
+            <span class={airport.streamingUnlock.netflix ? 'um ok' : 'um muted'}>
+              Netflix {airport.streamingUnlock.netflix ? '✓' : '△'}
+            </span>
+            {airport.discountCode && (
+              <span class="um promo">码: {airport.discountCode}</span>
+            )}
+          </div>
+
+          <p class="recommended-line">
+            <strong>适用人群：</strong>{airport.recommendedFor}
+          </p>
+
+          <!-- Expandable Package & Risk Details -->
+          <details class="card-details-box">
+            <summary class="details-summary">
+              <span>展开套餐档位{airport.packages ? ` (${airport.packages.length} 档)` : ''}与优缺点/风控详情</span>
+              <span class="details-chev" aria-hidden="true">▾</span>
+            </summary>
+            <div class="details-body">
+              {airport.nodeCoverage && (
+                <p class="detail-line"><strong>节点覆盖：</strong>{airport.nodeCoverage}</p>
+              )}
+              {airport.discountActivity && (
+                <p class="detail-line"><strong>优惠活动：</strong>{airport.discountActivity}</p>
+              )}
+              <p class="detail-line">
+                <strong>客户端与支付：</strong>{airport.clientMode || airport.clientSupport.join(' / ')} · {airport.paymentMethods.join(' / ')}
+              </p>
+
+              {airport.packages && airport.packages.length > 0 && (
+                <div class="mini-table-wrap">
+                  <table class="mini-pkg-table">
+                    <thead>
+                      <tr>
+                        <th>套餐</th>
+                        <th>价格</th>
+                        <th>流量</th>
+                        <th>周期</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {airport.packages.map((pkg) => (
+                        <tr>
+                          <td>{pkg.name}</td>
+                          <td class="mp-price">{pkg.price}</td>
+                          <td>{pkg.traffic}</td>
+                          <td>{pkg.cycle}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {airport.pros && airport.pros.length > 0 && (
+                <p class="detail-line ok-line"><strong>主要亮点：</strong>{airport.pros.join('；')}</p>
+              )}
+              {airport.risks && airport.risks.length > 0 && (
+                <p class="detail-line warn-line"><strong>注意点/局限：</strong>{airport.risks.join('；')}</p>
+              )}
+              {airport.peerDifference && (
+                <p class="detail-line"><strong>横向差异：</strong>{airport.peerDifference}</p>
+              )}
+              {airport.isUrlFormatAlert && (
+                <p class="detail-line warn-line">
+                  <strong>链接提示：</strong>该品牌原始跳转地址格式与常规面板不同，访问时请仔细核对域名。
+                </p>
+              )}
+            </div>
+          </details>
+
+          <!-- Action Footer -->
+          <div class="card-action-footer">
+            {hasExternalUrl ? (
+              <a
+                href={airport.officialUrl}
+                target="_blank"
+                rel="nofollow sponsored noopener noreferrer"
+                class="action-btn primary"
+              >
+                直达 {airport.name} 官网 ↗
+              </a>
+            ) : (
+              <a href="#methodology" class="action-btn muted-btn">
+                暂无独立外链 · 档案核验说明
+              </a>
+            )}
+
+            {airport.hasDeepReview ? (
+              <a href={`/airports/${airport.slug}/`} class="action-btn outline">
+                实测深度评测 ({evCount}图) →
+              </a>
+            ) : (
+              <a href="#airport-compare" class="action-btn outline compare-jump" data-compare-id={airport.id}>
+                加入参数 PK
+              </a>
+            )}
+          </div>
+        </article>
+      );
+    })}
+  </div>
+
+  <!-- Empty Filter State -->
+  <div id="finder-empty-state" class="empty-filter-state" hidden>
+    <p>没有同时符合当前筛选条件的机场品牌（当前共收录 {totalAirportsCount} 家）。</p>
+    <button type="button" id="empty-reset-btn" class="reset-btn">清空所有筛选条件</button>
   </div>
 </div>
 
+<script>
+  function setupAirportFinder() {
+    const root = document.getElementById('airport-finder-root');
+    if (!root || root.dataset.finderBound === 'true') return;
+    root.dataset.finderBound = 'true';
+
+    const searchInput = document.getElementById('airport-keyword-search') as HTMLInputElement | null;
+    const matchCountEl = document.getElementById('finder-match-count');
+    const emptyStateEl = document.getElementById('finder-empty-state');
+    const resetBtn = document.getElementById('finder-reset-btn');
+    const emptyResetBtn = document.getElementById('empty-reset-btn');
+    const cards = Array.from(root.querySelectorAll('.airport-matrix-card')) as HTMLElement[];
+
+    const state = {
+      scope: 'all',
+      line: 'all',
+      scenario: 'all',
+      tier: 'all',
+      query: ''
+    };
+
+    function applyFilters() {
+      let visibleCount = 0;
+      const q = state.query.trim().toLowerCase();
+
+      cards.forEach((card) => {
+        const line = card.dataset.line || '';
+        const tier = card.dataset.tier || '';
+        const status = card.dataset.status || '';
+        const isTopTen = card.dataset.topten === 'true';
+        const hasUnlimited = card.dataset.unlimited === 'true';
+        const supportsThirdParty = card.dataset.thirdparty === 'true';
+        const hasChatGPT = card.dataset.chatgpt === 'true';
+        const hasNetflix = card.dataset.netflix === 'true';
+        const searchBlob = card.dataset.search || '';
+
+        let matchScope = true;
+        if (state.scope === 'measured') matchScope = status === 'measured';
+        else if (state.scope === 'topten') matchScope = isTopTen;
+        else if (state.scope === 'unlimited') matchScope = hasUnlimited;
+        else if (state.scope === 'thirdparty') matchScope = supportsThirdParty;
+        else if (state.scope === 'historic') matchScope = status === 'historic';
+
+        const matchLine = state.line === 'all' || line === state.line;
+        const matchTier = state.tier === 'all' || tier === state.tier;
+        const matchScenario =
+          state.scenario === 'all' ||
+          (state.scenario === 'chatgpt' && hasChatGPT) ||
+          (state.scenario === 'netflix' && hasNetflix);
+        const matchQuery = !q || searchBlob.includes(q);
+
+        const isVisible = matchScope && matchLine && matchTier && matchScenario && matchQuery;
+        card.style.display = isVisible ? '' : 'none';
+        if (isVisible) visibleCount++;
+      });
+
+      if (matchCountEl) matchCountEl.textContent = String(visibleCount);
+      if (emptyStateEl) emptyStateEl.hidden = visibleCount > 0;
+    }
+
+    function resetAll() {
+      state.scope = 'all';
+      state.line = 'all';
+      state.scenario = 'all';
+      state.tier = 'all';
+      state.query = '';
+      if (searchInput) searchInput.value = '';
+
+      root.querySelectorAll('.filter-pills').forEach((group) => {
+        const btns = group.querySelectorAll('.fpill');
+        btns.forEach((b, idx) => {
+          b.classList.toggle('is-active', idx === 0);
+        });
+      });
+
+      applyFilters();
+    }
+
+    root.querySelectorAll('.filter-pills').forEach((groupEl) => {
+      const groupName = groupEl.getAttribute('data-filter-group') as 'scope' | 'line' | 'scenario' | 'tier' | null;
+      if (!groupName) return;
+
+      groupEl.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('.fpill') as HTMLElement | null;
+        if (!btn) return;
+        const val = btn.dataset.val || 'all';
+        state[groupName] = val;
+
+        groupEl.querySelectorAll('.fpill').forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        applyFilters();
+      });
+    });
+
+    searchInput?.addEventListener('input', () => {
+      state.query = searchInput.value;
+      applyFilters();
+    });
+
+    resetBtn?.addEventListener('click', resetAll);
+    emptyResetBtn?.addEventListener('click', resetAll);
+
+    // Optional quick PK jump preselect
+    root.querySelectorAll('.compare-jump').forEach((link) => {
+      link.addEventListener('click', () => {
+        const id = (link as HTMLElement).dataset.compareId;
+        const selA = document.getElementById('compare-brand-a') as HTMLSelectElement | null;
+        if (selA && id) {
+          selA.value = id;
+          selA.dispatchEvent(new Event('change'));
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupAirportFinder);
+  setupAirportFinder();
+</script>
+
 <style>
-  .airport-finder-terminal {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .finder-box {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 2.25rem;
-    margin: 2.5rem 0;
+    padding: 1.75rem;
+    margin-bottom: 3rem;
   }
 
   .finder-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1rem;
+    align-items: center;
+    gap: 1rem;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    margin-bottom: 0.75rem;
   }
 
   .finder-title-wrap {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.65rem;
   }
 
   .finder-title {
@@ -182,220 +493,309 @@ import Badge from '../ui/Badge.astro';
     font-size: 0.72rem;
     color: var(--accent);
     background: rgba(124, 255, 178, 0.08);
-    border: 1px solid rgba(124, 255, 178, 0.2);
-    padding: 0.2rem 0.55rem;
-    border-radius: 4px;
+    border: 1px solid rgba(124, 255, 178, 0.28);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
   }
 
   .finder-desc {
-    font-size: 0.95rem;
     color: var(--text-soft);
+    font-size: 0.92rem;
     line-height: 1.7;
-    margin-bottom: 1.75rem;
+    margin: 0 0 1.4rem;
   }
 
-  /* Filter Controls Panel */
-  .finder-filters-panel {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 1.25rem 1.5rem;
+  .finder-controls {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 0.9rem;
+    padding: 1.15rem;
+    background: rgba(9, 11, 16, 0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
   }
 
-  .filter-group-row {
+  .search-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .search-input-wrap {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
   }
 
-  .filter-group-lbl {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
+  .search-icon {
+    position: absolute;
+    left: 0.85rem;
     color: var(--muted);
-    min-width: 75px;
+    font-size: 1rem;
+    pointer-events: none;
   }
 
-  .filter-pills-list {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .matrix-filter-pill {
+  .keyword-input {
+    width: 100%;
+    padding: 0.62rem 0.9rem 0.62rem 2.2rem;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-full);
-    padding: 0.3rem 0.85rem;
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    color: var(--text-soft);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    color: #ffffff;
+    font-size: 0.88rem;
+    outline: none;
   }
 
-  .matrix-filter-pill:hover,
-  .matrix-filter-pill.is-active {
-    background: rgba(124, 255, 178, 0.12);
+  .keyword-input:focus {
+    border-color: var(--accent);
+  }
+
+  .match-counter {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+
+  .match-counter strong {
+    color: var(--accent);
+    font-size: 0.92rem;
+  }
+
+  .reset-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.78rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .reset-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
   }
 
-  /* Airport Cards Results */
-  .airport-results-grid {
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .filter-row-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem 1.75rem;
+  }
+
+  .filter-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 82px;
+  }
+
+  .filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.42rem;
+  }
+
+  .fpill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    font-size: 0.78rem;
+    padding: 0.34rem 0.72rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .fpill:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .fpill.is-active {
+    background: rgba(124, 255, 178, 0.14);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .airport-cards-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 1.15rem;
   }
 
   .airport-matrix-card {
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 1.75rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.25s ease;
+    gap: 0.78rem;
+    min-width: 0;
+    contain: inline-size;
   }
 
-  .airport-matrix-card:hover {
-    border-color: rgba(124, 255, 178, 0.4);
-    background: var(--surface-hover);
-    transform: translateY(-2px);
-  }
-
-  .airport-matrix-card.is-hidden {
-    display: none;
+  .airport-matrix-card.status-historic {
+    border-color: rgba(255, 255, 255, 0.08);
+    opacity: 0.94;
   }
 
   .card-top-row {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-bottom: 0.75rem;
-    flex-wrap: wrap;
+    align-items: flex-start;
     gap: 0.5rem;
   }
 
-  .top-title-group {
+  .rank-name-wrap {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.55rem;
+    min-width: 0;
   }
 
-  .airport-card-name {
-    font-size: 1.18rem;
+  .rank-num {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
     font-weight: 700;
-    color: #ffffff;
-    margin: 0;
-  }
-
-  .opened-year-tag {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
     color: var(--muted);
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
-  }
-
-  .airport-tagline {
-    font-size: 0.88rem;
-    color: var(--text-soft);
-    line-height: 1.6;
-    margin-bottom: 1.25rem;
-  }
-
-  .metrics-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .metric-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .metric-lbl {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--muted);
-  }
-
-  .metric-val {
-    font-family: var(--font-mono);
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .metric-val.score {
-    color: var(--accent);
-  }
-
-  .metric-sep {
-    width: 1px;
-    height: 22px;
-    background: var(--border);
-  }
-
-  .specs-box {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-    margin-bottom: 1.25rem;
-    font-size: 0.84rem;
-  }
-
-  .spec-row {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .spec-lbl {
-    font-family: var(--font-mono);
-    color: var(--muted);
-    font-size: 0.78rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.18rem 0.45rem;
+    border-radius: 4px;
     flex-shrink: 0;
   }
 
-  .spec-val.price {
-    color: var(--warning);
-    font-weight: 700;
-    font-family: var(--font-mono);
+  .rank-num.top10 {
+    color: #090b10;
+    background: var(--accent);
   }
 
-  .spec-val.discount code {
+  .airport-card-name {
+    margin: 0;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.3;
+  }
+
+  .name-link {
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  .name-link:hover {
     color: var(--accent);
-    font-weight: 700;
-    background: rgba(124, 255, 178, 0.1);
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
+    text-decoration: underline;
   }
 
-  .spec-val.desc {
+  .card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+
+  .mini-badge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    padding: 0.16rem 0.45rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .mini-badge.top {
+    color: #ffd166;
+    border-color: rgba(255, 209, 102, 0.4);
+    background: rgba(255, 209, 102, 0.1);
+  }
+
+  .mini-badge.status-measured {
+    color: var(--accent);
+    border-color: rgba(124, 255, 178, 0.4);
+    background: rgba(124, 255, 178, 0.1);
+  }
+
+  .mini-badge.status-vendor {
+    color: #8ab4f8;
+    border-color: rgba(138, 180, 248, 0.35);
+    background: rgba(138, 180, 248, 0.08);
+  }
+
+  .mini-badge.status-historic {
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .airport-tagline {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.55;
     color: var(--text-soft);
   }
 
-  .features-chips-wrap {
+  .card-metrics-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    background: rgba(9, 11, 16, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem;
+  }
+
+  .cm-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .cm-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .cm-val {
+    font-size: 0.84rem;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cm-val.price {
+    font-family: var(--font-mono);
+    color: var(--accent);
+  }
+
+  .card-tags-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-bottom: 1.5rem;
+    gap: 0.35rem;
+  }
+
+  .line-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.09);
+    border: 1px solid rgba(124, 255, 178, 0.25);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
   }
 
   .feature-tag {
@@ -407,117 +807,189 @@ import Badge from '../ui/Badge.astro';
     color: var(--text-soft);
   }
 
+  .feature-tag.accent-soft {
+    color: var(--accent);
+    border-color: rgba(124, 255, 178, 0.25);
+  }
+
+  .feature-tag.warn-soft {
+    color: #ffb86c;
+    border-color: rgba(255, 184, 108, 0.35);
+  }
+
+  .unlock-mini-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .um.ok {
+    color: var(--accent);
+  }
+
+  .um.muted {
+    color: var(--muted);
+  }
+
+  .um.promo {
+    margin-left: auto;
+    color: #ffd166;
+    background: rgba(255, 209, 102, 0.1);
+    padding: 0.05rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .recommended-line {
+    margin: 0;
+    font-size: 0.81rem;
+    line-height: 1.55;
+    color: var(--text-soft);
+  }
+
+  .card-details-box {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    background: rgba(9, 11, 16, 0.4);
+  }
+
+  .details-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.78rem;
+    color: var(--text);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .details-summary:hover {
+    color: var(--accent);
+  }
+
+  .details-body {
+    padding: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.79rem;
+    line-height: 1.55;
+    color: var(--text-soft);
+  }
+
+  .detail-line {
+    margin: 0;
+  }
+
+  .ok-line {
+    color: #b7f7d4;
+  }
+
+  .warn-line {
+    color: #ffd099;
+  }
+
+  .mini-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+  }
+
+  .mini-pkg-table {
+    width: 100%;
+    min-width: 320px;
+    border-collapse: collapse;
+    font-size: 0.74rem;
+  }
+
+  .mini-pkg-table th,
+  .mini-pkg-table td {
+    padding: 0.4rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .mini-pkg-table th {
+    color: var(--muted);
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .mp-price {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
   .card-action-footer {
     display: flex;
-    gap: 0.75rem;
-    padding-top: 1.25rem;
+    gap: 0.65rem;
+    padding-top: 0.95rem;
+    margin-top: auto;
     border-top: 1px solid var(--border);
+    flex-wrap: wrap;
   }
 
   .action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.55rem 0.95rem;
+    padding: 0.5rem 0.85rem;
     border-radius: var(--radius-sm);
-    font-size: 0.84rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 130px;
+    transition: all 0.18s ease;
   }
 
   .action-btn.primary {
-    flex: 1.4;
     background: var(--accent);
     color: #090b10;
-    font-weight: 700;
   }
 
   .action-btn.primary:hover {
-    background: #95ffc2;
-    transform: translateY(-1px);
+    background: #96ffc3;
   }
 
   .action-btn.outline {
-    flex: 1;
     background: transparent;
-    color: var(--text-soft);
     border: 1px solid var(--border);
+    color: var(--text);
   }
 
   .action-btn.outline:hover {
-    border-color: var(--text);
-    color: #ffffff;
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
-  @media (max-width: 960px) {
-    .airport-results-grid {
+  .action-btn.muted-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .empty-filter-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    margin-top: 1rem;
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 640px) {
+    .finder-box {
+      padding: 1.15rem;
+    }
+
+    .airport-cards-grid {
       grid-template-columns: 1fr;
     }
   }
 </style>
-
-<script>
-  function setupAirportFinder() {
-    let currentLine = 'all';
-    let currentScenario = 'all';
-    let currentTier = 'all';
-
-    const linePills = document.querySelectorAll('#line-filters .matrix-filter-pill');
-    const scenarioPills = document.querySelectorAll('#scenario-filters .matrix-filter-pill');
-    const tierPills = document.querySelectorAll('#tier-filters .matrix-filter-pill');
-    const cards = document.querySelectorAll<HTMLElement>('.airport-matrix-card');
-
-    function applyFilter() {
-      cards.forEach(card => {
-        const line = card.getAttribute('data-line') || '';
-        const tier = card.getAttribute('data-tier') || '';
-        const chatgpt = card.getAttribute('data-chatgpt') === 'true';
-        const netflix = card.getAttribute('data-netflix') === 'true';
-
-        let lineMatch = (currentLine === 'all') || line.includes(currentLine);
-        let tierMatch = (currentTier === 'all') || (tier === currentTier);
-        let scenarioMatch = true;
-
-        if (currentScenario === 'chatgpt') scenarioMatch = chatgpt;
-        else if (currentScenario === 'netflix') scenarioMatch = netflix;
-
-        if (lineMatch && tierMatch && scenarioMatch) {
-          card.classList.remove('is-hidden');
-        } else {
-          card.classList.add('is-hidden');
-        }
-      });
-    }
-
-    linePills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        linePills.forEach(p => p.classList.remove('is-active'));
-        pill.classList.add('is-active');
-        currentLine = pill.getAttribute('data-val') || 'all';
-        applyFilter();
-      });
-    });
-
-    scenarioPills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        scenarioPills.forEach(p => p.classList.remove('is-active'));
-        pill.classList.add('is-active');
-        currentScenario = pill.getAttribute('data-val') || 'all';
-        applyFilter();
-      });
-    });
-
-    tierPills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        tierPills.forEach(p => p.classList.remove('is-active'));
-        pill.classList.add('is-active');
-        currentTier = pill.getAttribute('data-val') || 'all';
-        applyFilter();
-      });
-    });
-  }
-
-  setupAirportFinder();
-  document.addEventListener('astro:page-load', setupAirportFinder);
-</script>

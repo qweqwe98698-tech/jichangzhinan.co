@@ -5,7 +5,9 @@ import HorizontalCard from '../../components/cards/HorizontalCard.astro';
 import FeatureCard from '../../components/cards/FeatureCard.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Divider from '../../components/ui/Divider.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import { topicsData, type TopicMeta } from '../../data/topics';
+import { getClusterByTopic } from '../../data/topicClusters';
 import { siteConfig } from '../../config/site';
 
 export async function getStaticPaths() {
@@ -34,41 +36,110 @@ interface Props {
 const { topic, posts } = Astro.props;
 const featuredPost = posts.find(p => p.data.featured) || posts[0];
 const remainingPosts = posts.filter(p => p.id !== featuredPost?.id);
+const clusterMeta = getClusterByTopic(topic.slug);
+const relatedTopicsList = (clusterMeta?.relatedTopics || [])
+  .map(slug => topicsData.find(t => t.slug === slug))
+  .filter((t): t is TopicMeta => Boolean(t));
 
 const breadcrumbs = [
   { name: '首页', item: '/' },
-  { name: '专题分类', item: '/topics/' },
+  { name: '知识专题', item: '/topics/' },
   { name: topic.name, item: `/topics/${topic.slug}/` }
+];
+
+const topicUrl = `${siteConfig.url}/topics/${topic.slug}/`;
+const topicSchemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: clusterMeta?.pillarTitle || `${topic.name}知识专题`,
+    description: topic.description,
+    url: topicUrl,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: posts.slice(0, 12).map((post, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `${siteConfig.url}/articles/${post.id}/`,
+        name: post.data.title
+      }))
+    }
+  }
 ];
 ---
 
 <BaseLayout
-  title={`${topic.name} (${topic.enName}) 知识专题 | ${siteConfig.name}`}
+  title={`${topic.name} | ${clusterMeta ? clusterMeta.targetKeywords.slice(0, 2).join(' · ') : topic.enName} | ${siteConfig.name}`}
   description={topic.description}
   breadcrumbs={breadcrumbs}
   faqs={topic.faqs}
+  extraSchemas={topicSchemas}
 >
   <div class="container topic-detail-page">
+    <Breadcrumb items={breadcrumbs} />
+
     <!-- Top Hero Banner for Topic -->
     <header class="topic-hero-header" data-reveal>
       <div class="header-pre-badge">
         <Badge variant="accent">
           <span class="signal-dot"></span>
-          CLUSTER // {topic.enName}
+          专题集群 · {topic.enName}
         </Badge>
         <span class="header-count">{posts.length} 篇收录文章</span>
       </div>
 
-      <h1 class="topic-main-title">{topic.name}</h1>
+      <h1 class="topic-main-title">{clusterMeta?.pillarTitle || topic.name}</h1>
       <p class="topic-lead-desc">{topic.description}</p>
+
+      {clusterMeta && (
+        <div class="flux-card" style="margin-top:1.5rem;padding:1.25rem 1.5rem;border-color:var(--border-accent);background:linear-gradient(135deg, rgba(124,255,178,0.06), var(--surface));text-align:left;">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.625rem;">
+            <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--accent);letter-spacing:0.04em;">核心结论速览 · GEO DIRECT ANSWER</span>
+            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+              {clusterMeta.targetKeywords.map(kw => (
+                <span style="font-size:0.75rem;padding:0.15rem 0.55rem;border-radius:9999px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-soft);">{kw}</span>
+              ))}
+            </div>
+          </div>
+          <p style="font-size:0.9375rem;line-height:1.7;color:var(--text);margin:0;">
+            {clusterMeta.coreAnswer}
+          </p>
+          <div style="margin-top:0.875rem;display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;">
+            <a href={clusterMeta.ctaHref} style="font-size:0.875rem;font-weight:600;color:var(--accent);text-decoration:none;">
+              {clusterMeta.ctaText} →
+            </a>
+            <a href="/airports/" style="font-size:0.8125rem;color:var(--text-soft);text-decoration:underline;text-underline-offset:3px;">
+              查看 42 家机场全库与 18 家实测图
+            </a>
+          </div>
+        </div>
+      )}
     </header>
 
-    <!-- Learning Path / 学习路径 -->
-    {topic.learningPath && topic.learningPath.length > 0 && (
+    <!-- Level-3 Cluster Navigation / 学习路径 -->
+    {clusterMeta && clusterMeta.learningLinks.length > 0 ? (
       <section class="learning-path-section flux-card" data-reveal>
         <div class="sec-title-row">
           <span class="signal-dot breathing"></span>
-          <h2 class="sec-heading">RECOMMENDED LEARNING PATH // 学习路径</h2>
+          <h2 class="sec-heading">本专题三级内容集群与阅读路径 ({clusterMeta.name})</h2>
+        </div>
+        <ol class="path-steps-list">
+          {clusterMeta.learningLinks.map((link, idx) => (
+            <li class="path-step-item">
+              <span class="path-step-idx">{String(idx + 1).padStart(2, '0')}</span>
+              <a href={link.href} class="path-step-text" style="display:flex;flex:1;justify-content:space-between;align-items:center;gap:0.75rem;color:var(--text);text-decoration:none;">
+                <span>{link.title}</span>
+                <span style="flex-shrink:0;font-size:0.75rem;font-family:var(--font-mono);padding:0.15rem 0.5rem;border-radius:9999px;background:var(--surface-2);border:1px solid var(--border);color:var(--accent);">{link.tag} →</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ) : topic.learningPath && topic.learningPath.length > 0 && (
+      <section class="learning-path-section flux-card" data-reveal>
+        <div class="sec-title-row">
+          <span class="signal-dot breathing"></span>
+          <h2 class="sec-heading">专题学习与选购路径</h2>
         </div>
         <ol class="path-steps-list">
           {topic.learningPath.map((step, idx) => (
@@ -86,7 +157,7 @@ const breadcrumbs = [
       <section class="topic-featured-section" data-reveal>
         <div class="sec-title-row">
           <span class="signal-dot blue"></span>
-          <h2 class="sec-heading">PILLAR GUIDE // 核心指南</h2>
+          <h2 class="sec-heading">核心精选指南 · PILLAR GUIDE</h2>
         </div>
         <FeatureCard
           title={featuredPost.data.title}
@@ -95,19 +166,19 @@ const breadcrumbs = [
           category={featuredPost.data.category}
           categoryName={featuredPost.data.categoryName}
           readingTime={featuredPost.data.readingTime}
-          badgeText="RECOMMENDED"
+          badgeText="推荐优先阅读"
           indexNum="★"
         />
       </section>
     )}
 
-    <Divider label="ALL TOPIC ARTICLES" />
+    <Divider label="专题全量收录 · ARTICLE ARCHIVE" />
 
     <!-- All Articles List -->
     <section class="topic-articles-section" data-reveal>
       <div class="sec-title-row">
         <span class="signal-dot purple"></span>
-        <h2 class="sec-heading">ALL ARTICLES // 本专题全部文章</h2>
+        <h2 class="sec-heading">本专题全部收录文章（{posts.length} 篇）</h2>
       </div>
 
       {posts.length > 0 ? (
@@ -137,7 +208,7 @@ const breadcrumbs = [
       <section class="topic-faq-section flux-card" id="faq" data-reveal>
         <div class="sec-title-row">
           <span class="signal-dot"></span>
-          <h2 class="sec-heading">TOPIC FAQ // 常见问题</h2>
+          <h2 class="sec-heading">本专题常见问题解答 · FAQ</h2>
         </div>
         <div class="faq-list">
           {topic.faqs.map((faq, idx) => (
@@ -149,6 +220,28 @@ const breadcrumbs = [
               <p class="faq-a">{faq.a}</p>
             </div>
           ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Upstream / Sibling Topics Network -->
+    {relatedTopicsList.length > 0 && (
+      <section class="learning-path-section flux-card" data-reveal>
+        <div class="sec-title-row">
+          <span class="signal-dot blue"></span>
+          <h2 class="sec-heading">上下游关联专题与总榜入口</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.875rem;margin-top:0.5rem;">
+          {relatedTopicsList.map(rt => (
+            <a href={`/topics/${rt.slug}/`} style="display:block;padding:1rem;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface-2);text-decoration:none;">
+              <div style="font-size:0.9375rem;font-weight:600;color:var(--text);margin-bottom:0.25rem;">{rt.name} →</div>
+              <div style="font-size:0.8125rem;color:var(--text-soft);line-height:1.5;">{rt.description}</div>
+            </a>
+          ))}
+          <a href="/airports/" style="display:block;padding:1rem;border-radius:var(--radius-sm);border:1px solid var(--border-accent);background:var(--accent-soft);text-decoration:none;">
+            <div style="font-size:0.9375rem;font-weight:600;color:var(--accent);margin-bottom:0.25rem;">2026 优质机场实测总榜 →</div>
+            <div style="font-size:0.8125rem;color:var(--text-soft);line-height:1.5;">多维度对比 42 家主流及历史机场档案，含 18 家实测截图与深度评测</div>
+          </a>
         </div>
       </section>
     )}

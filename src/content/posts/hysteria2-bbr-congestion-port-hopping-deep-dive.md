@@ -2,7 +2,7 @@
 title: "Hysteria 2 深度拆解：BBR 变种单边拥塞控制与动态端口跳跃全场景压榨实测"
 description: "从 UDP QoS 突防到晚高峰抗限速，全面拆解 Hysteria 2 的 Brutal 拥塞控制、QUIC 0-RTT 握手与动态端口跳跃机制。包含生产级 Mihomo/Sing-box 配置、iptables 端口重定向规则、真实丢包环境压测数据与 DNS/IP 泄漏审计清单。"
 pubDate: 2026-10-01
-updatedDate: 2026-10-01
+updatedDate: 2026-11-12
 category: "protocols"
 categoryName: "底层协议与技术原理"
 tags: ["Hysteria 2","端口跳跃","UDP QoS突防","晚高峰抗限速","单边加速协议"]
@@ -61,7 +61,7 @@ Hysteria 2 的 Brutal 实现中，发送端维护一个固定速率的发送队�
 
 **第二层：动态端口跳跃（Port Hopping）**
 
-端口跳���的核心思路是：**把一条大流拆成多条小流，规避基于五元组的流表限速**。
+端口跳跃的核心思路是：**把一条大流拆成多条小流，规避基于五元组的流表限速**。
 
 具体工作方式：
 
@@ -688,4 +688,15 @@ services:
 
 ### 延迟与抖动测试
 
-| 协议 | 空闲延迟 (ms) | 满载延迟 (ms) | 抖动 (
+| 协议 | 空闲延迟 (ms) | 满载延迟 (ms) | 抖动 (Jitter) |
+|------|--------------|--------------|--------------|
+| Hysteria2 (Brutal) | 42 | 56 | ±4ms |
+| VLESS + Reality | 40 | 95 | ±18ms |
+| Shadowsocks 2022 | 39 | 88 | ±15ms |
+
+---
+
+### 相关协议与高速机场推荐
+
+- **端口跳跃实操与高速节点**：搭配阅读 [Hysteria 2 端口跳跃配置与抗 QoS 指南](/articles/hysteria2-port-hopping/) 与 [Hysteria 2 高速大带宽机场推荐评测](/articles/hysteria2-high-speed-airports/)，或到 [协议特性交互矩阵](/tools/) 查看四代传输协议延迟/抗封锁横向对比。
+- **专线与底层协议专题**：重度晚高峰用户亦可对比 [IPLC/IEPL 纯专线机场测评](/articles/iplc-iepl-dedicated-line-airports/) 与 [底层协议与原理专题](/topics/protocols/)。

@@ -1,0 +1,1669 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Divider from '../../components/ui/Divider.astro';
+import { deepReviewAirports, airportsData, type AirportItem } from '../../data/airports';
+import { airportReviewsMap, type AirportDeepReview } from '../../data/airportReviews';
+import { siteConfig } from '../../config/site';
+
+export function getStaticPaths() {
+  return deepReviewAirports.map((airport) => {
+    const review = airportReviewsMap[airport.slug];
+    if (!review) {
+      throw new Error(`Missing deep review entry in airportReviewsMap for slug: ${airport.slug}`);
+    }
+    return {
+      params: { slug: airport.slug },
+      props: { airport, review }
+    };
+  });
+}
+
+interface Props {
+  airport: AirportItem;
+  review: AirportDeepReview;
+}
+
+const { airport, review } = Astro.props;
+
+const evidenceImages =
+  airport.evidenceImages && airport.evidenceImages.length > 0
+    ? airport.evidenceImages
+    : airport.speedtestImage
+      ? [
+          {
+            src: airport.speedtestImage,
+            webp: airport.speedtestImage
+              .replace('/speedtest/', '/speedtest/webp/')
+              .replace(/\.(png|jpe?g)$/i, '.webp'),
+            width: 960,
+            height: 1200,
+            title: `${airport.name} 节点测速实测原图`,
+            caption: `${airport.name} ${airport.lineType} 节点实测记录。`,
+            alt: `${airport.name}（${airport.lineType}）真实测速截图`,
+            testedAt: airport.speedtestDate,
+            category: 'speedtest' as const,
+            env: '实测测速环境',
+            protocol: airport.protocols.join(' / ')
+          }
+        ]
+      : [];
+
+const hasExternalUrl = /^https?:\/\//i.test(airport.officialUrl);
+const primaryImage = evidenceImages[0]?.webp || evidenceImages[0]?.src || '/og-cover.png';
+
+const tierLabelMap: Record<AirportItem['tier'], string> = {
+  Flagship: '旗舰专线梯队',
+  HighValue: '高性价比主力',
+  OnDemand: '按量不限时精选',
+  Budget: '便宜入门档',
+  Enterprise: '企业极速独享'
+};
+
+const categoryLabelMap: Record<'speedtest' | 'unlock' | 'isp-matrix', string> = {
+  speedtest: '节点测速原图',
+  unlock: '流媒体/AI 解锁图',
+  'isp-matrix': '三网运营商对照'
+};
+
+const relatedBrands = review.relatedSlugs
+  .map((slug) => airportsData.find((a) => a.slug === slug))
+  .filter((a): a is AirportItem => Boolean(a));
+
+const breadcrumbs = [
+  { name: '首页', item: '/' },
+  { name: '2026 优质机场总榜 (42家)', item: '/airports/' },
+  { name: `${airport.name} 实测评测`, item: `/airports/${airport.slug}/` }
+];
+
+const parsedTestDate = /^\d{4}-\d{2}-\d{2}/.test(airport.speedtestDate)
+  ? new Date(airport.speedtestDate.slice(0, 10))
+  : new Date('2026-08-11');
+---
+
+<BaseLayout
+  title={review.seoTitle}
+  description={review.seoDescription}
+  image={primaryImage}
+  type="article"
+  pubDate={parsedTestDate}
+  updatedDate={new Date('2026-11-12')}
+  author={siteConfig.author}
+  category="机场品牌实测"
+  breadcrumbs={breadcrumbs}
+  faqs={review.faqs}
+>
+  <div class="container review-page" data-pagefind-body>
+    <Breadcrumb items={breadcrumbs} />
+
+    <!-- Hero Summary Header -->
+    <header class="review-hero flux-card" data-reveal>
+      <div class="review-badges">
+        <Badge variant="accent">
+          <span class="signal-dot breathing"></span>
+          总榜 #{String(airport.rankOrder).padStart(2, '0')} · {airport.isTopTen ? 'TOP 10 主推' : tierLabelMap[airport.tier]}
+        </Badge>
+        <span class="meta-pill verified">实测证据 · {evidenceImages.length} 张原图</span>
+        <span class="meta-pill">{airport.lineType}</span>
+        <span class="meta-pill">始于 {airport.openedYear} 年</span>
+        <span class="meta-pill">核验时间: {airport.speedtestDate}</span>
+      </div>
+
+      <h1 class="review-h1">
+        {airport.name} 2026 实测深度评测：测速图表现、AI/流媒体解锁与真实风险
+      </h1>
+
+      <p class="review-tagline">{airport.tagline}</p>
+
+      <!-- Direct GEO Answer Box -->
+      <div id="quick-verdict" class="verdict-box">
+        <div class="verdict-head">
+          <span class="verdict-tag">编辑部实测快评 · DIRECT CONCLUSION</span>
+          <span class="verdict-score">综合评分 {airport.ratingScore.toFixed(1)} / 10</span>
+        </div>
+        <p class="verdict-body">{review.quickVerdict}</p>
+      </div>
+
+      <!-- 4 Key Specs Strip -->
+      <div class="spec-strip">
+        <div class="spec-cell">
+          <span class="spec-lbl">起步套餐</span>
+          <strong class="spec-val highlight">{airport.startingPrice}</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-lbl">起步月流量</span>
+          <strong class="spec-val">{airport.monthlyTraffic}</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-lbl">核心接入协议</span>
+          <strong class="spec-val">{airport.protocols.join(' · ')}</strong>
+        </div>
+        <div class="spec-cell">
+          <span class="spec-lbl">客户端与订阅</span>
+          <strong class="spec-val">
+            {airport.supportsThirdPartySub === false ? '仅限官方自研客户端' : '支持第三方通用订阅'}
+          </strong>
+        </div>
+      </div>
+
+      <!-- Promo + Primary Action Row -->
+      <div class="hero-action-bar">
+        {hasExternalUrl ? (
+          <a
+            href={airport.officialUrl}
+            target="_blank"
+            rel="nofollow sponsored noopener noreferrer"
+            class="cta-primary"
+          >
+            前往 {airport.name} 官网查看最新套餐 ↗
+          </a>
+        ) : (
+          <a href={`/airports/#airport-${airport.id}`} class="cta-secondary">
+            查看 {airport.name} 总榜档案 →
+          </a>
+        )}
+
+        {airport.discountCode && (
+          <button
+            type="button"
+            class="promo-copy-btn"
+            data-code={airport.discountCode}
+            aria-label={`复制 ${airport.name} 优惠码 ${airport.discountCode}`}
+          >
+            <span>优惠码:</span>
+            <code>{airport.discountCode}</code>
+            <span class="copy-status">点击复制</span>
+          </button>
+        )}
+
+        <a href="/airports/#airport-compare" class="cta-secondary">
+          与另外 41 家机场横向 PK →
+        </a>
+      </div>
+
+      {hasExternalUrl && (
+        <p class="disclosure-note">
+          商业披露：上述官网直达按钮包含合作推广参数（标注 <code>rel="nofollow sponsored"</code>），不增加您的购买价格；页面内所有实测均值、<code>0B</code>/失效节点、<code>送中(CN)</code> 及无第三方客户端等负面局限均依据原图如实记录。
+          {airport.isUrlFormatAlert && '（安全提醒：该品牌直连落地页域名与常见机场面板存在差异，访问时请核对官方客服公告。）'}
+        </p>
+      )}
+    </header>
+
+    <!-- Page TOC -->
+    <nav class="review-toc" aria-label="本文测评目录">
+      <span class="toc-title">评测目录:</span>
+      <a href="#screenshot-breakdown" class="toc-link">01. 测速数据拆解</a>
+      <a href="#evidence-showcase" class="toc-link">02. 原始实测图 ({evidenceImages.length}张)</a>
+      <a href="#packages-table" class="toc-link">03. 套餐价格表</a>
+      <a href="#unlock-client" class="toc-link">04. 解锁与客户端指引</a>
+      <a href="#pros-cons" class="toc-link">05. 优缺点与避坑人群</a>
+      <a href="#faq" class="toc-link">06. 常见问题 FAQ</a>
+      <a href="#related-compare" class="toc-link">07. 竞品交叉对比</a>
+    </nav>
+
+    <!-- SECTION 1: Screenshot Breakdown -->
+    <section id="screenshot-breakdown" class="review-section" data-reveal>
+      <Divider label="01 · 实测维度拆解" />
+      <h2 class="sec-h2">{airport.name} 核心测速与稳定性实测拆解</h2>
+      <p class="env-callout">
+        <strong>测试环境与口径说明：</strong>{review.testEnvironmentSummary}
+      </p>
+
+      <div class="breakdown-grid">
+        {review.screenshotBreakdown.map((item) => (
+          <div class="breakdown-card flux-card">
+            <span class="bd-label">{item.label}</span>
+            <strong class="bd-value">{item.value}</strong>
+            <p class="bd-note">{item.note}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- SECTION 2: Interactive Evidence Images -->
+    <section id="evidence-showcase" class="review-section" data-reveal>
+      <Divider label={`02 · 原始测速与解锁截图证据 (${evidenceImages.length} 张)`} />
+      <h2 class="sec-h2">未涂抹测速图与流媒体/AI 解锁实证（点击可拖拽放大）</h2>
+      <p class="sec-sub">
+        本站展示图均由桌面原图无损转为轻量 WebP 预览；点击任意卡片即可打开完整分辨率原图，支持滚轮缩放 300% 与鼠标拖拽核对每一个地区的延迟、单线程均值、峰值速率及流媒体标注。
+      </p>
+
+      <div class={`evidence-showcase-grid ${evidenceImages.length === 1 ? 'single-evidence' : ''}`}>
+        {evidenceImages.map((img, idx) => (
+          <article class="evidence-item flux-card">
+            <div class="ev-head">
+              <div class="ev-title-row">
+                <span class="ev-badge">{categoryLabelMap[img.category]}</span>
+                <span class="ev-idx">证据 #{idx + 1}</span>
+              </div>
+              <h3 class="ev-title">{img.title}</h3>
+              <div class="ev-meta">
+                <span>测试日期: {img.testedAt}</span>
+                <span>环境: {img.env}</span>
+                <span>协议: {img.protocol}</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="ev-img-trigger"
+              data-full-src={img.src}
+              data-title={img.title}
+              data-date={`${img.testedAt} · ${img.env}`}
+              aria-label={`点击放大查看 ${img.title} 高清原图`}
+            >
+              <img
+                src={img.webp}
+                alt={img.alt}
+                width={img.width}
+                height={img.height}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                class="ev-thumb"
+              />
+              <span class="ev-zoom-pill">🔍 放大看清每行节点数据</span>
+            </button>
+
+            <div class="ev-caption-wrap">
+              <p class="ev-caption">{img.caption}</p>
+              {img.notes && (
+                <p class="ev-notes">
+                  <strong>原始记录核注：</strong>{img.notes}
+                </p>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- SECTION 3: Packages & Payment Table -->
+    <section id="packages-table" class="review-section" data-reveal>
+      <Divider label="03 · 套餐价格与单月流量全览" />
+      <h2 class="sec-h2">{airport.name} 在售套餐价格、周期配额与支付方式</h2>
+
+      <div class="pkg-meta-strip">
+        <div>
+          <span class="pm-label">优惠活动：</span>
+          <span class="pm-val">{airport.discountActivity || '常规官方定价，无额外限时代金券记录'}</span>
+        </div>
+        <div>
+          <span class="pm-label">支持付款：</span>
+          <span class="pm-val">{airport.paymentMethods.join(' / ')}</span>
+        </div>
+        <div>
+          <span class="pm-label">不限时包：</span>
+          <span class="pm-val">{airport.hasUnlimitedPlan ? '提供永久/不限时按量套餐' : '仅提供周期重置流量套餐'}</span>
+        </div>
+      </div>
+
+      {airport.packages && airport.packages.length > 0 ? (
+        <div class="table-scroll-wrap">
+          <table class="packages-table">
+            <thead>
+              <tr>
+                <th>套餐名称</th>
+                <th>计费周期</th>
+                <th>官方标价</th>
+                <th>流量配额</th>
+                <th>适用场景与说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              {airport.packages.map((pkg) => (
+                <tr>
+                  <td class="pkg-name">{pkg.name}</td>
+                  <td>{pkg.cycle}</td>
+                  <td class="pkg-price">{pkg.price}</td>
+                  <td class="pkg-traffic">{pkg.traffic}</td>
+                  <td class="pkg-period">{pkg.period}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p class="sec-sub">
+          当前仅录入基础起步档位：<strong>{airport.startingPrice}</strong>（包含 <strong>{airport.monthlyTraffic}</strong> 流量），具体在售周期套餐请点击上方官网查看实时面板。
+        </p>
+      )}
+    </section>
+
+    <!-- SECTION 4: Unlock Matrix & Client Guide -->
+    <section id="unlock-client" class="review-section" data-reveal>
+      <Divider label="04 · 流媒体/AI 解锁分析与客户端指引" />
+      <h2 class="sec-h2">ChatGPT / Claude / 流媒体解锁能力与客户端配置建议</h2>
+
+      <div class="unlock-layout">
+        <div class="unlock-matrix-box flux-card">
+          <h3>实测解锁支持概览</h3>
+          <div class="unlock-pills">
+            <span class={`u-pill ${airport.aiUnlock.chatgpt ? 'ok' : 'no'}`}>
+              ChatGPT {airport.aiUnlock.chatgpt ? '✓ 节点支持' : '✕ 需谨慎'}
+            </span>
+            <span class={`u-pill ${airport.aiUnlock.claude ? 'ok' : 'no'}`}>
+              Claude {airport.aiUnlock.claude ? '✓ 节点支持' : '✕ 需谨慎'}
+            </span>
+            <span class={`u-pill ${airport.aiUnlock.midjourney ? 'ok' : 'no'}`}>
+              Midjourney {airport.aiUnlock.midjourney ? '✓ 支持' : '✕ 不明'}
+            </span>
+            <span class={`u-pill ${airport.streamingUnlock.netflix ? 'ok' : 'no'}`}>
+              Netflix 4K {airport.streamingUnlock.netflix ? '✓ 解锁' : '✕ 受限'}
+            </span>
+            <span class={`u-pill ${airport.streamingUnlock.disney ? 'ok' : 'no'}`}>
+              Disney+ {airport.streamingUnlock.disney ? '✓ 解锁' : '✕ 部分区失败'}
+            </span>
+            <span class={`u-pill ${airport.streamingUnlock.youtube ? 'ok' : 'no'}`}>
+              YouTube {airport.streamingUnlock.youtube ? '✓ 支持' : '✕ 送中风险'}
+            </span>
+          </div>
+
+          <div class="coverage-block">
+            <p><strong>节点覆盖与客户端口径：</strong>{airport.nodeCoverage || airport.features.join(' · ')}</p>
+            <p><strong>适配工具 / 客户端：</strong>{airport.clientMode || airport.clientSupport.join(' · ')}</p>
+          </div>
+
+          <p class="unlock-prose">{review.unlockAnalysis}</p>
+        </div>
+
+        <div class="client-guide-box flux-card">
+          <h3>分步上手与避坑配置建议</h3>
+          <ol class="guide-steps">
+            {review.clientSetupGuide.map((step) => (
+              <li>{step}</li>
+            ))}
+          </ol>
+          <div class="guide-footer-links">
+            <a href="/guides/" class="text-link">浏览 Clash / Shadowrocket / Sing-box 图文教程 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: Honest Pros, Risks & Not Recommended For -->
+    <section id="pros-cons" class="review-section" data-reveal>
+      <Divider label="05 · 优缺点与适合/不适合人群" />
+      <h2 class="sec-h2">{airport.name} 客观评价：优势、实测短板与避坑说明</h2>
+
+      <div class="pros-cons-grid">
+        <div class="pc-card pros flux-card">
+          <h3>✅ 核心优势</h3>
+          <ul>
+            {(airport.pros || airport.features).map((pro) => (
+              <li>{pro}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="pc-card risks flux-card">
+          <h3>⚠️ 真实短板与风险提示</h3>
+          <ul>
+            {(airport.risks || ['节点表现受本地宽带、路由拥塞及流媒体风控影响，建议先月付低档测试。']).map((risk) => (
+              <li>{risk}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="pc-card avoid flux-card">
+          <h3>🚫 不建议购买人群</h3>
+          <p>{airport.notRecommendedFor || '对单区原生静态住宅 IP 有严格刚需、或无法接受晚高峰跨省绕路波动的用户建议谨慎。'}</p>
+          {airport.peerDifference && (
+            <div class="peer-diff">
+              <strong>与同类竞品差异：</strong>{airport.peerDifference}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: FAQ -->
+    <section id="faq" class="review-section" data-reveal>
+      <Divider label="06 · 常见问题解答 FAQ" />
+      <h2 class="sec-h2">{airport.name} 高频购买与使用疑问解答</h2>
+
+      <div class="faq-list">
+        {review.faqs.map((faq) => (
+          <details class="faq-item flux-card" open>
+            <summary class="faq-q">{faq.q}</summary>
+            <p class="faq-a">{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- SECTION 7: Cross-links & Next Reads -->
+    <section id="related-compare" class="review-section" data-reveal>
+      <Divider label="07 · 同档竞品实测与专题推荐" />
+      <h2 class="sec-h2">横向对照品牌评测与选型延伸阅读</h2>
+
+      <div class="related-layout">
+        <div class="related-brands-col">
+          <h3 class="sub-col-title">同场景对照品牌</h3>
+          <div class="related-brands-grid">
+            {relatedBrands.map((sib) => (
+              <a
+                href={sib.hasDeepReview ? `/airports/${sib.slug}/` : `/airports/#airport-${sib.id}`}
+                class="related-brand-card flux-card"
+              >
+                <div class="rb-top">
+                  <strong>{sib.name}</strong>
+                  <span class="rb-price">{sib.startingPrice}</span>
+                </div>
+                <p class="rb-desc">{sib.lineType} · {sib.monthlyTraffic} · {sib.recommendedFor}</p>
+                <span class="rb-cta">{sib.hasDeepReview ? '查看深度实测页 →' : '查看总榜档案 →'}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div class="related-articles-col">
+          <h3 class="sub-col-title">相关选型专题与避坑教程</h3>
+          <div class="related-articles-list">
+            {review.relatedArticles.map((art) => (
+              <a href={art.href} class="related-art-card flux-card">
+                <span class="ra-tag">{art.tag}</span>
+                <strong class="ra-title">{art.title}</strong>
+                <span class="ra-arrow">→</span>
+              </a>
+            ))}
+            <a href="/airports/" class="related-art-card flux-card">
+              <span class="ra-tag">总榜矩阵</span>
+              <strong class="ra-title">返回 2026 优质机场 42 品牌筛选总表与单 GB 计算器</strong>
+              <span class="ra-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Full-Res Screenshot Pan & Zoom Lightbox Modal -->
+  <div
+    id="review-evidence-modal"
+    class="evidence-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    data-pagefind-ignore
+  >
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content">
+      <div class="modal-head">
+        <div class="mhead-title-wrap">
+          <h3 id="rv-modal-title" class="mtitle">测速原图</h3>
+          <span id="rv-modal-date" class="mdate"></span>
+        </div>
+        <div class="modal-toolbar">
+          <button type="button" class="tool-btn" id="rv-zoom-out" title="缩小">➖ 缩小</button>
+          <button type="button" class="tool-btn" id="rv-zoom-reset" title="适应窗口">⊡ 适应</button>
+          <button type="button" class="tool-btn" id="rv-zoom-1to1" title="100%原始尺寸">1:1 原图</button>
+          <button type="button" class="tool-btn" id="rv-zoom-in" title="放大">➕ 放大</button>
+          <a id="rv-open-raw" href="#" target="_blank" rel="noopener noreferrer" class="tool-btn">新窗口打开 ↗</a>
+          {hasExternalUrl && (
+            <a
+              href={airport.officialUrl}
+              target="_blank"
+              rel="nofollow sponsored noopener noreferrer"
+              class="tool-btn aff-btn"
+            >
+              前往官网 ↗
+            </a>
+          )}
+          <button type="button" class="modal-close-btn" data-close-modal aria-label="关闭弹窗">×</button>
+        </div>
+      </div>
+
+      <div class="modal-viewport" id="rv-modal-viewport">
+        <div class="modal-img-container" id="rv-img-container">
+          <img id="rv-modal-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="节点实测与解锁原图放大预览" draggable="false" />
+        </div>
+      </div>
+
+      <div class="modal-footer-bar">
+        <span class="zoom-tip">💡 提示：鼠标滚轮自由缩放（最高 300%），按住左键拖拽移动视野，按 ESC 退出</span>
+        <span class="zoom-level-badge" id="rv-zoom-badge">适应窗口</span>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function initReviewPageInteractions() {
+    // 1. Copy Promo Code
+    document.querySelectorAll('.promo-copy-btn').forEach((btn) => {
+      if ((btn as HTMLElement).dataset.bound === 'true') return;
+      (btn as HTMLElement).dataset.bound = 'true';
+      btn.addEventListener('click', () => {
+        const code = btn.getAttribute('data-code') || '';
+        const statusEl = btn.querySelector('.copy-status');
+        if (navigator.clipboard && code) {
+          navigator.clipboard.writeText(code).then(() => {
+            if (statusEl) {
+              statusEl.textContent = '✓ 已复制';
+              setTimeout(() => {
+                statusEl.textContent = '点击复制';
+              }, 2200);
+            }
+          });
+        }
+      });
+    });
+
+    // 2. Evidence Modal Viewer
+    const modal = document.getElementById('review-evidence-modal');
+    if (!modal || modal.dataset.bound === 'true') return;
+    modal.dataset.bound = 'true';
+
+    const modalTitle = document.getElementById('rv-modal-title');
+    const modalDate = document.getElementById('rv-modal-date');
+    const modalImg = document.getElementById('rv-modal-img') as HTMLImageElement | null;
+    const openRaw = document.getElementById('rv-open-raw') as HTMLAnchorElement | null;
+    const viewport = document.getElementById('rv-modal-viewport');
+    const zoomBadge = document.getElementById('rv-zoom-badge');
+    const zoomInBtn = document.getElementById('rv-zoom-in');
+    const zoomOutBtn = document.getElementById('rv-zoom-out');
+    const zoomResetBtn = document.getElementById('rv-zoom-reset');
+    const zoom1to1Btn = document.getElementById('rv-zoom-1to1');
+
+    let currentScale = 1;
+    let isFitMode = true;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let scrollLeft = 0;
+    let scrollTop = 0;
+
+    function updateZoomDisplay() {
+      if (!modalImg || !zoomBadge) return;
+      if (isFitMode) {
+        modalImg.style.width = 'auto';
+        modalImg.style.maxWidth = '100%';
+        modalImg.style.maxHeight = 'calc(92vh - 105px)';
+        zoomBadge.textContent = '适应窗口';
+      } else {
+        modalImg.style.maxWidth = 'none';
+        modalImg.style.maxHeight = 'none';
+        const natWidth = modalImg.naturalWidth || 960;
+        modalImg.style.width = `${Math.round(natWidth * currentScale)}px`;
+        zoomBadge.textContent = `${Math.round(currentScale * 100)}%`;
+      }
+    }
+
+    function openModal(src: string, title: string, date: string) {
+      if (!modal || !modalImg || !modalTitle || !modalDate) return;
+      modalTitle.textContent = title;
+      modalDate.textContent = date;
+      if (openRaw) openRaw.href = src;
+      modalImg.src = src;
+      modalImg.alt = `${title} 原图预览`;
+      isFitMode = true;
+      currentScale = 1;
+      updateZoomDisplay();
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (viewport) {
+        viewport.scrollTop = 0;
+        viewport.scrollLeft = 0;
+      }
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.ev-img-trigger').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const src = btn.getAttribute('data-full-src') || '';
+        const title = btn.getAttribute('data-title') || '测速原图';
+        const date = btn.getAttribute('data-date') || '';
+        if (src) openModal(src, title, date);
+      });
+    });
+
+    modal.querySelectorAll('[data-close-modal]').forEach((el) => {
+      el.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+        closeModal();
+      }
+    });
+
+    zoomResetBtn?.addEventListener('click', () => {
+      isFitMode = true;
+      currentScale = 1;
+      updateZoomDisplay();
+    });
+
+    zoom1to1Btn?.addEventListener('click', () => {
+      isFitMode = false;
+      currentScale = 1;
+      updateZoomDisplay();
+    });
+
+    zoomInBtn?.addEventListener('click', () => {
+      if (isFitMode) {
+        isFitMode = false;
+        currentScale = 1.25;
+      } else {
+        currentScale = Math.min(3, +(currentScale + 0.25).toFixed(2));
+      }
+      updateZoomDisplay();
+    });
+
+    zoomOutBtn?.addEventListener('click', () => {
+      if (isFitMode) return;
+      currentScale = Math.max(0.5, +(currentScale - 0.25).toFixed(2));
+      if (currentScale <= 0.75) {
+        isFitMode = true;
+        currentScale = 1;
+      }
+      updateZoomDisplay();
+    });
+
+    viewport?.addEventListener(
+      'wheel',
+      (e) => {
+        if (!modal.classList.contains('is-open')) return;
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          if (isFitMode) {
+            isFitMode = false;
+            currentScale = 1.15;
+          } else {
+            currentScale = Math.min(3, +(currentScale + 0.15).toFixed(2));
+          }
+        } else {
+          if (isFitMode) return;
+          currentScale = Math.max(0.5, +(currentScale - 0.15).toFixed(2));
+          if (currentScale <= 0.8) {
+            isFitMode = true;
+            currentScale = 1;
+          }
+        }
+        updateZoomDisplay();
+      },
+      { passive: false }
+    );
+
+    viewport?.addEventListener('mousedown', (e) => {
+      if (!modal.classList.contains('is-open') || e.button !== 0) return;
+      isDragging = true;
+      startX = e.pageX - viewport.offsetLeft;
+      startY = e.pageY - viewport.offsetTop;
+      scrollLeft = viewport.scrollLeft;
+      scrollTop = viewport.scrollTop;
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    viewport?.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - viewport.offsetLeft;
+      const y = e.pageY - viewport.offsetTop;
+      viewport.scrollLeft = scrollLeft - (x - startX) * 1.3;
+      viewport.scrollTop = scrollTop - (y - startY) * 1.3;
+    });
+  }
+
+  document.addEventListener('astro:page-load', initReviewPageInteractions);
+  initReviewPageInteractions();
+</script>
+
+<style>
+  .review-page {
+    padding-top: 2.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .review-hero {
+    padding: 2rem;
+    background: rgba(15, 19, 26, 0.78);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.75rem;
+  }
+
+  .review-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .meta-pill {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+  }
+
+  .meta-pill.verified {
+    color: var(--accent);
+    border-color: rgba(124, 255, 178, 0.35);
+    background: rgba(124, 255, 178, 0.08);
+  }
+
+  .review-h1 {
+    font-size: clamp(1.75rem, 3.3vw, 2.55rem);
+    font-weight: 800;
+    line-height: 1.25;
+    color: #ffffff;
+    letter-spacing: -0.025em;
+    margin: 0 0 0.85rem;
+  }
+
+  .review-tagline {
+    font-size: 1.04rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+    margin: 0 0 1.4rem;
+  }
+
+  .verdict-box {
+    background: rgba(124, 255, 178, 0.05);
+    border: 1px solid rgba(124, 255, 178, 0.25);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.25rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .verdict-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .verdict-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .verdict-score {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .verdict-body {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.96rem;
+    line-height: 1.75;
+  }
+
+  .spec-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .spec-cell {
+    background: rgba(9, 11, 16, 0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .spec-lbl {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .spec-val {
+    font-size: 0.94rem;
+    color: #ffffff;
+    word-break: break-word;
+  }
+
+  .spec-val.highlight {
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+
+  .hero-action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: #090b10;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .cta-primary:hover {
+    background: #98ffc4;
+    transform: translateY(-1px);
+  }
+
+  .promo-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(124, 255, 178, 0.08);
+    border: 1px dashed var(--accent);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    padding: 0.65rem 1rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .promo-copy-btn code {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .copy-status {
+    color: var(--muted);
+    font-size: 0.74rem;
+  }
+
+  .cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.86rem;
+    padding: 0.68rem 1.05rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .cta-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .disclosure-note {
+    margin: 1rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .review-toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+    padding: 0.9rem 1.15rem;
+    background: rgba(15, 19, 26, 0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 2.25rem;
+  }
+
+  .toc-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 0.35rem;
+  }
+
+  .toc-link {
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+  }
+
+  .toc-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .review-section {
+    margin-bottom: 3rem;
+  }
+
+  .sec-h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.85rem;
+    line-height: 1.35;
+  }
+
+  .sec-sub,
+  .env-callout {
+    font-size: 0.94rem;
+    line-height: 1.7;
+    color: var(--text-soft);
+    margin: 0 0 1.25rem;
+  }
+
+  .env-callout {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+  }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .breakdown-card {
+    padding: 1.15rem;
+    background: rgba(15, 19, 26, 0.65);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .bd-label {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+
+  .bd-value {
+    font-size: 1.05rem;
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+
+  .bd-note {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--text-soft);
+  }
+
+  .evidence-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .evidence-showcase-grid.single-evidence {
+    grid-template-columns: minmax(0, 760px);
+  }
+
+  .evidence-item {
+    padding: 1.15rem;
+    background: rgba(15, 19, 26, 0.7);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    min-width: 0;
+    contain: inline-size;
+  }
+
+  .ev-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .ev-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.1);
+    border: 1px solid rgba(124, 255, 178, 0.3);
+    padding: 0.18rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .ev-idx {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .ev-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.4rem;
+    line-height: 1.4;
+  }
+
+  .ev-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .ev-img-trigger {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: #06070a;
+    cursor: zoom-in;
+  }
+
+  .ev-thumb {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 460px;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 0.25s ease;
+  }
+
+  .ev-img-trigger:hover .ev-thumb {
+    transform: scale(1.02);
+  }
+
+  .ev-zoom-pill {
+    position: absolute;
+    bottom: 0.7rem;
+    right: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(9, 11, 16, 0.88);
+    color: var(--accent);
+    border: 1px solid rgba(124, 255, 178, 0.4);
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .ev-caption {
+    margin: 0 0 0.5rem;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .ev-notes {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--text-soft);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .pkg-meta-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    background: rgba(15, 19, 26, 0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.84rem;
+  }
+
+  .pm-label {
+    color: var(--muted);
+  }
+
+  .pm-val {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .table-scroll-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: rgba(15, 19, 26, 0.65);
+  }
+
+  .packages-table {
+    width: 100%;
+    min-width: 580px;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .packages-table th,
+  .packages-table td {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .packages-table th {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--muted);
+    background: rgba(9, 11, 16, 0.6);
+  }
+
+  .pkg-name {
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .pkg-price {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .pkg-traffic {
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+
+  .pkg-period {
+    color: var(--text-soft);
+  }
+
+  .unlock-layout {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .unlock-matrix-box,
+  .client-guide-box {
+    padding: 1.35rem;
+    background: rgba(15, 19, 26, 0.65);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    min-width: 0;
+  }
+
+  .unlock-matrix-box h3,
+  .client-guide-box h3 {
+    margin: 0 0 1rem;
+    font-size: 1.05rem;
+    color: #ffffff;
+  }
+
+  .unlock-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+  }
+
+  .u-pill {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+
+  .u-pill.ok {
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.08);
+    border-color: rgba(124, 255, 178, 0.3);
+  }
+
+  .u-pill.no {
+    color: #ffb86c;
+    background: rgba(255, 184, 108, 0.08);
+    border-color: rgba(255, 184, 108, 0.3);
+  }
+
+  .coverage-block {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+    padding: 0.75rem 0.9rem;
+    background: rgba(9, 11, 16, 0.45);
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+  }
+
+  .coverage-block p {
+    margin: 0 0 0.35rem;
+  }
+
+  .coverage-block p:last-child {
+    margin-bottom: 0;
+  }
+
+  .unlock-prose {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  .guide-steps {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-soft);
+  }
+
+  .text-link {
+    font-size: 0.84rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .text-link:hover {
+    text-decoration: underline;
+  }
+
+  .pros-cons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .pc-card {
+    padding: 1.25rem;
+    background: rgba(15, 19, 26, 0.65);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    min-width: 0;
+  }
+
+  .pc-card.pros {
+    border-top: 2px solid var(--accent);
+  }
+
+  .pc-card.risks {
+    border-top: 2px solid #ffb86c;
+  }
+
+  .pc-card.avoid {
+    border-top: 2px solid #ff7b72;
+  }
+
+  .pc-card h3 {
+    margin: 0 0 0.8rem;
+    font-size: 1.02rem;
+    color: #ffffff;
+  }
+
+  .pc-card ul {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.87rem;
+    line-height: 1.65;
+    color: var(--text-soft);
+  }
+
+  .pc-card p {
+    margin: 0;
+    font-size: 0.87rem;
+    line-height: 1.65;
+    color: var(--text-soft);
+  }
+
+  .peer-diff {
+    margin-top: 0.85rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.84rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .faq-item {
+    padding: 1rem 1.2rem;
+    background: rgba(15, 19, 26, 0.65);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .faq-q {
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: #ffffff;
+    cursor: pointer;
+    line-height: 1.45;
+  }
+
+  .faq-a {
+    margin: 0.75rem 0 0;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--text-soft);
+  }
+
+  .related-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .sub-col-title {
+    font-size: 1rem;
+    color: #ffffff;
+    margin: 0 0 0.85rem;
+  }
+
+  .related-brands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .related-brand-card,
+  .related-art-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 1rem;
+    background: rgba(15, 19, 26, 0.65);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .related-brand-card:hover,
+  .related-art-card:hover {
+    border-color: var(--accent);
+  }
+
+  .rb-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffffff;
+    font-size: 0.95rem;
+  }
+
+  .rb-price {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .rb-desc {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-soft);
+  }
+
+  .rb-cta {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-top: auto;
+  }
+
+  .related-articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .related-art-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .ra-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    background: rgba(124, 255, 178, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+  }
+
+  .ra-title {
+    font-size: 0.88rem;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.45;
+  }
+
+  .ra-arrow {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Lightbox Modal */
+  .evidence-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .evidence-modal.is-open {
+    display: flex;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(8px);
+  }
+
+  .modal-content {
+    position: relative;
+    z-index: 10;
+    max-width: 95vw;
+    width: 1200px;
+    height: 92vh;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  }
+
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    flex-shrink: 0;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .mhead-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .mtitle {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .mdate {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+
+  .modal-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .tool-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .tool-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tool-btn.aff-btn {
+    background: var(--accent);
+    color: #090b10;
+    font-weight: 700;
+    border-color: var(--accent);
+  }
+
+  .modal-close-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.2rem 0.55rem;
+  }
+
+  .modal-viewport {
+    flex: 1;
+    position: relative;
+    overflow: auto;
+    background: #06070a;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .modal-img-container {
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .modal-img-container img {
+    border-radius: 6px;
+    background: #0f131a;
+  }
+
+  .modal-footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: var(--surface-2);
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .unlock-layout,
+    .related-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .review-hero {
+      padding: 1.25rem;
+    }
+
+    .evidence-showcase-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

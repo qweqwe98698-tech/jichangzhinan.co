@@ -90,5 +90,5 @@ nexttrace 1.1.1.1
 
 1. **坚决贯彻“优先月付”**：除非是运营 4 年以上的知名老牌（如 [光速云](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y)、[星岛梦](https://guangs.xingdaomeng.com/#/?code=1TynBYnR)），否则对任何新机场坚决不买年付。
 2. **常备不限时按量备用包**：在手机和电脑中配置一个 [星岛梦](https://guangs.xingdaomeng.com/#/?code=1TynBYnR) 的永久按量流量包作为容灾兜底。
-3. **查阅全网真实实测数据**：参考本站 [16 家主流机场实测横评天梯榜](/articles/2026-best-airports-ranking-guide/) 与 [16 品牌测速实测证据库](/airports/#evidence-gallery)，选择具备原始测速公开证据的透明品牌。
+3. **查阅全网真实实测数据**：参考本站 [42 家主流及历史机场档案与 18 家实测天梯榜](/articles/2026-best-airports-ranking-guide/) 与 [24 张原图测速实测证据库](/airports/#evidence-gallery)，重点核验每款产品的 `0B` 节点与「厂商口径/实测证据」区别，也可直达 [光速云 6 图深度评测](/airports/guangsu-cloud/) 看多省测速验证。
 4. **出现故障先查本地**：当网络突然断开时，先参考 [代理排错全百科 (20大高频解答)](/articles/proxy-troubleshooting-geo-faq/) 排除系统时间与端口冲突，避免误判。

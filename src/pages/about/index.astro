@@ -2,25 +2,28 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Divider from '../../components/ui/Divider.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import { siteConfig } from '../../config/site';
 
 const breadcrumbs = [
   { name: '首页', item: '/' },
-  { name: '关于网站', item: '/about/' }
+  { name: '关于本站', item: '/about/' }
 ];
 ---
 
 <BaseLayout
   title={`关于网站与编辑原则 | ${siteConfig.name}`}
-  description="了解机场指南的创办初衷、编辑准则、技术价值观与免责声明。"
+  description="了解机场指南的创办初衷、42 家机场品牌收录标准、24 张测速原图实测口径、商业返利透明披露与免责声明。"
   breadcrumbs={breadcrumbs}
 >
   <div class="container about-page">
+    <Breadcrumb items={breadcrumbs} />
+
     <!-- Header -->
     <header class="about-header" data-reveal>
       <Badge variant="accent">
         <span class="signal-dot"></span>
-        ABOUT FLUXGRID
+        关于编辑部 · ABOUT US
       </Badge>
       <h1 class="about-title">关于 {siteConfig.name}</h1>
       <p class="about-desc">

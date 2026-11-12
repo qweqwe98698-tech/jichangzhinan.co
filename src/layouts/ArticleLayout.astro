@@ -6,6 +6,8 @@ import ArticleTOC from '../components/article/ArticleTOC.astro';
 import ArticleMeta from '../components/article/ArticleMeta.astro';
 import RelatedPosts from '../components/article/RelatedPosts.astro';
 import ArticleNavigation from '../components/article/ArticleNavigation.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import { getClusterByTopic } from '../data/topicClusters';
 
 interface HeadingItem {
   depth: number;
@@ -39,11 +41,12 @@ interface Props {
 }
 
 const { post, headings, prevPost, nextPost } = Astro.props;
-const { title, description, pubDate, updatedDate, category, categoryName, tags, author, difficulty, readingTime, related, keyProblems, faq } = post.data;
+const { title, description, pubDate, updatedDate, category, categoryName, tags, cover, author, difficulty, readingTime, related, keyProblems, faq } = post.data;
+const clusterMeta = getClusterByTopic(category);
 
 const breadcrumbs = [
   { name: '首页', item: '/' },
-  { name: '专题分类', item: '/topics/' },
+  { name: '知识专题', item: '/topics/' },
   { name: categoryName || category, item: `/topics/${category}/` },
   { name: title, item: `/articles/${post.id}/` }
 ];
@@ -52,6 +55,7 @@ const breadcrumbs = [
 <BaseLayout
   title={title}
   description={description}
+  image={cover || '/og-cover.png'}
   type="article"
   pubDate={pubDate}
   updatedDate={updatedDate}
@@ -64,7 +68,11 @@ const breadcrumbs = [
   <!-- Reading Progress Bar -->
   <ReadingProgress />
 
-  <article class="article-page-container container">
+  <article class="article-page-container container" data-pagefind-body>
+    <div data-pagefind-ignore>
+      <Breadcrumb items={breadcrumbs} />
+    </div>
+
     <!-- Top Article Header -->
     <ArticleHeader
       title={title}
@@ -82,14 +90,14 @@ const breadcrumbs = [
     <!-- 3-Column Desktop Grid Layout -->
     <div class="article-body-grid">
       <!-- Left Column: Sticky Table of Contents -->
-      <aside class="col-toc" aria-label="目录导航">
+      <aside class="col-toc" aria-label="目录导航" data-pagefind-ignore>
         <ArticleTOC headings={headings} />
       </aside>
 
       <!-- Center Column: Core Article Content -->
       <div class="col-content">
         <!-- Main Markdown Prose Container -->
-        <div class="prose-content" id="article-prose" data-pagefind-body>
+        <div class="prose-content" id="article-prose">
           <slot />
         </div>
 
@@ -114,19 +122,42 @@ const breadcrumbs = [
           </section>
         )}
 
-        <!-- Prev / Next Navigation -->
-        <ArticleNavigation prevPost={prevPost} nextPost={nextPost} />
+        <!-- Pillar-Cluster Hub Navigation & Commercial Entry -->
+        {clusterMeta && (
+          <section class="flux-card" style="margin:2rem 0 1.5rem;padding:1.25rem 1.5rem;border-color:var(--border-accent);" data-pagefind-ignore>
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+              <div style="font-size:0.875rem;font-weight:700;color:var(--text);">
+                所属专题集群：<a href={`/topics/${clusterMeta.slug}/`} style="color:var(--accent);text-decoration:underline;text-underline-offset:3px;">{clusterMeta.name} →</a>
+              </div>
+              <a href="/airports/" style="font-size:0.8125rem;padding:0.25rem 0.7rem;border-radius:9999px;border:1px solid var(--border-accent);background:var(--accent-soft);color:var(--accent);text-decoration:none;">
+                2026 优质机场总榜 (42家收录 · 18家实测)
+              </a>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+              {clusterMeta.learningLinks.filter(l => l.href !== `/articles/${post.id}/`).slice(0, 4).map(link => (
+                <a href={link.href} style="font-size:0.8125rem;padding:0.3rem 0.7rem;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-soft);text-decoration:none;">
+                  {link.tag}: {link.title.slice(0, 22)}{link.title.length > 22 ? '…' : ''}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
-        <!-- Related Posts Network -->
-        <RelatedPosts
-          currentSlug={post.id}
-          category={category}
-          relatedSlugs={related}
-        />
+        <!-- Prev / Next Navigation -->
+        <div data-pagefind-ignore>
+          <ArticleNavigation prevPost={prevPost} nextPost={nextPost} />
+
+          <!-- Related Posts Network -->
+          <RelatedPosts
+            currentSlug={post.id}
+            category={category}
+            relatedSlugs={related}
+          />
+        </div>
       </div>
 
       <!-- Right Column: Sticky Article Meta -->
-      <aside class="col-meta" aria-label="文章信息">
+      <aside class="col-meta" aria-label="文章信息" data-pagefind-ignore>
         <ArticleMeta
           category={category}
           categoryName={categoryName}
@@ -144,6 +175,8 @@ const breadcrumbs = [
   .article-page-container {
     padding-top: 2.5rem;
     padding-bottom: 5rem;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .article-body-grid {
@@ -151,6 +184,9 @@ const breadcrumbs = [
     grid-template-columns: 240px minmax(0, 1fr) 260px;
     gap: 3rem;
     align-items: start;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .col-toc {
@@ -159,7 +195,8 @@ const breadcrumbs = [
 
   .col-content {
     width: 100%;
-    max-width: var(--content-max-width);
+    min-width: 0;
+    max-width: min(var(--content-max-width), 100%);
     margin: 0 auto;
   }
 
@@ -172,6 +209,28 @@ const breadcrumbs = [
     font-size: 1.06rem;
     line-height: 1.85;
     color: var(--text-soft);
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    contain: inline-size;
+    overflow-wrap: break-word;
+  }
+
+  .prose-content :global(a),
+  .prose-content :global(code) {
+    overflow-wrap: anywhere;
+  }
+
+  .prose-content :global(pre),
+  .prose-content :global(pre code) {
+    overflow-wrap: normal;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .prose-content :global(img) {
+    max-width: 100%;
+    height: auto;
   }
 
   .prose-content :global(h2) {
@@ -316,7 +375,7 @@ const breadcrumbs = [
 
   @media (max-width: 900px) {
     .article-body-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: 2rem;
     }
     .col-toc {

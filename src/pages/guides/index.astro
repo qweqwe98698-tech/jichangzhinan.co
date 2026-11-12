@@ -5,6 +5,7 @@ import HorizontalCard from '../../components/cards/HorizontalCard.astro';
 import FeatureCard from '../../components/cards/FeatureCard.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Divider from '../../components/ui/Divider.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import { siteConfig } from '../../config/site';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
@@ -17,31 +18,53 @@ const sortedGuides = guidePosts.sort((a, b) => {
   return dateB - dateA;
 });
 
-const featuredGuide = sortedGuides[0];
+const featuredGuide = sortedGuides.find(p => p.id === 'airport-ladder-beginner-selection-guide') || sortedGuides[0];
 const beginnerGuides = sortedGuides.filter(g => g.data.difficulty === 'Beginner');
 const intermediateGuides = sortedGuides.filter(g => g.data.difficulty === 'Intermediate');
 const advancedGuides = sortedGuides.filter(g => g.data.difficulty === 'Advanced');
 
 const breadcrumbs = [
   { name: '首页', item: '/' },
-  { name: '实战教程', item: '/guides/' }
+  { name: '实战配置教程', item: '/guides/' }
+];
+
+const guidesSchema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: '2026 客户端与分流实战配置教程中心',
+    description: '涵盖 Clash Verge Rev、Shadowrocket、Sing-box、OpenWrt 旁路由与 DNS 防泄漏全流程实战指南。',
+    url: `${siteConfig.url}/guides/`,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: sortedGuides.slice(0, 12).map((g, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        url: `${siteConfig.url}/articles/${g.id}/`,
+        name: g.data.title
+      }))
+    }
+  }
 ];
 ---
 
 <BaseLayout
-  title={`实战教程与配置指南 | ${siteConfig.name}`}
-  description="涵盖主流操作系统与核心代理软件的保姆级实操指南，支持按 Beginner / Intermediate / Advanced 难度筛选。"
+  title={`实战配置教程与机场客户端使用指南 | ${siteConfig.name}`}
+  description="系统学习机场梯子选购、Clash Verge Rev / Shadowrocket / v2rayN 安装、Smart DNS 与分流规则优化，支持按新手/中阶/高阶难度筛选。"
   breadcrumbs={breadcrumbs}
+  extraSchemas={guidesSchema}
 >
   <div class="container guides-page">
+    <Breadcrumb items={breadcrumbs} />
+
     <header class="guides-header" data-reveal>
       <Badge variant="accent">
         <span class="signal-dot"></span>
-        HANDS-ON TUTORIALS
+        实战教程中心 · HANDS-ON GUIDES
       </Badge>
-      <h1 class="guides-title">实战配置教程</h1>
+      <h1 class="guides-title">客户端、路由与防泄漏实战教程</h1>
       <p class="guides-desc">
-        拒绝空洞理论，专注可落地的实战步骤。从零搭建客户端到企业级规则分流，按难度梯次助你轻松进阶。
+        专注可复现的配置与排错步骤。从新手购入第一家机场梯子，到 Mihomo / Sing-box 脚本调优、MosDNS 双栈防泄漏，按难度梯度快速检索。还没挑好服务商？可先查看 <a href="/airports/" style="color:var(--accent);">2026 优质机场总榜</a>。
       </p>
 
       <!-- Difficulty Filter Chips (Interactive via Client-side JS) -->
@@ -56,6 +79,7 @@ const breadcrumbs = [
     <!-- Top Featured Guide -->
     {featuredGuide && (
       <section class="featured-guide-sec" data-reveal>
+        <h2 style="font-size:1.25rem;font-weight:700;margin:0 0 1rem;color:var(--text);">新手首读 · 推荐核心指南</h2>
         <FeatureCard
           title={featuredGuide.data.title}
           description={featuredGuide.data.description}
@@ -63,13 +87,15 @@ const breadcrumbs = [
           category={featuredGuide.data.category}
           categoryName={featuredGuide.data.categoryName}
           readingTime={featuredGuide.data.readingTime}
-          badgeText="EDITOR'S CHOICE"
+          badgeText="新手推荐"
           indexNum="★"
         />
       </section>
     )}
 
-    <Divider label="ALL GUIDES BY DIFFICULTY" />
+    <Divider label="全难度实战目录 · 按发布/更新排序" />
+
+    <h2 style="font-size:1.25rem;font-weight:700;margin:0 0 1.25rem;color:var(--text);">全部实战教程（共 {sortedGuides.length} 篇）</h2>
 
     <!-- All Guides List -->
     <div class="guides-list-container" id="guides-list" data-reveal>

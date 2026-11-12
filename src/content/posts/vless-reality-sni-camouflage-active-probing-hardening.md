@@ -2,7 +2,7 @@
 title: "VLESS-Reality 密钥套件与 SNI 伪装机制深度破译：借用境外大厂证书与抗 GFW 主动嗅探硬化指南"
 description: "从 TLS 1.3 握手指纹、X25519 密钥协商到 SNI 借用与 dest 回落链路，逐层拆解 VLESS-Reality 的抗主动探测机制。包含 Mihomo/Sing-box 生产级配置、XTLS-Vision 流控参数、nftables 硬化规则与抓包审计清单，直击 GFW 主动嗅探与 TLS-in-TLS 检测痛点。"
 pubDate: 2026-10-01
-updatedDate: 2026-10-01
+updatedDate: 2026-11-12
 category: "protocols"
 categoryName: "底层协议与技术原理"
 tags: ["VLESS-Reality","SNI借用","TLS 1.3握手特征","反主动探测","XTLS-Vision"]
@@ -15,7 +15,7 @@ badge: "DEEP DIVE"
 related: ["surge-mac-ios-advanced","boxjs-session-automation","hysteria2-bbr-congestion-port-hopping-deep-dive","hysteria2-high-speed-airports"]
 keyProblems:
   - "GFW 主动探测（Active Probing）对自签证书节点的识别：TLS 握手返回证书链与 SNI 不匹配，触发 SNI 黑名单与 IP 封禁"
-  - "Reality 借用真实境外大厂证书的 X25519 密钥协商机制：客户端如何用服务端公钥验���临时证书签名，实现零证书部署"
+  - "Reality 借用真实境外大厂证书的 X25519 密钥协商机制：客户端如何用服务端公钥验证临时证书签名，实现零证书部署"
   - "XTLS-Vision 流控与 splice 零拷贝在 TLS-in-TLS 场景下的性能落地，以及 dest 回落链路的正确配置"
   - "通过 tcpdump/Wireshark 抓包验证 ClientHello 指纹、JA3/JA4 哈希与 SNI 一致性，排查 DNS/IP 泄漏"
 faq:
@@ -117,7 +117,7 @@ client-fingerprint: chrome  # 可选 chrome / firefox / safari / ios / android /
 │  ┌───▼───┐  │         │  ┌────────────────────────────────┐  │         │      │      │
 │  │ TUN   │  │         │  │ 2. 主动探测                     │  │         │      │      │
 │  │ 栈    │  │         │  │    - 直接 TLS 握手              │  │         │      │      │
-│  └─��─┬───┘  │         │  │    - 证书链校验                 │  │         │      │      │
+│  └──┬───┘  │         │  │    - 证书链校验                 │  │         │      │      │
 │      │      │         │  │    - SNI 一致性                 │  │         │      │      │
 │  ┌───▼───┐  │         │  └────────────────────────────────┘  │         │      │      │
 │  │Reality│──┼─────────┼──────────────────────────────────────┼─────────┼──────▼───┐  │
@@ -145,7 +145,7 @@ Client                          GFW (被动)              Reality Server        
   │   SNI=www.microsoft.com        │                        │                            │
   │   key_share=C_pub (X25519)     │                        │                            │
   │   session_id=shortId           │                        │                            │
-  │─────���──────────────────────────┼───────────────────────>│                            │
+  │───────────────────────────────┼───────────────────────>│                            │
   │                                │  [记录 JA3 指纹]        │                            │
   │                                │                        │ ② 识别 Reality 客户端       │
   │                                │                        │   (shortId + key_share)     │
@@ -493,7 +493,7 @@ sysctl net.ipv4.tcp_congestion_control  # 应输出 bbr
 |---------|--------------|----------------|----------------|-----------------|-----------|--------------|
 | VLESS-Reality + Vision | 42 | 487 | 312 | 18 | ★★★★★ | ★★★★★ |
 | VLESS-TLS + Vision | 45 | 478 | 305 | 19 | ★★☆☆☆ | ★★★★★ |
-| Trojan-TLS | 48 | 452 | 289 | 24 | ★★☆☆☆ | ★���★☆☆ |
+| Trojan-TLS | 48 | 452 | 289 | 24 | ★★☆☆☆ | ★★★☆☆ |
 | VMess-WS-TLS | 68 | 312 | 198 | 42 | ★★☆☆☆ | ★☆☆☆☆ |
 | Hysteria2 (QUIC) | 28 | 521 | 398 | 31 | ★★★☆☆ | N/A |
 | Shadowsocks-2022 | 35 | 498 | 356 | 15 | ★★★☆☆ | N/A |
@@ -621,4 +621,16 @@ cat /etc/resolv.conf
 dig +trace www.google.com
 # 观察查询是否经过代理
 
-# 3. 在线检测
+# 3. 在线与本地防泄漏联动检测
+dig +short whoami.akamai.net @1.1.1.1
+curl -s https://www.dnsleaktest.com/ | head -n 5
+```
+
+确保服务端回落 `dest` 与客户端 `uTLS` 指纹（Chrome / Firefox / Safari）保持匹配，避免在公网主动探测与本地分流规则之间产生特征割裂。
+
+---
+
+### 协议选型与抗探测延伸阅读
+
+- **核心实战对照**：配套阅读 [VLESS-Reality 安全加固与 SNI 目标挑选](/articles/vless-reality-deep-hardening/)、[主流代理协议全景横评](/articles/network-protocols-comparison/) 与 [uTLS 客户端指纹伪装机制](/articles/utls-fingerprint-simulation/)。
+- **高抗封锁与专线推荐**：极端网络环境下亦可对比 [Hysteria 2 端口跳跃与动态防阻断](/articles/hysteria2-bbr-congestion-port-hopping-deep-dive/) 或在 [2026 优质机场总榜](/airports/) 与 [底层协议专题](/topics/protocols/) 筛选内置 Reality / IEPL 混合接入的机场。

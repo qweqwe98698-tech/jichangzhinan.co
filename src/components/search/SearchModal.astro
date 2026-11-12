@@ -26,11 +26,13 @@
 
     <!-- Category Filter Bar -->
     <div class="search-filter-bar">
-      <button class="filter-pill is-active" data-filter="all">全部</button>
-      <button class="filter-pill" data-filter="clients">客户端</button>
-      <button class="filter-pill" data-filter="protocols">协议</button>
-      <button class="filter-pill" data-filter="beginner">新手</button>
-      <button class="filter-pill" data-filter="tools">工具</button>
+      <button type="button" class="filter-pill is-active" data-filter="all">全部</button>
+      <button type="button" class="filter-pill" data-filter="airport">机场推荐</button>
+      <button type="button" class="filter-pill" data-filter="性价比">高性价比</button>
+      <button type="button" class="filter-pill" data-filter="便宜">便宜入门</button>
+      <button type="button" class="filter-pill" data-filter="纯净">纯净 IP</button>
+      <button type="button" class="filter-pill" data-filter="clients">客户端</button>
+      <button type="button" class="filter-pill" data-filter="protocols">协议</button>
     </div>
 
     <!-- Search Results Container -->
@@ -46,10 +48,10 @@
         </div>
         <div class="popular-searches">
           <span class="popular-title">热门搜索：</span>
-          <button class="quick-tag" data-query="Clash">Clash Verge</button>
-          <button class="quick-tag" data-query="Sing-box">Sing-box</button>
-          <button class="quick-tag" data-query="Hysteria">Hysteria 2</button>
-          <button class="quick-tag" data-query="DNS">DNS 泄漏</button>
+          <button type="button" class="quick-tag" data-query="高性价比">高性价比机场</button>
+          <button type="button" class="quick-tag" data-query="便宜机场">便宜机场</button>
+          <button type="button" class="quick-tag" data-query="纯净">纯净 IP</button>
+          <button type="button" class="quick-tag" data-query="Clash">Clash Verge</button>
         </div>
       </div>
 
@@ -439,9 +441,12 @@
     function renderDevFallback(query: string) {
       // In dev mode when pagefind isn't built yet
       const sampleArticles = [
+        { title: '2026 稳定好用机场推荐：42 品牌档案与 18 家实测横评天梯榜', url: '/articles/2026-best-airports-ranking-guide/', excerpt: '光速云、暮光加速、飞猫云、微风网络等 42 家机场专线与 18 家实测截图总榜' },
+        { title: '2026 高性价比机场推荐榜单：15–20 元 IEPL 纯专线实测', url: '/articles/high-value-cost-effective-airports/', excerpt: '按单 GB 成本、晚高峰 4K 与优惠码筛选高性价比 IEPL 专线' },
+        { title: '2026 便宜机场推荐指南：月付 15 元内 & 年付折 7–8 元', url: '/articles/cheap-budget-airports-recommendation/', excerpt: '唯兔云、宇宙云、星岛梦、飞猫云低预算入门精选与避坑' },
+        { title: '2026 纯净 IP 机场推荐：ChatGPT / Claude 防封号节点', url: '/articles/best-airports-for-chatgpt-claude/', excerpt: '原生 ISP 住宅低欺诈分节点、Cloudflare 盾绕过与 AI 策略组' },
+        { title: '2026 翻墙机场与梯子新手入门全攻略', url: '/articles/airport-ladder-beginner-selection-guide/', excerpt: '零基础购买机场订阅、安装 Clash Verge Rev / Shadowrocket 三步上手' },
         { title: 'Clash Verge Rev 从入门到精通完整实战指南', url: '/articles/clash-verge-rev-guide/', excerpt: '掌握 Clash Verge Rev 客户端订阅导入、Tun 模式与规则分流' },
-        { title: 'Sing-box 核心原理与通用配置全景解析', url: '/articles/sing-box-universal-config/', excerpt: '深入理解 Sing-box 核心架构、Hysteria2 / TUIC 协议与 Rule-Set' },
-        { title: '主流代理协议全维度对比：Shadowsocks / Vmess / Vless / Trojan / Hysteria2', url: '/articles/network-protocols-comparison/', excerpt: '全方位对比主流网络协议性能、加密机制与抗丢包测试' },
         { title: '彻底杜绝 DNS 泄漏：DoH / DoT 与分流解析深度防范指南', url: '/articles/anti-dns-leak-guide/', excerpt: '保护 DNS 真实解析行为，防止运营商劫持与 DNS 泄漏' }
       ];
 
@@ -449,9 +454,47 @@
       renderResults(matched.map(m => ({ url: m.url, meta: { title: m.title }, excerpt: m.excerpt })));
     }
 
+    const filterPills = modal?.querySelectorAll<HTMLElement>('.search-filter-bar .filter-pill');
+    const filterMap: Record<string, string> = {
+      airport: '机场推荐 IEPL',
+      性价比: '性价比',
+      便宜: '便宜机场',
+      纯净: '纯净 IP ChatGPT',
+      clients: 'Clash Shadowrocket',
+      protocols: 'VLESS Hysteria 协议'
+    };
+
+    filterPills?.forEach(pill => {
+      pill.addEventListener('click', () => {
+        filterPills.forEach(p => p.classList.remove('is-active'));
+        pill.classList.add('is-active');
+        const filterKey = pill.getAttribute('data-filter') || 'all';
+        if (filterKey === 'all') {
+          if (input) input.value = '';
+          performSearch('');
+          return;
+        }
+        const query = filterMap[filterKey] || filterKey;
+        if (input) input.value = query;
+        performSearch(query);
+      });
+    });
+
     triggers.forEach(t => t.addEventListener('click', openModal));
     closeBtn?.addEventListener('click', closeModal);
     backdrop?.addEventListener('click', closeModal);
+
+    // Support URL SearchAction (?q=...)
+    try {
+      const initialQ = new URLSearchParams(window.location.search).get('q');
+      if (initialQ && initialQ.trim()) {
+        openModal();
+        if (input) {
+          input.value = initialQ.trim();
+          performSearch(initialQ.trim());
+        }
+      }
+    } catch {}
 
     quickTags.forEach(btn => {
       btn.addEventListener('click', () => {

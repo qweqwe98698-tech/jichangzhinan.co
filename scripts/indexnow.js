@@ -12,12 +12,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const HOST = 'jichangzhinan.co';
-const KEY = 'd8b5c92e7f1a4e6b8c3d5a2f9e1b7c4a';
+const KEY = process.env.INDEXNOW_KEY || '955295c2400545a89ecee22f232f0137';
 const KEY_LOCATION = `https://${HOST}/${KEY}.txt`;
+const DRY_RUN = process.argv.includes('--dry-run');
 
 // Read all markdown post IDs to construct URL list
 const postsDir = path.join(__dirname, '..', 'src', 'content', 'posts');
 const postFiles = fs.readdirSync(postsDir).filter(f => f.endsWith('.md') || f.endsWith('.mdx'));
+
+// Read all deep-review airport slugs from src/data/airports.ts
+const airportsSource = fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'airports.ts'), 'utf8');
+const airportBlocks = airportsSource.split(/(?=\{\s*\n\s*id:\s*['"])/);
+const deepAirportSlugs = [];
+for (const block of airportBlocks) {
+  if (/hasDeepReview:\s*true/.test(block)) {
+    const slugMatch = block.match(/slug:\s*['"]([^'"]+)['"]/);
+    if (slugMatch) {
+      deepAirportSlugs.push(slugMatch[1]);
+    }
+  }
+}
 
 const urlList = [
   `https://${HOST}/`,
@@ -33,8 +47,13 @@ const urlList = [
   `https://${HOST}/topics/clients/`,
   `https://${HOST}/topics/routing/`,
   `https://${HOST}/topics/security/`,
-  `https://${HOST}/topics/beginner/`
+  `https://${HOST}/topics/beginner/`,
+  `https://${HOST}/topics/protocols/`
 ];
+
+deepAirportSlugs.forEach(slug => {
+  urlList.push(`https://${HOST}/airports/${slug}/`);
+});
 
 postFiles.forEach(file => {
   const slug = file.replace(/\.(md|mdx)$/, '');
@@ -60,6 +79,13 @@ const options = {
 };
 
 console.log(`[IndexNow] Preparing to submit ${urlList.length} canonical URLs for ${HOST}...`);
+console.log(`[IndexNow] Key location: ${KEY_LOCATION}`);
+
+if (DRY_RUN) {
+  console.log('[IndexNow] Dry run enabled, skipping HTTP POST to api.indexnow.org.');
+  console.log(JSON.stringify({ host: HOST, key: KEY, keyLocation: KEY_LOCATION, urlCount: urlList.length }, null, 2));
+  process.exit(0);
+}
 
 const req = https.request(options, (res) => {
   console.log(`[IndexNow] Response Status Code: ${res.statusCode} (${res.statusMessage})`);

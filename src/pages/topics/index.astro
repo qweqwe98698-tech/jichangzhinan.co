@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopicCard from '../../components/cards/TopicCard.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Divider from '../../components/ui/Divider.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import { topicsData } from '../../data/topics';
 import { siteConfig } from '../../config/site';
 
@@ -19,27 +20,51 @@ const topicsWithStats = topicsData.map(topic => {
 
 const breadcrumbs = [
   { name: '首页', item: '/' },
-  { name: '专题分类', item: '/topics/' }
+  { name: '知识专题', item: '/topics/' }
+];
+
+const topicsCollectionSchema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: '2026 机场选购与代理技术八大知识专题',
+    description: '按系统化知识体系浏览网络技术专题：涵盖机场推荐、专线评测、场景方案、客户端配置、底层协议、智能分流、安全避坑与新手入门。',
+    url: `${siteConfig.url}/topics/`,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: topicsWithStats.map((topic, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        url: `${siteConfig.url}/topics/${topic.slug}/`,
+        name: `${topic.name}（${topic.postsCount} 篇）`
+      }))
+    }
+  }
 ];
 ---
 
 <BaseLayout
-  title={`专题分类目录 | ${siteConfig.name}`}
-  description="按系统化知识体系浏览网络技术专题：涵盖新手入门、客户端配置、核心协议、规则分流与隐私安全。"
+  title={`知识专题导航 · 八大 Pillar-Cluster 内容集群 | ${siteConfig.name}`}
+  description="按系统化 Pillar-Cluster 体系浏览机场与网络代理专题：包含机场推荐与选购、IPLC 专线评测、ChatGPT 纯净 IP 场景、全平台客户端教程、底层协议及新手排错。"
   breadcrumbs={breadcrumbs}
+  extraSchemas={topicsCollectionSchema}
 >
   <div class="container topics-hub-page">
+    <Breadcrumb items={breadcrumbs} />
+
     <!-- Top Header -->
     <header class="hub-header" data-reveal>
       <Badge variant="accent">
         <span class="signal-dot"></span>
-        TAXONOMY CLUSTERS
+        八大专题集群 · TAXONOMY CLUSTERS
       </Badge>
-      <h1 class="hub-title">专题知识库</h1>
+      <h1 class="hub-title">知识专题集群中心</h1>
       <p class="hub-desc">
-        将碎片化的网络配置知识沉淀为体系化的专题集群。选择适合你当前阶段的专题，沿着学习路径深入探索。
+        将碎片化的机场评测与代理配置知识沉淀为体系化的八大专题集群。先选定目标需求，再沿三级内容路径逐步深入。
       </p>
     </header>
+
+    <h2 style="font-size:1.35rem;font-weight:700;margin:0 0 1.25rem;color:var(--text);">按需求与技术层级挑选专题（共 {topicsWithStats.length} 大集群）</h2>
 
     <!-- Topics Grid -->
     <div class="topics-grid" data-reveal data-reveal-delay="2">

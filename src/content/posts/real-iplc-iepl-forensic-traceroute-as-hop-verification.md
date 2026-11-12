@@ -1,10 +1,10 @@
 ---
-title: "真假 IPLC / IEPL 专线网络取证全指南：使用 MTR / NextTrace 追踪路由 AS 跳数与假专线公网中继套路鉴别"
+title: "真假 IPLC/IEPL 专线取证指南：使用 MTR 与 NextTrace 追踪 AS 跳数鉴别公网中继"
 description: "深度拆解真假 IPLC/IEPL 专线的底层网络机理，手把手教你用 MTR 与 NextTrace 追踪 AS 跳数、识别公网中继伪装专线的套路，附带生产级配置、抓包审计与跑路预警自检清单，帮助你在 22 分钟内建立一套可复现的专线取证方法论。"
 pubDate: 2026-10-13
-updatedDate: 2026-10-13
-category: "security"
-categoryName: "避坑与安全防骗"
+updatedDate: 2026-11-12
+category: "lines"
+categoryName: "专线与网络线路"
 tags: ["真假IPLC鉴别","NextTrace路由追踪","AS跳数检测","倍率刺客防范","机场跑路预警"]
 author: "机场指南编辑部"
 featured: false
@@ -12,11 +12,11 @@ draft: false
 difficulty: "Intermediate"
 readingTime: "15 MIN READ"
 badge: "DEEP DIVE"
-related: ["ai-productivity-routing","anti-webrtc-dns-ipv6-leak-zero-fingerprint-hardening","network-protocols-comparison","clash-verge-rev-guide"]
+related: ["iplc-iepl-dedicated-line-airports","airport-scam-avoidance-and-fake-iplc","anti-webrtc-dns-ipv6-leak-zero-fingerprint-hardening","network-protocols-comparison"]
 keyProblems:
   - "机场宣称 IPLC/IEPL 专线，但晚高峰 RTT 抖动超过 80ms，疑似公网中继伪装"
   - "MTR 输出中出现大量 AS4134 / AS4809 / AS58453 等公网骨干 AS，与专线应有的 L2/L3 直连路径不符"
-  - "NextTrace 显���跨境段经过 3 个以上公网 AS 跳数，触发倍率刺客计费却无专线体验"
+  - "NextTrace 显示跨境段经过 3 个以上公网 AS 跳数，触发倍率刺客计费却无专线体验"
   - "客户端侧 DNS / IPv6 / WebRTC 泄漏导致真实出口 IP 暴露，需配合内核级抓包审计"
 faq:
   - q: "IPLC 和 IEPL 到底有什么区别？为什么很多机场混着叫？"
@@ -614,3 +614,10 @@ echo "7-day baseline complete. Review logs in $LOG_DIR"
 ---
 
 **最后一句实话：** 专线不是玄学，是物理层和路由层的硬约束。MTR 和 NextTrace 不会说谎，说谎的是机场的营销文案。把这两个工具用熟，把 7 天基线跑起来，你就能在倍率刺客和跑路机场面前，拥有真正的技术话语权。
+
+---
+
+### 延伸阅读与核验入口
+
+- **实测真专线机场推荐**：直接查阅 [IPLC / IEPL 纯专线机场深度推荐与节点测评](/articles/iplc-iepl-dedicated-line-airports/)，或访问 [2026 优质机场多维筛选终端与 真/伪 IPLC 在线核验台](/airports/#iplc-verifier) 比对入口 ASN 与倍率机制。
+- **避坑防骗专题**：结合 [机场避坑与防骗指南：如何识破假专线与跑路前兆](/articles/airport-scam-avoidance-and-fake-iplc/) 与 [专线与网络线路专题集群](/topics/lines/) 完整排查风险，若需要兼顾预算，可对比 [15–20 元高性价比 IEPL 专线横评](/articles/high-value-cost-effective-airports/)。

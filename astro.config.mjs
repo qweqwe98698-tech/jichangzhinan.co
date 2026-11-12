@@ -10,7 +10,7 @@ function rehypeExternalLinks() {
         const href = String(node.properties.href);
         if (/^https?:\/\//i.test(href) && !href.includes('jichangzhinan.co') && !href.startsWith('http://localhost')) {
           node.properties.target = '_blank';
-          const isCommercial = /aff|code=|\?r=|\/register\?|civetnet|speedworld|gsyvip|xingdaomeng|flycat|v2yun|sogoyun|u1s1|kosing|qqy|kuaili|jlyvip|1flyun|2maoyun/i.test(href);
+          const isCommercial = /aff|code=|\?r=|\/register\?|civetnet|speedworld|gsyvip|xingdaomeng|flycat|v2yun|sogoyun|u1s1|kosing|qqy|kuaili|jlyvip|1flyun|2maoyun|yuzoucloud|gntaff|vipaff|twilightaff|breezenetaff|dalaoyunaff|worryfreeaff|fireflyaff|flashleapaff|shandianshuaff|yunjiexianaff|liulianyunaff|shenxingaff|huanqiutiaff|invisibleaff|ladderaff|gcvipaff|wgetcloud\.ltd|sibker\.com|cyberguard\.best|ssyylf\.com|lingdongaff|wavenetaff|edgenovaaff/i.test(href);
           node.properties.rel = isCommercial ? 'nofollow sponsored noopener noreferrer' : 'nofollow noopener noreferrer';
         }
       }
@@ -29,10 +29,10 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
-      filter: (page) =>
-        !page.includes('/404') &&
-        !page.includes('/search') &&
-        !page.includes('/draft')
+      filter: (page) => {
+        const pathname = new URL(page).pathname;
+        return !/^\/(404|search|draft)(\/|\.html|$)/.test(pathname);
+      }
     }),
     mdx()
   ],

@@ -1,0 +1,116 @@
+---
+export interface BreadcrumbItem {
+  name: string;
+  item: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  class?: string;
+}
+
+const { items = [], class: className = '' } = Astro.props;
+
+function toHref(item: string): string {
+  if (item.startsWith('https://jichangzhinan.co')) {
+    const rel = item.replace('https://jichangzhinan.co', '');
+    return rel || '/';
+  }
+  if (item.startsWith('http://jichangzhinan.co')) {
+    const rel = item.replace('http://jichangzhinan.co', '');
+    return rel || '/';
+  }
+  return item;
+}
+---
+
+{items.length > 0 && (
+  <nav class={`flux-breadcrumb ${className}`} aria-label="面包屑导航">
+    <ol class="breadcrumb-list">
+      {items.map((crumb, idx) => {
+        const isLast = idx === items.length - 1;
+        const href = toHref(crumb.item);
+        return (
+          <li class="breadcrumb-item">
+            {isLast ? (
+              <span class="breadcrumb-current" aria-current="page">
+                {crumb.name}
+              </span>
+            ) : (
+              <>
+                <a href={href} class="breadcrumb-link">
+                  {crumb.name}
+                </a>
+                <span class="breadcrumb-sep" aria-hidden="true">/</span>
+              </>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .flux-breadcrumb {
+    margin-bottom: 1.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+  }
+
+  .breadcrumb-link {
+    color: var(--text-soft, #b2b8c5);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .breadcrumb-link:hover {
+    color: var(--accent, #7cffb2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .breadcrumb-sep {
+    color: var(--muted, #7f8796);
+    font-family: var(--font-mono, monospace);
+    user-select: none;
+  }
+
+  .breadcrumb-current {
+    color: var(--text, #f4f6fa);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 42ch;
+  }
+
+  @media (max-width: 640px) {
+    .flux-breadcrumb {
+      font-size: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .breadcrumb-current {
+      max-width: 24ch;
+    }
+  }
+</style>

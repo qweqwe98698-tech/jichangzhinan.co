@@ -3,8 +3,8 @@ title: "2026 代理协议全景横评：SS / VLESS / Trojan / Hy2 选型对比"
 description: "科学上网加密协议深度横评：Shadowsocks 2022、VMess、VLESS-Reality、Trojan 与 Hysteria 2 底层原理、握手开销与抗 DPI 封锁全景指南。"
 pubDate: 2026-08-01
 updatedDate: 2026-08-16
-category: "security"
-categoryName: "安全与避坑"
+category: "protocols"
+categoryName: "底层协议与原理"
 tags: ["代理协议", "Shadowsocks", "VLESS", "Trojan", "Hysteria2", "TUIC", "协议对比", "安全防御"]
 author: "机场指南编辑部"
 featured: false
@@ -82,4 +82,4 @@ faq: [
 └── ④ 使用老旧路由器固件或不支持现代协议的旧客户端 ──> 选用【Trojan】
 ```
 
-更多协议加固与实操配置，请参阅 [VLESS-Reality 生产级安全加固实战](/articles/vless-reality-deep-hardening/) 与 [Hysteria 2 协议高速机场推荐](/articles/hysteria2-high-speed-airports/)。
+更多协议加固、双跳中继与实操配置，请参阅 [VLESS-Reality 生产级安全加固实战](/articles/vless-reality-deep-hardening/)、[Hysteria 2 协议高速机场推荐](/articles/hysteria2-high-speed-airports/) 与 [WireGuard + Cloudflare WARP 双跳隐藏与原生 IP 解锁实战](/articles/wireguard-warp-dual-hop/)。

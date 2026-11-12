@@ -27,7 +27,7 @@ const sortedPosts = allPosts.sort((a, b) => {
 
 const featuredPosts = sortedPosts.filter(p => p.data.featured);
 const mainFeaturePost = featuredPosts.find(p => p.id === '2026-best-airports-ranking-guide') || featuredPosts[0] || sortedPosts[0];
-const secondaryPost1 = featuredPosts.find(p => p.id === 'iplc-iepl-dedicated-line-airports') || featuredPosts[1] || sortedPosts[1];
+const secondaryPost1 = sortedPosts.find(p => p.id === 'high-value-cost-effective-airports') || featuredPosts[1] || sortedPosts[1];
 const secondaryPost2 = sortedPosts.find(p => p.id === 'best-airports-for-chatgpt-claude') || sortedPosts[2];
 
 // Compute dynamic count per topic
@@ -44,7 +44,7 @@ const latestPosts = sortedPosts.slice(0, 6);
 ---
 
 <BaseLayout
-  title={`${siteConfig.name} - 2026最新优质机场推荐与代理导航 · 数字知识库`}
+  title={`${siteConfig.name} - 2026 优质机场推荐、高性价比专线与代理导航`}
   description={siteConfig.description}
 >
   <!-- Hero Section -->
@@ -60,9 +60,9 @@ const latestPosts = sortedPosts.slice(0, 6);
       <div class="section-header-bar">
         <div class="sec-left">
           <span class="signal-dot breathing"></span>
-          <h2 id="today-title" class="sec-main-title">TODAY'S SELECTION // 编辑精选与榜单</h2>
+          <h2 id="today-title" class="sec-main-title">2026 核心榜单与编辑精选 · FEATURED</h2>
         </div>
-        <span class="sec-right-tag">2026 权威天梯榜</span>
+        <span class="sec-right-tag">重点推荐与专线横评</span>
       </div>
 
       <div class="today-grid">
@@ -111,9 +111,9 @@ const latestPosts = sortedPosts.slice(0, 6);
             <div class="trending-header">
               <div class="trending-title-wrap">
                 <span class="signal-dot blue"></span>
-                <h3 class="trending-title">HOT RANKING</h3>
+                <h3 class="trending-title">热门榜与必读精选</h3>
               </div>
-              <span class="trending-badge">2026 PICKS</span>
+              <span class="trending-badge">2026 热榜</span>
             </div>
 
             <ol class="trending-list">
@@ -135,7 +135,7 @@ const latestPosts = sortedPosts.slice(0, 6);
 
             <div class="trending-card-footer">
               <a href="/airports/" class="trending-more-link">
-                <span>查看 16 品牌完整横评天梯</span>
+                <span>查看 42 品牌档案与 18 家实测天梯</span>
                 <span class="trend-arrow">→</span>
               </a>
             </div>
@@ -144,14 +144,14 @@ const latestPosts = sortedPosts.slice(0, 6);
       </div>
     </section>
 
-    <Divider label="2026 AIRPORT SELECTION MATRIX" />
+    <Divider label="2026 机场筛选终端 · 42 品牌库 (18 家实测)" />
 
     <!-- SECTION: AIRPORT FINDER TERMINAL (Direct interactive embedding) -->
     <section class="home-section airport-matrix-section" data-reveal>
       <div class="section-header-bar">
         <div class="sec-left">
           <span class="signal-dot"></span>
-          <h2 class="sec-main-title">AIRPORT FINDER // 2026 优质机场筛选终端</h2>
+          <h2 class="sec-main-title">2026 优质机场交互筛选矩阵</h2>
         </div>
         <a href="/airports/" class="sec-more-link">进入完整机场导航中心 →</a>
       </div>
@@ -159,16 +159,16 @@ const latestPosts = sortedPosts.slice(0, 6);
       <AirportFilterTerminal />
     </section>
 
-    <Divider label="EXPLORE BENTO GRID" />
+    <Divider label="核心场景与专栏矩阵" />
 
     <!-- SECTION: EXPLORE GRID (Irregular Bento Grid) -->
     <section class="home-section explore-bento-section" aria-labelledby="bento-title" data-reveal>
       <div class="section-header-bar">
         <div class="sec-left">
           <span class="signal-dot purple"></span>
-          <h2 id="bento-title" class="sec-main-title">EXPLORE GRID // 探索矩阵</h2>
+          <h2 id="bento-title" class="sec-main-title">精选专线、避坑与工具入口矩阵</h2>
         </div>
-        <span class="sec-right-tag">IRREGULAR BENTO</span>
+        <span class="sec-right-tag">重点导航</span>
       </div>
 
       <div class="bento-grid-irregular">
@@ -234,14 +234,14 @@ const latestPosts = sortedPosts.slice(0, 6);
       </div>
     </section>
 
-    <Divider label="TAXONOMY TERMINAL" />
+    <Divider label="八大知识专题体系 · TAXONOMY" />
 
     <!-- SECTION: TOPICS TERMINAL -->
     <section class="home-section topics-section" aria-labelledby="topics-title" data-reveal>
       <div class="section-header-bar">
         <div class="sec-left">
           <span class="signal-dot blue"></span>
-          <h2 id="topics-title" class="sec-main-title">TOPICS // 专题分类索引</h2>
+          <h2 id="topics-title" class="sec-main-title">知识专题分类索引（{topicCounts.length} 大核心集群）</h2>
         </div>
         <a href="/topics/" class="sec-more-link">浏览全部专题体系 →</a>
       </div>
@@ -259,14 +259,14 @@ const latestPosts = sortedPosts.slice(0, 6);
       </div>
     </section>
 
-    <Divider label="LATEST STREAM" />
+    <Divider label="最新实测与技术文章流" />
 
     <!-- SECTION: LATEST ARTICLES STREAM -->
     <section class="home-section latest-stream-section" aria-labelledby="stream-title" data-reveal>
       <div class="section-header-bar">
         <div class="sec-left">
           <span class="signal-dot breathing"></span>
-          <h2 id="stream-title" class="sec-main-title">LATEST ARTICLES // 最新文章矩阵</h2>
+          <h2 id="stream-title" class="sec-main-title">最新更新评测与实战指南</h2>
         </div>
         <a href="/archive/" class="sec-more-link">查看完整归档时间轴 ({allPosts.length} 篇) →</a>
       </div>

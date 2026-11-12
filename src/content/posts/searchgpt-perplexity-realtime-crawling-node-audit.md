@@ -2,7 +2,7 @@
 title: "SearchGPT 与 Perplexity 实时爬虫反代拦截对抗：出口 IP 纯净度审计与动态调度实战"
 description: "深度拆解 SearchGPT 与 Perplexity 实时抓取链路对出口 IP 的 ASN 属性、rDNS、TLS 指纹与行为评分风控，给出 Mihomo/Sing-box 生产级动态出口调度配置、nftables 防泄漏规则、丢包对抗与纯净度审计全流程，附压测数据对比与排错命令。"
 pubDate: 2026-10-21
-updatedDate: 2026-10-21
+updatedDate: 2026-11-12
 category: "scenarios"
 categoryName: "场景方案"
 tags: ["SearchGPT代理","Perplexity节点","出口IP纯净度","数据中心IP伪装","AI搜索SEO"]
@@ -613,4 +613,11 @@ bucket = TokenBucket(rate=0.2, capacity=3)
 
 ### 5.1 出口一致性校验
 
-抓取器
+抓取器在触发跨地域或高欺诈评分节点时会立即返回空结果或 403，上线前应依次使用 `curl --resolve`、`dig +short whoami.akamai.net` 与 BrowserLeaks 验证 DNS 出口、TLS JA3/JA4 与会话 IP 处于同一原生住宅或干净机房 ASN 段内，避免健康检查切线造成并发回源不一致。
+
+---
+
+### 纯净 IP 与 AI 风控延伸阅读
+
+- **原生纯净 IP 机场测评**：直接挑选稳定支持 AI 实时检索的低欺诈分节点，请参阅 [2026 纯净 IP 机场推荐（ChatGPT / Claude 实测）](/articles/best-airports-for-chatgpt-claude/) 与 [AI 生产力住宅 IP 防风控架构](/articles/ai-productivity-residential-ip-anti-fraud-architecture/)。
+- **总榜与专题导航**：或浏览 [场景化选型专题](/topics/scenarios/) 与 [2026 优质机场总榜](/airports/) 对比多地区落地与协议参数。

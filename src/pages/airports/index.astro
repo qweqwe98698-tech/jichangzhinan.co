@@ -7,72 +7,114 @@ import AirportCostCalculator from '../../components/airports/AirportCostCalculat
 import RealIPLCVerifier from '../../components/airports/RealIPLCVerifier.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Divider from '../../components/ui/Divider.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import { airportsData, deepReviewAirports, totalAirportsCount } from '../../data/airports';
 import { siteConfig } from '../../config/site';
+
+const measuredCount = deepReviewAirports.length;
 
 const breadcrumbs = [
   { name: '首页', item: '/' },
-  { name: '机场推荐与导航', item: '/airports/' }
+  { name: `2026 优质机场推荐与评测总榜 (${totalAirportsCount}家)`, item: '/airports/' }
+];
+
+const airportsListSchema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `2026 优质机场推荐榜单与 ${totalAirportsCount} 品牌实测导航`,
+    description: `汇集光速云、暮光加速、飞猫云、微风网络、大佬云、星岛梦、无忧链接等 ${totalAirportsCount} 家机场全档案：其中 ${measuredCount} 家配有真实测速/解锁图与独立深度评测页。`,
+    url: `${siteConfig.url}/airports/`,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: airportsData.map((airport, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: `${airport.name}（${airport.lineType} · ${airport.startingPrice} / ${airport.monthlyTraffic}）`,
+        url: airport.hasDeepReview
+          ? `${siteConfig.url}/airports/${airport.slug}/`
+          : `${siteConfig.url}/airports/#airport-${airport.id}`
+      }))
+    }
+  }
 ];
 ---
 
 <BaseLayout
-  title={`2026 最新优质机场推荐与代理导航 | ${siteConfig.name}`}
-  description="2026 稳定好用机场梯子全维度横评推荐：涵盖光速云、灵猫网络、星岛梦等 16 家主流机场实测资料、IEPL 专线、16 张原始测速图证据、优惠折扣码与 ChatGPT / Netflix 4K 解锁能力评测。"
+  title={`2026 优质机场推荐榜单：${totalAirportsCount} 家高性价比与便宜专线全档案（${measuredCount} 家实测截图） | ${siteConfig.name}`}
+  description={`2026 好用的翻墙机场与机场梯子怎么选？完整收录光速云、暮光加速、飞猫云、微风网络、大佬云、星岛梦、无忧链接等 ${totalAirportsCount} 家品牌：公开 ${measuredCount} 品牌 24 张真实测速/解锁图、18 篇独立深度评测、折扣码、单 GB 成本计算器与真假专线核验。`}
   breadcrumbs={breadcrumbs}
+  extraSchemas={airportsListSchema}
 >
   <div class="container airports-hub-page">
+    <Breadcrumb items={breadcrumbs} />
+
     <!-- Top Hero Banner -->
     <header class="airports-hero-header" data-reveal>
       <div class="hero-pre-badge">
         <Badge variant="accent">
           <span class="signal-dot breathing"></span>
-          2026 AIRPORT SELECTION MATRIX // 16 品牌实测证据库
+          2026 机场总榜 · {totalAirportsCount} 品牌档案库（{measuredCount} 家实测截图）
         </Badge>
-        <span class="hero-update-tag">最后更新: 2026-08</span>
+        <span class="hero-update-tag">最近核验更新: 2026-11</span>
       </div>
 
-      <h1 class="airports-main-title">2026 优质机场推荐与网络代理导航</h1>
+      <h1 class="airports-main-title">2026 优质机场推荐榜单与 {totalAirportsCount} 家专线实测导航</h1>
       <p class="airports-lead-desc">
-        汇集 16 家经过严格实测的优质机场服务商。公开 16 张节点测速原始截图证据，提供专属优惠码、真实入门套餐规格、专线类型甄别与多品牌横向 PK 对比。
+        <strong>快速结论</strong>：全站完整收纳 <strong>{totalAirportsCount} 家主流及历史机场品牌</strong>，前 10 位按主推序置顶（光速云、暮光加速、飞猫云、微风网络、大佬云、星岛梦、二猫云、无忧链接、唯兔云、Firefly）；日常主力优选 15–25 元/月高性价比 IEPL 专线，低预算入门可选飞猫云（¥7.5/月起）、无忧链接（年付折 7.4 元/月）或星岛梦（年付 8 折）。本站为 <strong>{measuredCount} 家配有实测截图的品牌建立了独立深度评测页</strong>，诚实标注 <code>0B</code>/失效节点、<code>送中(CN)</code> 及是否支持 Clash 订阅。<span style="color:var(--muted);">（商业披露：部分官网直达链接含合作返利参数，标注为 nofollow sponsored，评测结论保持独立客观。）</span>
       </p>
+
+      <!-- Top Measured Deep-Review Quick Jump Strip -->
+      <div class="deep-review-shortcuts" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.15rem;">
+        <span style="font-family:var(--font-mono);font-size:0.74rem;color:var(--accent);align-self:center;">精选深度实测:</span>
+        {deepReviewAirports.slice(0, 8).map((b) => (
+          <a href={`/airports/${b.slug}/`} class="quick-nav-pill" style="border-color:rgba(124,255,178,0.35);">
+            #{String(b.rankOrder).padStart(2, '0')} {b.name} 评测
+          </a>
+        ))}
+      </div>
 
       <!-- Quick Anchor Navigation -->
       <div class="airports-quick-nav">
-        <a href="#airport-filter" class="quick-nav-pill">● 16 品牌筛选矩阵</a>
-        <a href="#evidence-gallery" class="quick-nav-pill">● 16 品牌实测证据库</a>
-        <a href="#airport-compare" class="quick-nav-pill">● 品牌横向 PK 对决</a>
-        <a href="#cost-calculator" class="quick-nav-pill">● 流量预算计算器</a>
+        <a href="#airport-filter" class="quick-nav-pill">● {totalAirportsCount} 品牌筛选矩阵</a>
+        <a href="#evidence-gallery" class="quick-nav-pill">● 24 张实测与解锁图库</a>
+        <a href="#airport-compare" class="quick-nav-pill">● 42 家横向 PK 对比</a>
+        <a href="#cost-calculator" class="quick-nav-pill">● 单 GB 成本计算器</a>
         <a href="#iplc-verifier" class="quick-nav-pill">● 真假专线自检</a>
-        <a href="#methodology" class="quick-nav-pill">● 评测准则</a>
+        <a href="#methodology" class="quick-nav-pill">● 评测准则与深度专刊</a>
       </div>
     </header>
 
-    <!-- SECTION 1: Airport Filter Terminal (16 Brands) -->
+    <!-- SECTION 1: Airport Filter Terminal (42 Brands) -->
     <section id="airport-filter" data-reveal>
       <AirportFilterTerminal />
     </section>
 
-    <!-- SECTION 2: 16 Brands Untouched Measured Evidence Gallery -->
+    <!-- SECTION 2: 18 Brands / 24 Measured Evidence Gallery -->
     <section id="evidence-gallery" data-reveal>
-      <Divider label="16 BRANDS UNTOUCHED SPEEDTEST EVIDENCE" />
+      <Divider label={`测速与解锁实证图库 · ${measuredCount} 品牌 24 张原图`} />
+      <h2 class="airports-sub-heading" style="font-size:1.35rem;font-weight:700;margin:0 0 1rem;color:var(--text);">{measuredCount} 家实测机场测速截图与流媒体/AI 解锁证据库</h2>
       <AirportEvidenceGallery />
     </section>
 
     <!-- SECTION 3: Side-by-Side Brand Comparison -->
     <section id="airport-compare" data-reveal>
-      <Divider label="SIDE-BY-SIDE BRAND COMPARISON" />
+      <Divider label="品牌参数横向对比 · SIDE-BY-SIDE" />
+      <h2 class="airports-sub-heading" style="font-size:1.35rem;font-weight:700;margin:0 0 1rem;color:var(--text);">机场品牌参数与套餐规格 PK 对比台</h2>
       <AirportCompareTool />
     </section>
 
     <!-- SECTION 4: Cost & Bandwidth Calculator -->
     <section id="cost-calculator" data-reveal>
-      <Divider label="TRAFFIC & BUDGET ESTIMATION" />
+      <Divider label="套餐预算估算 · COST CALCULATOR" />
+      <h2 class="airports-sub-heading" style="font-size:1.35rem;font-weight:700;margin:0 0 1rem;color:var(--text);">月/季/年付单 GB 流量成本计算器</h2>
       <AirportCostCalculator />
     </section>
 
     <!-- SECTION 5: Real IPLC Verifier -->
     <section id="iplc-verifier" data-reveal>
-      <Divider label="IPLC TOPOLOGY DIAGNOSTIC" />
+      <Divider label="真伪 IPLC 鉴伪 · TOPOLOGY DIAGNOSTIC" />
+      <h2 class="airports-sub-heading" style="font-size:1.35rem;font-weight:700;margin:0 0 1rem;color:var(--text);">真/伪 IPLC 与 IEPL 专线路由特征自检台</h2>
       <RealIPLCVerifier />
     </section>
 
@@ -90,9 +132,9 @@ const breadcrumbs = [
             <span class="mpoint-badge">实测图库</span>
           </div>
           <h3>真实晚高峰压测与测速截图公开</h3>
-          <p>所有 16 家推荐节点均提供 2026-08-11 批次原始多并发测速截图证据，绝无 PS 或隐瞒异常高延迟节点。</p>
+          <p>18 家实测品牌共公开 24 张原始并发测速、三网对照与流媒体/AI 解锁截图，如实记录 0B 节点与送中局限。</p>
           <div class="mpoint-action">
-            <span>查看 16 品牌测速证据画廊</span>
+            <span>查看 24 张实测与解锁证据画廊</span>
             <span class="action-arrow">↓</span>
           </div>
         </a>

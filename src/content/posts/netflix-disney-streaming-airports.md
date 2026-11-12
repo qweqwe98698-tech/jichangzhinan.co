@@ -64,14 +64,14 @@ faq: [
 
 ## 03. 核心优势评测
 
-### 1. [光速云](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y) —— 极致 4K 秒开体验
-- **核心亮点**：光速云配备了深港与沪美 IEPL 内网专线，并在落地端部署了原生住宅 IP 双栈 DNS 解锁。实测拖动进度条缓冲时间小于 0.5 秒，Dolby Vision / Dolby Atmos 信号灯瞬间点亮，入门 17 元/月配合优惠码 `AMM` 极其超值。
+### 1. [光速云（6 张原图 & 70 节点解锁实测 →）](/airports/guangsu-cloud/) —— 全能 4K 多区兼顾与三网实测
+- **核心亮点**：光速云配备 IEPL + 企业内网专线，70 节点矩阵显示日/美/港 Netflix、Disney+ 与 YouTube、美区 TikTok 表现出色（需留意新台地区 YouTube 多数标送中(CN) 与台区 D+ 失败样本），极速版 ¥25/168GB 配合码 `AMM` 或选择 ¥99 年付轻量档，[前往光速云官网](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y)。
 
-### 2. [SOGO 云](https://guangs.sogoyunaff.cc/#/?code=327Vs0w7) —— 2026 综合影音旗舰
+### 2. [SOGO 云](/airports/sogoyun/) —— 2026 综合影音旗舰（[官网](https://guangs.sogoyunaff.cc/#/?code=327Vs0w7)）
 - **核心亮点**：25 元/月包含 150GB 专线流量，全节点覆盖主流及冷门地区流媒体，优惠码 `sss777`。
 
-### 3. [灵猫网络](https://vip01.civetnet.com/#/?code=8MIAyxak) —— 追剧大流量首选
-- **核心亮点**：19 元/月即可享有 150GB 专线流量，输入优惠码 `lmao888`，完美满足周末全天候 4K 刷剧的流量吞吐需求。
+### 3. [灵猫网络](/airports/civetnet/) —— 追剧大流量首选（[官网](https://vip01.civetnet.com/#/?code=8MIAyxak)）
+- **核心亮点**：19 元/月即可享有 150GB 专线流量，输入优惠码 `lmao888`，完美满足周末全天候 4K 刷剧的流量吞吐需求，也可对照 [无忧链接流媒体/AI 解锁图实测](/airports/wuyou/)。
 
 ---
 
@@ -102,4 +102,4 @@ rules:
   - DOMAIN-SUFFIX,disneyplus.com,🎬 国际流媒体
 ```
 
-详细的多平台（Apple TV / Surge / Loon）配置方案，请进一步查阅 [Netflix 与 Disney+ 跨区解锁策略组设计](/articles/streaming-unlock-policy/) 与 [Loon iOS 完整使用指南](/articles/loon-ios-complete-workflow/)。
+详细的多平台（Apple TV / Surge / Loon）配置与住宅 IPv6 解锁方案，请进一步查阅 [Netflix 4K HDR 与 Disney+ 住宅 IPv6 原生广播策略路由实战](/articles/netflix-disney-residential-ipv6-unblock-policy-routing/)、[Netflix 与 Disney+ 跨区解锁策略组设计](/articles/streaming-unlock-policy/) 与 [Loon iOS 完整使用指南](/articles/loon-ios-complete-workflow/)。

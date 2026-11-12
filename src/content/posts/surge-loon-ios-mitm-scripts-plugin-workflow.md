@@ -2,7 +2,7 @@
 title: "Surge 5 与 Loon iOS 极客级 MitM 模块与插件编写实战：API 动态重写、请求抓包分析与多策略组嵌套"
 description: "从 TLS 1.3 握手与证书链信任锚出发，拆解 Surge 5 与 Loon 在 iOS 上的 MitM 解密全链路，给出可运行的脚本重写、插件编写、抓包分析与多级策略组嵌套配置，含 MTU、RTT、丢包率等真实参数与排错命令。"
 pubDate: 2026-11-05
-updatedDate: 2026-11-05
+updatedDate: 2026-11-12
 category: "clients"
 categoryName: "客户端教程"
 tags: ["Surge配置","Loon插件编写","MitM证书解密","网络抓包分析","分流策略嵌套"]
@@ -56,7 +56,7 @@ Surge 的 `http-request` / `http-response` 脚本和 Loon 的 `script` 钩子，
 
 更隐蔽的是 **Content-Encoding**。请求体若是 `gzip`/`br` 压缩，脚本里拿到的 `$request.body` 是压缩字节流，直接 `JSON.parse` 必炸。正确姿势是先判断 `Content-Encoding` 再解压。Surge 脚本里可用 `$utils.ungzip()`，Loon 里用 `$http` 的 body 处理或内置 `decompress`。
 
-还有一个时序错位���**重写（rewrite）和脚本（script）的执行顺序**。Surge 里 `[Rewrite]` 段的规则先于 `[Script]` 段执行，如果你用 rewrite 改了 URL 又用脚本读原始 URL，拿到的已是改写后的。Loon 的插件里 `http-request` 与 `http-response` 也是分阶段，`requires-body` 不声明就拿不到 body。这些顺序在官方文档里散落各处，实战里踩一次就记住了。
+还有一个时序错位：**重写（rewrite）和脚本（script）的执行顺序**。Surge 里 `[Rewrite]` 段的规则先于 `[Script]` 段执行，如果你用 rewrite 改了 URL 又用脚本读原始 URL，拿到的已是改写后的。Loon 的插件里 `http-request` 与 `http-response` 也是分阶段，`requires-body` 不声明就拿不到 body。这些顺序在官方文档里散落各处，实战里踩一次就记住了。
 
 ### 1.4 多策略组嵌套的选路抖动
 
@@ -80,7 +80,7 @@ Surge 的 `http-request` / `http-response` 脚本和 Loon 的 `script` 钩子，
                             │ ① TCP SYN → 127.0.0.1:6152 (Surge HTTP proxy)
                             │    或 Loon 本地 TUN 接管
                             ▼
-┌──────────────────────────────────────────────────────��───────────┐
+┌───────────────────────────────────────────────────────────────────┐
 │                    Surge 5 / Loon 本地代理引擎                      │
 │                                                                  │
 │  ┌────────────┐   ② TLS 握手(代理充服务端, 动态证书)               │
@@ -106,7 +106,7 @@ Surge 的 `http-request` / `http-response` 脚本和 Loon 的 `script` 钩子，
          ▼                                           │
 ┌────────────────────┐                               │
 │  出口节点(机场/自建) │──► ⑩ 真实 TLS 握手(代理充客户端)┘
-└─────────┬──────────��
+└─────────┬────────────
           │ ⑪ 明文回传 → 代理重新加密 → App
           ▼
      api.example.com
@@ -446,4 +446,11 @@ MitM 不是免费的。解密要 CPU，脚本要 JS 引擎，嵌套策略要探�
 | HTTP/3 (QUIC) 解密 | 不支持，需 reject 回落 | 不支持，TUN 可拦 | 都要靠 reject |
 | 策略组嵌套 | 支持多层 | 支持多层 | 注意探测间隔错开 |
 | 插件/模块生态 | 模块(.sgmodule) | 插件(.plugin) | Loon 插件可依赖其他插件 |
-| 定时脚本 | `type=cron` | 支持
+| 定时脚本 | `type=cron` | 支持 `cron` 调度 | 用于签到、节点测活与状态通知 |
+
+---
+
+### iOS 实战与订阅规则扩展阅读
+
+- **入门与进阶连读**：iOS 新手可先上手 [Shadowrocket (小火箭) 导入与分流实战](/articles/shadowrocket-ios-setup/)，再参考 [Surge 5 Mac/iOS 进阶玩法](/articles/surge-mac-ios-advanced/) 与 [Loon iOS 完整工作流](/articles/loon-ios-complete-workflow/)。
+- **规则工具与节点推荐**：合并多机场分流可使用 [在线订阅规则转换工具](/tools/)，需要低延迟流媒体解锁节点可查看 [Netflix / Disney+ 4K 流媒体机场推荐](/articles/netflix-disney-streaming-airports/) 或 [全平台客户端实战专题](/topics/clients/)。

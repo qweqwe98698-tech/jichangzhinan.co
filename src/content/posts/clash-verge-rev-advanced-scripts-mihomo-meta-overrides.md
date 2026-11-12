@@ -2,7 +2,7 @@
 title: "Clash Verge Rev 核心进阶：Script 脚本覆写、Mihomo Meta 内核分流与自建私有订阅转换链实战"
 description: "从 Clash Verge Rev 的 Script 覆写钩子切入，拆解 Mihomo Meta 内核的 rule-providers、TUN 栈、DNS 分流与 fake-ip 机制，手把手搭建基于 subconverter 的私有订阅转换链，附生产级 YAML、nftables 规则与抓包审计方法，解决规则冲突、DNS 泄漏与 TUN 吞吐瓶颈。"
 pubDate: 2026-10-29
-updatedDate: 2026-10-29
+updatedDate: 2026-11-12
 category: "clients"
 categoryName: "客户端教程"
 tags: ["Clash Verge Rev","Mihomo脚本覆写","私有订阅转换","Rule-Set规则集","Tun内核分流"]
@@ -35,7 +35,7 @@ faq:
 
 **痛点二：TUN 模式下的 DNS 与 fake-ip 错配。** 这是最隐蔽的坑。TUN 虚拟网卡接管了系统全部三层流量，Mihomo 必须靠 fake-ip 机制把域名请求"骗"到 198.18.0.0/16 网段，再在内部做域名到真实 IP 的映射。问题在于：`fake-ip-filter` 默认列表只覆盖了 `*.lan`、`*.local` 这类，**没覆盖** `time.windows.com`（NTP 对时）、`stun.l.google.com`（WebRTC 打洞）、`*.msftconnecttest.com`（Windows 联网探测）。这些域名拿到 fake-ip 后，应用直接连 198.18.x.x，Mihomo 内部映射表里没有对应真实 IP，连接超时。表现就是：开了 TUN，微信语音打不通、Windows 显示"无 Internet"、某些游戏语音直接哑火。
 
-更狠的是 DNS 泄漏。如果你的 `dns.nameserver` 里写了 `https://dns.google/dns-query`（DoH），而这个 DoH 请求本身又匹配了 `GEOIP,US,PROXY` 规则走了代理，那么 DNS 查询会先绕到美国再回来，RTT 从 15ms 变成 220ms，而且**查询源 IP 暴露给了 Google**。你以��你在用国内 DNS 分流，实际上每条查询都出国转了一圈。
+更狠的是 DNS 泄漏。如果你的 `dns.nameserver` 里写了 `https://dns.google/dns-query`（DoH），而这个 DoH 请求本身又匹配了 `GEOIP,US,PROXY` 规则走了代理，那么 DNS 查询会先绕到美国再回来，RTT 从 15ms 变成 220ms，而且**查询源 IP 暴露给了 Google**。你以为你在用国内 DNS 分流，实际上每条查询都出国转了一圈。
 
 **痛点三：公共订阅转换后端的信任问题。** 用 `sub-web` 公共实例转换订阅，你的机场订阅链接（含 token）、节点密码、UUID 全部明文经过第三方服务器。2025 年已经出现过多个公共转换站被拖库、订阅链接被打包出售的事件。更现实的问题是：公共转换后端**不支持**注入自定义 `rule-providers`、不支持按节点名正则过滤、不支持注入 `dialer-proxy` 链式代理。你想让 Hysteria2 节点走 `port-hopping` 端口跳跃，公共转换器根本不认这个字段。
 
@@ -290,7 +290,7 @@ rule-providers:
     path: ./ruleset/cncidr.yaml
     interval: 86400
 
-# ---- 规则���顺序即优先级 ----
+# ---- 规则的顺序即优先级 ----
 rules:
   - RULE-SET,private,DIRECT
   - RULE-SET,reject,REJECT
@@ -532,4 +532,12 @@ curl -s --http3 https://cloudflare-quic.com/ -o /dev/null -w "%{http_code}\n"
 | 检查项 | 命令/方法 | 期望结果 |
 |---|---|---|
 | 订阅转换 token 是否生效 | `curl "https://sub.yourdomain.com/sub?url=xxx"`（不带 token） | 返回 403 |
-| 转换服务是否被搜索引擎收录 | `site:sub.yourdomain.com` |
+| 转换服务是否被搜索引擎收录 | `site:sub.yourdomain.com` | 无任何公开索引页面 |
+| TUN DNS 接管状态 | `dig @1.1.1.1 +short whoami.akamai.net` | 返回代理出口 IP 而非本地宽带 IP |
+
+---
+
+### 延伸学习与配套工具
+
+- **基础与规则联动**：若尚未完成客户端初始化，可先阅读 [Clash Verge Rev 全平台安装与 TUN 增强指南](/articles/clash-verge-rev-guide/)，搭配 [Subconverter 订阅转换与多机场规则合并](/articles/subconverter-rule-merge/) 及 [在线规则转换向导](/tools/) 一并调优。
+- **线路与专题归档**：想挑选原生支持 Mihomo 内核的高性价比节点，请访问 [15–20 元高性价比 IEPL 专线横评](/articles/high-value-cost-effective-airports/) 或浏览 [全平台客户端实战专题](/topics/clients/)。

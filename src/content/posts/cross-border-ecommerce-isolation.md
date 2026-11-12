@@ -80,4 +80,4 @@ faq: [
 3. **隔离支付通道**：每个店铺绑定的提现账户与扣费信用卡必须采用不同主体的虚拟卡；
 4. **备用线路支持**：选用具备企业专线背书的服务商（如 [光速云 IEPL 专线](/airports/)）作为稳定中继通道。
 
-更多出海加速与 TikTok 直播推流方案，请参阅 [TikTok 跨境电商机场方案](/articles/tiktok-cross-border-ecommerce-airports/) 与 [彻底杜绝 DNS 泄漏指南](/articles/anti-dns-leak-guide/)。
+更多出海加速、容器级物理隔离与 TikTok 直播推流方案，请参阅 [Docker Macvlan 旁路网关：跨境电商多店铺独立 IP 容器隔离实战](/articles/docker-macvlan-crossborder-ecommerce-ip-isolation/)、[TikTok 跨境电商机场方案](/articles/tiktok-cross-border-ecommerce-airports/) 与 [彻底杜绝 DNS 泄漏指南](/articles/anti-dns-leak-guide/)。

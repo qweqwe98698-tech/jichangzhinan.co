@@ -62,10 +62,10 @@ faq: [
 
 ## 03. 核心优势评测
 
-### 1. [光速云](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y) —— 电竞级 IEPL 纯专线（¥17 / 110GB）
-- **核心亮点**：光速云拥有深港与沪日物理海底光缆专线，全节点支持 UDP 转发与 Full Cone NAT 穿透。在晚高峰 21:30 实测 Apex 港服延迟稳定在 24ms 且无任何跳 Ping 丢包，配合优惠码 `AMM` 是性价比最高的电竞副梯。
+### 1. [光速云（6图深度实测 →）](/airports/guangsu-cloud/) —— 电竞级 IEPL 纯专线（¥25 / 168GB · 年付¥99）
+- **核心亮点**：光速云拥有深港与沪日物理海底光缆专线，9Gbps 单线程实测多数节点 UDP 为 Full Cone NAT 穿透，配合优惠码 `AMM`（极速版及以上适用）兼具低抖动优势，[前往光速云官网](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y)。
 
-### 2. [灵猫网络](https://vip01.civetnet.com/#/?code=8MIAyxak) —— 大流量专线支持
+### 2. [灵猫网络](/airports/civetnet/) —— 大流量专线支持（¥19 / 150GB）
 - **核心亮点**：19 元月付提供 150GB 充沛专线流量，优惠码 `lmao888`，兼顾日常游戏联机与大容量游戏更新补丁下载。
 
 ---

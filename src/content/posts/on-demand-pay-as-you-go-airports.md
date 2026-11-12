@@ -2,10 +2,12 @@
 title: "按量计费不限时机场推荐：轻度用户与备用防失联首选"
 description: "按量计费永久有效不限时机场选型指南：告别每月流量清零浪费，深度对比星岛梦与灵猫网络等正规按量流量包、双订阅主备防失联网络架构与倍率防坑技巧。"
 pubDate: 2026-08-04
-updatedDate: 2026-08-16
+updatedDate: 2026-11-12
 category: "recommendations"
 categoryName: "机场推荐与评测"
 tags: ["按量计费机场", "不限时机场", "永久有效梯子", "备用机场", "防失联", "星岛梦", "灵猫网络"]
+cover: "/speedtest/webp/xingdaomeng.webp"
+coverAlt: "星岛梦按量计费永久不限时企业级内网专线测速图"
 author: "机场指南编辑部"
 featured: false
 draft: false
@@ -53,11 +55,13 @@ faq: [
 
 按量计费由于没有持续的月费现金流，对服务商的运营实力与信誉提出了更高的要求。以下 3 家为编辑部长期实测、运营资质透明的按量精选服务商：
 
-| 品牌名称 | 按量套餐特性 | 线路架构 | 专属优惠码 / 活动 | 真实倍率 | 选型点评 | 官方直达 |
+| 品牌与实测评测 | 按量套餐特性 | 线路架构 | 专属优惠码 / 活动 | 真实倍率 | 选型点评 | 官方直达 |
 | :--- | :--- | :--- | :--- | :---: | :--- | :---: |
-| **[星岛梦 (Xingdaomeng)](https://guangs.xingdaomeng.com/#/?code=1TynBYnR)** | **特供永久不过期按量包** | 企业级内网专线 | 优惠码 `nmw888` (9 折) | **全节点 1.0x** | 2020 老牌，按量套餐经典标杆，节点稳定 | [直达官网](https://guangs.xingdaomeng.com/#/?code=1TynBYnR) |
-| **[灵猫网络 (CivetNet)](https://vip01.civetnet.com/#/?code=8MIAyxak)** | **大容量按量定制包** | 企业专线中继 | 优惠码 `lmao888` (9 折) | **全节点 1.0x** | 兼备月付大流量与不限时按量，流媒体解锁全 | [直达官网](https://vip01.civetnet.com/#/?code=8MIAyxak) |
-| **[飞猫云 (Flycat)](https://guangs.flycataff.com/#/?code=6uq0Xe9y)** | **小流量长期套餐** | IEPL 专线保障 | 优惠码 `flycat888` (8 折) | **全节点 1.0x** | 低门槛尝鲜，支持客户端一键导入 | [直达官网](https://guangs.flycataff.com/#/?code=6uq0Xe9y) |
+| **[星岛梦 (Xingdaomeng)](/airports/xingdaomeng/)** | **特供永久不过期按量包** | 企业级内网专线 | 优惠码 `nmw888` (9 折) | **全节点 1.0x** | 2020 老牌，68节点实测港97MB/s，按量经典标杆 | [直达官网](https://guangs.xingdaomeng.com/#/?code=1TynBYnR) |
+| **[光速云 (Guangsu Cloud)](/airports/guangsu-cloud/)** | **¥147 永久 247GB 不限时包** | IEPL + 企业双架构 | （注：147 永久与 99 年付无额外折扣） | **全节点 1.0x** | 6图实测全网第一，不常续费的用户可直冲永久包 | [直达官网](https://sahude.gsyvipaff.com/#/?code=keqgvT5Y) |
+| **[灵猫网络 (CivetNet)](/airports/civetnet/)** | **大容量按量定制包** | 企业专线中继 | 优惠码 `lmao888` (9 折) | **全节点 1.0x** | 兼备月付 ¥19/150GB 与不限时按量，流媒体解锁全 | [直达官网](https://vip01.civetnet.com/#/?code=8MIAyxak) |
+| **[无忧链接](/airports/wuyou/)** | **提供永久按量 / 年付 ¥88.8** | BGP/专线 · 自研端 | 起步季¥28 / 年¥88.8 | **常规可用** | 2图公开 AI/流媒体测试 · 仅限官方客户端使用 | [直达官网](https://worryfree.worryfreeaff.com/#/register?code=P4Y2i9vH) |
+| **[飞猫云 (Flycat)](/airports/flycat/)** | **小流量长期轻量档** | IEPL 专线保障 | 优惠码 `flycat888` (8 折) | **全节点 1.0x** | 低门槛 ¥7.5 起尝鲜，08-11 晚间港新表现稳定 | [直达官网](https://guangs.flycataff.com/#/?code=6uq0Xe9y) |
 
 ---
 
@@ -66,6 +70,8 @@ faq: [
 ### 1. [星岛梦](https://guangs.xingdaomeng.com/#/?code=1TynBYnR) —— 2020 年老牌按量首选
 - **核心卖点**：从 2020 年运营至今，是业界极少数长期坚持提供“不限时按量流量包”的老牌服务商。其按量套餐不仅价格实惠，而且所有节点均支持标准 1.0x 倍率，支持 Shadowsocks 与 VLESS 协议，完美适配 Clash、v2rayN、Shadowrocket 等主流工具。
 - **推荐策略**：建议充值一个 100G-300G 的按量包，作为手机和电脑的兜底备用。
+
+![星岛梦按量不限时企业级内网专线测速实测图](/speedtest/webp/xingdaomeng.webp)
 
 ### 2. [灵猫网络](https://vip01.civetnet.com/#/?code=8MIAyxak) —— 专线按量高品质之选
 - **核心卖点**：采用企业级内网专线接入，即使是按量节点，也能享受极速 4K 解锁与超低抖动，配合优惠码 `lmao888` 极具竞争力。
@@ -106,4 +112,4 @@ proxy-groups:
 
 在这个架构下，日常访问优先走主力专线；一旦主力机场发生意外波动，客户端会在 **180 秒内自动无缝跳转到星岛梦的按量节点**，确保你的 Zoom 会议、Telegram 消息或 ChatGPT 编写工作完全不被中断！
 
-更多故障自检方案请阅读 [科学上网与代理排错全百科](/articles/proxy-troubleshooting-geo-faq/)。
+更多预算方案与故障自检指南，请继续查看 [2026 便宜机场入门精选](/articles/cheap-budget-airports-recommendation/)、[2026 高性价比机场推荐榜单](/articles/high-value-cost-effective-airports/)、[科学上网与代理排错全百科](/articles/proxy-troubleshooting-geo-faq/)，或进入 [42 家机场交互对比表（支持单选含永久/不限时筛选）](/airports/) 计算长期流量开销。

@@ -2,7 +2,7 @@
 title: "Sing-box 内核 eBPF / cgroup 透明代理深度调优：绕过系统协议栈的高性能 10Gbps 网关方案"
 description: "从 netfilter 透明代理的性能瓶颈切入，拆解 Sing-box 基于 eBPF sockmap 与 cgroup v2 的流量接管机制，给出 10Gbps 软路由网关的完整 YAML/JSON 配置、内核参数调优、MTU 与 UDP 单边加速实操，并附压测对比与 DNS 泄漏审计清单。"
 pubDate: 2026-10-17
-updatedDate: 2026-10-17
+updatedDate: 2026-11-12
 category: "protocols"
 categoryName: "底层协议与技术原理"
 tags: ["Sing-box eBPF","Linux内核转发","cgroup流量接管","软路由高吞吐","UDP单边加速"]
@@ -15,7 +15,7 @@ badge: "DEEP DIVE"
 related: ["on-demand-pay-as-you-go-airports","airport-scam-avoidance-and-fake-iplc","openwrt-transparent-gateway-master","hysteria2-high-speed-airports"]
 keyProblems:
   - "核心痛点 1：iptables REDIRECT/TPROXY 在 10Gbps 线速下触发 conntrack 表膨胀与软中断（ksoftirqd）打满单核，P99 延迟从 0.4ms 劣化到 8ms 以上"
-  - "核心机制 2：cgroup v2 + eBPF sock_ops/BPF_CGROUP_INET_* 钩子在 socket 层完成重��向，跳过 netfilter 五元组匹配，配合 sockmap 实现零拷贝转发"
+  - "核心机制 2：cgroup v2 + eBPF sock_ops/BPF_CGROUP_INET_* 钩子在 socket 层完成重定向，跳过 netfilter 五元组匹配，配合 sockmap 实现零拷贝转发"
   - "实操方案 3：Sing-box 1.10+ 的 auto_route / auto_redirect 与手动 cgroup 挂载、nftables 兜底规则、MTU 1280/1420 分场景取值、UDP 单边加速参数"
   - "验证审计 4：ss -tin 观察 socket 队列、bpftool prog show 核对挂载点、tcpdump 抓包验证 DNS 泄漏、dig +trace 校验解析路径"
 faq:
@@ -382,7 +382,7 @@ table inet singbox {
 }
 ```
 
-注意 `prerouting` 链里**没有** TPROXY 规则——转发流量靠 `auto_route` 写进路由表的 `default dev tun0` 走 TUN，eBPF 只接管本机进程。这是 eBPF 和 TUN 的混合��构：**本机进程走 eBPF 零拷贝，LAN 设备走 TUN 转发。** 两者互补，不冲突。
+注意 `prerouting` 链里**没有** TPROXY 规则——转发流量靠 `auto_route` 写进路由表的 `default dev tun0` 走 TUN，eBPF 只接管本机进程。这是 eBPF 和 TUN 的混合架构：**本机进程走 eBPF 零拷贝，LAN 设备走 TUN 转发。** 两者互补，不冲突。
 
 ### 3.4 systemd 服务与能力授予
 
@@ -559,4 +559,14 @@ done
 echo 32768 > /proc/sys/net/core/rps_sock_flow_entries
 
 # 看 socket 队列是否堆积
-ss -tin | awk '{
+ss -tin | awk '{ if (/skmem/) print }' | head -n 20
+```
+
+观察 `skmem` 中的接收与发送缓冲区（`rmem`/`wmem`）以及 `bytes_retrans` 重传计数；若高并发期间出现缓冲区持续打满，适当调大 `/etc/sysctl.conf` 中 `net.core.rmem_max` 与 `net.ipv4.tcp_congestion_control=bbr` 后重新加载即可恢复线速吞吐。
+
+---
+
+### 相关透明代理与协议指南
+
+- **配置与旁路由实战**：搭配阅读 [Sing-box 全平台通用 JSON 架构与规则迁移](/articles/sing-box-universal-config/) 与 [OpenWrt / iStoreOS 旁路由 MosDNS 避坑指南](/articles/openwrt-istoreos-bypass-gateway-mosdns-fakeip-mastery/) 完善网关规则集。
+- **专线适配与专题导航**：追求万兆线速的软路由环境建议选用 [IPLC/IEPL 纯专线机场](/articles/iplc-iepl-dedicated-line-airports/) 或查阅 [底层协议与原理专题](/topics/protocols/) 与 [工具箱](/tools/)。
